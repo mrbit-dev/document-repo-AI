@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hermes Agent Documentation</title>
+<style>
+:root{
+--bg:#0b1220;--panel:#111827;--card:#1f2937;--text:#e5e7eb;--muted:#9ca3af;--accent:#3b82f6;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text);display:flex}
+.sidebar{width:280px;position:fixed;height:100vh;overflow:auto;background:var(--panel);padding:24px}
+.sidebar h2{margin-top:0}
+.sidebar a{display:block;color:var(--muted);text-decoration:none;padding:8px 0}
+.sidebar a:hover{color:white}
+.main{margin-left:280px;padding:40px;max-width:1100px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#2563eb);padding:40px;border-radius:16px}
+.card{background:var(--card);padding:24px;border-radius:14px;margin:24px 0}
+pre{background:#020617;padding:16px;border-radius:10px;overflow:auto}
+code{color:#93c5fd}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #374151;padding:10px}
+th{background:#111827}
+.note{border-left:4px solid #f59e0b;padding:12px;background:#3a2b0a}
+@media(max-width:900px){
+.sidebar{display:none}
+.main{margin-left:0}
+}
+</style>
+</head>
+<body>
+<div class="sidebar">
+<h2>Hermes Agent Docs</h2>
+<a href="#overview">Tổng quan</a>
+<a href="#compare">So sánh OpenClaw</a>
+<a href="#architecture">Kiến trúc</a>
+<a href="#install">Cài đặt VPS</a>
+<a href="#ssh">SSH Tunnel</a>
+<a href="#port">Mở Port 9119</a>
+<a href="#troubleshooting">Troubleshooting</a>
+</div>
+
+<div class="main">
+<section class="hero">
+<h1>Hermes Agent Deployment Guide</h1>
+<p>Hướng dẫn triển khai Hermes Agent trên VPS Ubuntu dành cho người mới và quản trị viên hệ thống.</p>
+</section>
+
+<section id="overview" class="card">
+<h2>1. Tổng quan về Hermes Agent</h2>
+<p>Hermes Agent là AI Agent Framework của Nous Research, hỗ trợ quản lý Agent, MCP Server, Tool Calling, Session và Dashboard Web trực quan.</p>
+<ul>
+<li>Dashboard Web</li>
+<li>MCP Integration</li>
+<li>Tool Execution</li>
+<li>Session Management</li>
+<li>Cloud & Local LLM</li>
+</ul>
+</section>
+
+<section id="compare" class="card">
+<h2>2. So sánh Hermes Agent và OpenClaw</h2>
+<table>
+<tr><th>Tiêu chí</th><th>Hermes</th><th>OpenClaw</th></tr>
+<tr><td>Dễ cài đặt</td><td>✅</td><td>⚠️</td></tr>
+<tr><td>Dashboard</td><td>✅</td><td>Tùy phiên bản</td></tr>
+<tr><td>MCP</td><td>✅</td><td>✅</td></tr>
+<tr><td>Người mới</td><td>✅</td><td>⚠️</td></tr>
+<tr><td>Tùy biến sâu</td><td>Khá</td><td>✅</td></tr>
+</table>
+</section>
+
+<section id="architecture" class="card">
+<h2>3. Kiến trúc Hermes Agent</h2>
+<pre><code>Hermes Agent
+├── Dashboard
+├── Profiles
+├── Sessions
+├── Models
+├── MCP Servers
+├── Tools
+└── Workspace</code></pre>
+</section>
+
+<section id="install" class="card">
+<h2>4. Cài đặt vào VPS</h2>
+
+<h3>Bước 1: Tạo User</h3>
+<pre><code>sudo adduser luna
+sudo usermod -aG sudo luna
+su - luna</code></pre>
+
+<h3>Bước 2: Cài đặt Hermes Agent</h3>
+<pre><code>curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+
+uv tool install hermes-agent
+
+hermes --help</code></pre>
+
+<h3>Khởi động Dashboard</h3>
+<pre><code>hermes dashboard</code></pre>
+</section>
+
+<section id="ssh" class="card">
+<h2>5. Truy cập Dashboard từ PC bằng SSH Tunnel</h2>
+<p>Sau khi Dashboard chạy trên VPS:</p>
+<pre><code>ssh -L 9119:127.0.0.1:9119 luna@165.99.16.113</code></pre>
+
+<p>Mở trình duyệt:</p>
+<pre><code>http://localhost:9119</code></pre>
+
+<div class="note">
+Không cần expose Dashboard trực tiếp ra Internet khi sử dụng SSH Tunnel.
+</div>
+</section>
+
+<section id="port" class="card">
+<h2>6. Mở Port 9119</h2>
+<pre><code>sudo ufw allow 9119/tcp
+sudo ufw reload</code></pre>
+
+<p>Kiểm tra:</p>
+<pre><code>ss -tulpn | grep 9119</code></pre>
+</section>
+
+<section id="troubleshooting" class="card">
+<h2>7. Troubleshooting</h2>
+
+<h3>Kiểm tra Dashboard</h3>
+<pre><code>hermes dashboard --status</code></pre>
+
+<h3>Kiểm tra Port</h3>
+<pre><code>sudo lsof -i :9119</code></pre>
+
+<h3>Kiểm tra từ VPS</h3>
+<pre><code>curl http://127.0.0.1:9119</code></pre>
+
+<h3>Lưu ý bảo mật</h3>
+<ul>
+<li>Không dùng --insecure trên VPS public.</li>
+<li>Nên sử dụng SSH Tunnel.</li>
+<li>Không chia sẻ API Key.</li>
+</ul>
+</section>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sub Agent trong Claude Code</title>
+
+<style>
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    max-width:1200px;
+    margin:auto;
+    padding:40px;
+    line-height:1.8;
+    background:#f5f7fb;
+    color:#222;
+}
+
+h1,h2,h3{
+    color:#1a4fd8;
+}
+
+.section{
+    background:white;
+    padding:25px;
+    margin-bottom:25px;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+code{
+    background:#eef2ff;
+    padding:2px 6px;
+    border-radius:4px;
+}
+
+pre{
+    background:#111827;
+    color:#f3f4f6;
+    padding:15px;
+    overflow:auto;
+    border-radius:8px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #ddd;
+    padding:12px;
+}
+
+th{
+    background:#1a4fd8;
+    color:white;
+}
+
+.note{
+    background:#fff8e1;
+    border-left:5px solid #ffc107;
+    padding:15px;
+}
+
+.success{
+    background:#e8f5e9;
+    border-left:5px solid #4caf50;
+    padding:15px;
+}
+</style>
+</head>
+<body>
+
+<h1>Sub Agent trong Claude Code</h1>
+
+<div class="section">
+<h2>1. Khái niệm Sub Agent là gì?</h2>
+
+<p>
+Sub Agent là các tác nhân phụ được sử dụng để chia nhỏ công việc lớn thành nhiều nhiệm vụ nhỏ hơn.
+Thay vì một AI phải tự xử lý toàn bộ dự án, công việc được phân chia cho nhiều agent chuyên trách.
+</p>
+
+<p>
+Ví dụ:
+</p>
+
+<ul>
+<li>Agent Backend viết API</li>
+<li>Agent Frontend xây dựng giao diện</li>
+<li>Agent Database thiết kế schema</li>
+<li>Agent QA kiểm thử</li>
+<li>Agent Reviewer đánh giá chất lượng code</li>
+</ul>
+
+<p>
+Mô hình này tương tự cách một nhóm lập trình viên làm việc trong công ty phần mềm.
+</p>
+
+</div>
+
+<div class="section">
+
+<h2>2. Tại sao cần Sub Agent?</h2>
+
+<ul>
+<li>Tăng tốc xử lý dự án lớn.</li>
+<li>Giảm context overload.</li>
+<li>Phân chia trách nhiệm rõ ràng.</li>
+<li>Dễ review chéo.</li>
+<li>Tạo cảm giác AI Team thay vì AI đơn lẻ.</li>
+<li>Phù hợp với codebase hàng nghìn file.</li>
+</ul>
+
+<div class="note">
+Claude Code có thể hoạt động theo hai kiểu Sub Agent hoàn toàn khác nhau.
+Nhiều người thường nhầm lẫn giữa chúng.
+</div>
+
+</div>
+
+<div class="section">
+
+<h2>3. Hai loại Sub Agent trong Claude Code</h2>
+
+<table>
+
+<tr>
+<th>Loại</th>
+<th>Mô tả</th>
+<th>Có Agent thật?</th>
+</tr>
+
+<tr>
+<td>Role-play Sub Agent</td>
+<td>Claude đóng vai nhiều agent trong cùng một phiên chat</td>
+<td>❌ Không</td>
+</tr>
+
+<tr>
+<td>Spawned Agent</td>
+<td>Claude tạo agent riêng để thực hiện công việc</td>
+<td>✅ Có</td>
+</tr>
+
+</table>
+
+</div>
+
+<div class="section">
+
+<h2>4. Role-play Sub Agent (Đóng vai Agent)</h2>
+
+<p>
+Đây là cách phổ biến nhất hiện nay.
+Claude không thực sự tạo agent mới.
+Nó chỉ mô phỏng nhiều agent trong một context duy nhất.
+</p>
+
+<h3>Prompt ví dụ</h3>
+
+<pre>
+Bạn là trưởng nhóm kỹ thuật.
+
+Tạo nhóm AI gồm:
+
+- Backend Agent
+- Frontend Agent
+- QA Agent
+- Reviewer Agent
+
+Nhiệm vụ:
+Xây dựng hệ thống đăng nhập Laravel.
+
+Hãy hiển thị:
+- Phân công công việc
+- Tiến độ từng agent
+- Kết quả cuối cùng
+</pre>
+
+<h3>Kết quả</h3>
+
+<ul>
+<li>Claude sẽ giả lập nhiều agent.</li>
+<li>Tất cả vẫn nằm trong cùng một context.</li>
+<li>Không có process riêng.</li>
+<li>Không có worker riêng.</li>
+</ul>
+
+</div>
+
+<div class="section">
+
+<h2>5. Spawned Agent (Agent Thật)</h2>
+
+<p>
+Đây là tính năng Agent Teams đang được thử nghiệm.
+Claude Code có thể tạo agent phụ thực sự để xử lý nhiệm vụ.
+</p>
+
+<p>
+Mỗi agent có thể:
+</p>
+
+<ul>
+<li>Đọc code</li>
+<li>Phân tích riêng</li>
+<li>Trả kết quả cho Agent chính</li>
+<li>Thực hiện nhiệm vụ độc lập</li>
+</ul>
+
+<div class="success">
+Đây mới là mô hình Multi-Agent thực sự.
+</div>
+
+</div>
+
+<div class="section">
+
+<h2>6. Cách phân biệt 2 loại</h2>
+
+<table>
+
+<tr>
+<th>Dấu hiệu</th>
+<th>Role-play</th>
+<th>Spawn Agent</th>
+</tr>
+
+<tr>
+<td>Agent thật</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+
+<tr>
+<td>Chỉ có một context</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+
+<tr>
+<td>Có task delegation</td>
+<td>Giả lập</td>
+<td>Thật</td>
+</tr>
+
+<tr>
+<td>Có log sub-agent</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+
+<tr>
+<td>Có worker riêng</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+
+</table>
+
+</div>
+
+<div class="section">
+
+<h2>7. Prompt cho Role-play Agent</h2>
+
+<pre>
+Build a complete task management application.
+
+Create:
+
+- Project Manager Agent
+- Backend Agent
+- Frontend Agent
+- QA Agent
+- Reviewer Agent
+
+Show:
+
+- Task assignments
+- Progress updates
+- Code review
+- Testing results
+
+Use multiple agents whenever possible.
+</pre>
+
+<p>
+Prompt này chỉ khiến Claude đóng vai nhiều agent.
+</p>
+
+</div>
+
+<div class="section">
+
+<h2>8. Prompt cho Spawn Agent Thật</h2>
+
+<pre>
+Analyze the repository.
+
+Break work into independent tasks.
+
+Spawn specialized agents whenever possible.
+
+Delegate work to:
+
+- Backend Agent
+- Frontend Agent
+- Database Agent
+- QA Agent
+
+Each agent must complete its own task.
+
+Show delegation decisions.
+
+Have agents review each other's work.
+
+Merge the final result.
+</pre>
+
+<p>
+Prompt này có khả năng kích hoạt Agent Teams nếu Claude Code hỗ trợ.
+</p>
+
+</div>
+
+<div class="section">
+
+<h2>9. Cách kiểm tra trên Claude Code VS Code</h2>
+
+<h3>Bước 1</h3>
+
+<pre>
+code ~/.claude/settings.json
+</pre>
+
+<h3>Bước 2</h3>
+
+Thêm:
+
+<pre>
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_LOG_LEVEL": "debug"
+  }
+}
+</pre>
+
+<h3>Bước 3</h3>
+
+Restart VS Code.
+
+<h3>Bước 4</h3>
+
+Chạy prompt Spawn Agent.
+
+<h3>Bước 5</h3>
+
+Quan sát log.
+
+<p>Nếu xuất hiện:</p>
+
+<pre>
+Delegating task...
+
+Creating agent...
+
+Agent completed task...
+
+Collecting outputs...
+</pre>
+
+<p>
+=> Có khả năng Agent thật đang được tạo.
+</p>
+
+<p>Nếu chỉ thấy:</p>
+
+<pre>
+Backend Agent:
+Frontend Agent:
+QA Agent:
+</pre>
+
+<p>
+=> Chỉ là Role-play.
+</p>
+
+</div>
+
+<div class="section">
+
+<h2>10. Ví dụ thực tế - Laravel Task Management System</h2>
+
+<h3>Mục tiêu</h3>
+
+<ul>
+<li>Laravel 12</li>
+<li>MySQL</li>
+<li>Authentication</li>
+<li>Task CRUD</li>
+<li>Project Management</li>
+<li>Role Permission</li>
+<li>Dashboard</li>
+<li>API</li>
+<li>Testing</li>
+</ul>
+
+<h3>Prompt hoàn chỉnh</h3>
+
+<pre>
+Build a production-ready Laravel Task Management System.
+
+Technology:
+
+- Laravel 12
+- MySQL
+- Tailwind CSS
+- REST API
+- PHPUnit
+
+Create a multi-agent workflow.
+
+Spawn specialized agents:
+
+1. Solution Architect Agent
+   - Design architecture
+   - Define modules
+
+2. Database Agent
+   - Create schema
+   - Design migrations
+
+3. Backend Agent
+   - Authentication
+   - Task CRUD
+   - Project CRUD
+   - Role Permission
+
+4. Frontend Agent
+   - Dashboard
+   - Forms
+   - Tables
+   - Responsive UI
+
+5. API Agent
+   - REST endpoints
+   - Validation
+   - Documentation
+
+6. QA Agent
+   - Feature tests
+   - Integration tests
+
+7. Security Agent
+   - Security review
+   - Vulnerability analysis
+
+8. Reviewer Agent
+   - Review all code
+   - Suggest improvements
+
+Requirements:
+
+- Delegate work clearly
+- Show task assignments
+- Show agent outputs
+- Perform peer review
+- Merge final implementation
+
+Use sub-agents whenever possible.
+</pre>
+
+</div>
+
+<div class="section">
+
+<h2>11. Khi nào nên dùng Role-play Agent và Spawned Agent?</h2>
+
+<h3>Role-play Agent</h3>
+
+<p>
+Role-play Agent là việc Claude đóng vai nhiều chuyên gia hoặc nhiều thành viên trong nhóm
+trong cùng một phiên làm việc.
+</p>
+
+<h4>Nên dùng khi</h4>
+
+<ul>
+<li>Phân tích yêu cầu dự án.</li>
+<li>Lên kế hoạch phát triển.</li>
+<li>Thiết kế kiến trúc hệ thống.</li>
+<li>Brainstorm ý tưởng.</li>
+<li>Codebase nhỏ hoặc trung bình.</li>
+<li>Cần kết quả nhanh.</li>
+<li>Tạo demo hoặc video minh họa AI Team.</li>
+</ul>
+
+<h4>Không nên dùng khi</h4>
+
+<ul>
+<li>Dự án quá lớn.</li>
+<li>Cần xử lý nhiều nhiệm vụ độc lập.</li>
+<li>Cần phân tích hàng trăm file.</li>
+<li>Cần review nhiều phần hệ thống song song.</li>
+</ul>
+
+<h4>Ưu điểm</h4>
+
+<ul>
+<li>Nhanh.</li>
+<li>Tốn ít token hơn.</li>
+<li>Dễ sử dụng.</li>
+<li>Không cần cấu hình đặc biệt.</li>
+<li>Phù hợp phần lớn công việc hằng ngày.</li>
+</ul>
+
+<h4>Nhược điểm</h4>
+
+<ul>
+<li>Thực chất chỉ có một model xử lý.</li>
+<li>Không có khả năng làm việc song song thực sự.</li>
+<li>Dễ bị ảnh hưởng bởi giới hạn context.</li>
+<li>Các agent không thực sự độc lập.</li>
+</ul>
+
+<hr>
+
+<h3>Spawned Agent (Sub-Agent Thật)</h3>
+
+<p>
+Spawned Agent là việc hệ thống tạo ra các agent riêng biệt để xử lý từng nhóm công việc
+chuyên môn khác nhau.
+</p>
+
+<h4>Nên dùng khi</h4>
+
+<ul>
+<li>Dự án lớn.</li>
+<li>Monorepo nhiều module.</li>
+<li>Codebase hàng trăm hoặc hàng nghìn file.</li>
+<li>Refactor hệ thống quy mô lớn.</li>
+<li>Review bảo mật.</li>
+<li>Kiểm thử toàn bộ dự án.</li>
+<li>Phân tích kiến trúc phức tạp.</li>
+</ul>
+
+<h4>Nhóm công việc phù hợp</h4>
+
+<ul>
+<li>Backend Development</li>
+<li>Frontend Development</li>
+<li>Database Design</li>
+<li>Testing & QA</li>
+<li>Security Review</li>
+<li>Performance Analysis</li>
+<li>Documentation</li>
+<li>Architecture Review</li>
+</ul>
+
+<h4>Ưu điểm</h4>
+
+<ul>
+<li>Chia nhỏ công việc hiệu quả.</li>
+<li>Giảm tải cho context chính.</li>
+<li>Có thể xử lý nhiều nhiệm vụ độc lập.</li>
+<li>Dễ review chéo giữa các agent.</li>
+<li>Phù hợp với dự án doanh nghiệp.</li>
+</ul>
+
+<h4>Nhược điểm</h4>
+
+<ul>
+<li>Tốn nhiều token hơn.</li>
+<li>Thời gian thực hiện lâu hơn.</li>
+<li>Khó quản lý hơn.</li>
+<li>Không phải lúc nào cũng cần thiết.</li>
+</ul>
+
+<hr>
+
+<h3>Bảng lựa chọn nhanh</h3>
+
+<table>
+
+<tr>
+<th>Tình huống</th>
+<th>Nên dùng</th>
+</tr>
+
+<tr>
+<td>Viết chức năng CRUD đơn giản</td>
+<td>Role-play Agent</td>
+</tr>
+
+<tr>
+<td>Tạo Landing Page</td>
+<td>Role-play Agent</td>
+</tr>
+
+<tr>
+<td>Thiết kế Database</td>
+<td>Role-play Agent</td>
+</tr>
+
+<tr>
+<td>Xây dựng hệ thống Laravel hoàn chỉnh</td>
+<td>Spawned Agent</td>
+</tr>
+
+<tr>
+<td>Refactor dự án lớn</td>
+<td>Spawned Agent</td>
+</tr>
+
+<tr>
+<td>Review bảo mật toàn bộ hệ thống</td>
+<td>Spawned Agent</td>
+</tr>
+
+<tr>
+<td>Kiểm thử hàng trăm file</td>
+<td>Spawned Agent</td>
+</tr>
+
+<tr>
+<td>Brainstorm ý tưởng sản phẩm</td>
+<td>Role-play Agent</td>
+</tr>
+
+</table>
+
+<div class="success">
+Quy tắc đơn giản:
+
+Nếu một lập trình viên có thể hoàn thành công việc trong một lần ngồi làm việc,
+Role-play Agent thường là đủ.
+
+Nếu công việc cần nhiều chuyên môn, nhiều giai đoạn hoặc nhiều nhóm nhiệm vụ độc lập,
+Spawned Agent sẽ phát huy hiệu quả hơn.
+</div>
+
+</div>
+
+<div class="section">
+
+<h2>12. Kết luận</h2>
+
+<p>
+Sub Agent là một trong những khái niệm quan trọng nhất khi làm việc với Claude Code.
+</p>
+
+<ul>
+<li>Role-play Agent = mô phỏng nhiều agent.</li>
+<li>Spawn Agent = tạo agent thật.</li>
+<li>Role-play phù hợp demo nhanh.</li>
+<li>Spawn Agent phù hợp dự án lớn.</li>
+<li>Muốn kiểm tra chính xác phải xem log và luồng delegation.</li>
+</ul>
+
+<p>
+Hiểu rõ sự khác nhau giữa hai loại này sẽ giúp bạn tránh nhầm lẫn khi xây dựng video, demo hoặc workflow AI Team chuyên nghiệp.
+</p>
+
+</div>
+
+</body>
+</html>
