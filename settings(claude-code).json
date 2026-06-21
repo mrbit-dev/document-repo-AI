@@ -1,0 +1,10 @@
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "ghi-enpoint-vao-nhe",
+    "ANTHROPIC_AUTH_TOKEN": "API key local AI",
+    "ANTHROPIC_MODEL": "ghi-model-vao-day",
+    "CLAUDE_CODE_LOG_LEVEL": "debug", // debug log của claude code
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" //bật ché độ agent Team
+  },
+  "theme": "dark-daltonized"
+}
