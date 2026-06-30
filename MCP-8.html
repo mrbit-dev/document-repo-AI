@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Servers 2026 – Hướng dẫn toàn tập</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; font-size: 16px; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0f;
+            color: #e4e4e7;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        a { color: #ff884d; text-decoration: none; transition: color .2s; }
+        a:hover { color: #ffaa77; }
+        img { max-width: 100%; height: auto; }
+        ::selection { background: #ff660066; color: #fff; }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #12121a; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        /* ===== TYPOGRAPHY ===== */
+        h1, h2, h3, h4 { font-weight: 700; line-height: 1.3; letter-spacing: -.02em; }
+        h1 { font-size: 3rem; }
+        h2 { font-size: 2rem; margin-top: 4rem; margin-bottom: 1rem; }
+        h3 { font-size: 1.4rem; margin-top: 2.5rem; margin-bottom: .75rem; color: #ff884d; }
+        h4 { font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: .5rem; color: #ccc; }
+        p { margin-bottom: 1rem; }
+        ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+        li { margin-bottom: .35rem; }
+        strong { color: #fff; font-weight: 600; }
+        code:not(pre code) {
+            background: #1e1e2e;
+            color: #ffaa77;
+            padding: .15em .45em;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: .9em;
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            text-align: center;
+            padding: 5rem 1.5rem 3rem;
+            background: linear-gradient(180deg, #0f0f1a 0%, #0a0a0f 100%);
+            border-bottom: 1px solid #1e1e2e;
+        }
+        .hero h1 {
+            background: linear-gradient(135deg, #ff6600, #ff884d, #ffaa77);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+        }
+        .hero .subtitle {
+            font-size: 1.15rem;
+            color: #888;
+            margin-top: .75rem;
+            max-width: 640px;
+            margin-inline: auto;
+        }
+        .hero .badge {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: .35rem 1rem;
+            border-radius: 999px;
+            background: #ff660022;
+            border: 1px solid #ff660044;
+            color: #ff884d;
+            font-size: .85rem;
+            font-weight: 500;
+        }
+        .hero .author {
+            margin-top: .5rem;
+            font-size: .9rem;
+            color: #666;
+        }
+
+        /* ===== TABLE OF CONTENTS ===== */
+        .toc {
+            background: #12121a;
+            border: 1px solid #1e1e2e;
+            border-radius: 12px;
+            padding: 2rem 2.5rem;
+            margin: 2rem 0 3rem;
+        }
+        .toc h2 { margin: 0 0 1rem; font-size: 1.35rem; }
+        .toc ol {
+            list-style: none;
+            counter-reset: toc;
+            padding: 0;
+        }
+        .toc ol li {
+            counter-increment: toc;
+            padding: .4rem 0;
+            border-bottom: 1px solid #1a1a26;
+            font-weight: 500;
+        }
+        .toc ol li:last-child { border-bottom: none; }
+        .toc ol li::before {
+            content: counter(toc) ".";
+            color: #ff6600;
+            font-weight: 700;
+            margin-right: .5rem;
+        }
+        .toc ol li a { color: #ccc; }
+        .toc ol li a:hover { color: #ff884d; }
+
+        /* ===== SECTION ===== */
+        section { margin-bottom: 3rem; }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: .75rem;
+            border-bottom: 1px solid #1e1e2e;
+        }
+        .section-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: #ff6600;
+            color: #fff;
+            font-weight: 800;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .section-header h2 { margin: 0; font-size: 1.5rem; }
+
+        /* ===== OVERVIEW BOX ===== */
+        .overview {
+            background: linear-gradient(135deg, #14141f, #1a1a2a);
+            border-left: 4px solid #ff6600;
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .overview p { margin: 0; font-size: .95rem; color: #bbb; }
+        .overview strong { color: #fff; }
+
+        /* ===== USE-CASE TAGS ===== */
+        .use-case {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            margin-bottom: 1.25rem;
+        }
+        .use-case span {
+            background: #ff660011;
+            border: 1px solid #ff660033;
+            color: #ffaa77;
+            padding: .25rem .75rem;
+            border-radius: 999px;
+            font-size: .8rem;
+            font-weight: 500;
+        }
+
+        /* ===== CODE BLOCKS ===== */
+        pre {
+            background: #0d0d14;
+            border: 1px solid #1e1e2e;
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            overflow-x: auto;
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+        pre code {
+            font-family: 'Fira Code', monospace;
+            font-size: .88rem;
+            color: #d4d4d8;
+            line-height: 1.6;
+            background: none;
+            padding: 0;
+        }
+        /* Syntax highlight */
+        .hl-comment { color: #6a9955; }
+        .hl-keyword { color: #c586c0; }
+        .hl-string { color: #ce9178; }
+        .hl-var { color: #9cdcfe; }
+        .hl-prompt { color: #888; user-select: none; }
+
+        /* ===== DEMO BOX ===== */
+        .demo {
+            background: #12121a;
+            border: 1px solid #1e1e2e;
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .demo-title {
+            font-weight: 600;
+            color: #ff6600;
+            margin-bottom: .5rem;
+            font-size: .9rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+        .demo .prompt {
+            background: #0d0d14;
+            padding: .75rem 1rem;
+            border-radius: 6px;
+            border-left: 3px solid #ff660066;
+            font-style: italic;
+            color: #ccc;
+            margin-bottom: .5rem;
+        }
+        .demo .response {
+            padding: .5rem 1rem;
+            color: #aaa;
+            font-size: .9rem;
+        }
+        .demo .response ul { margin: .25rem 0; padding-left: 1.25rem; }
+
+        /* ===== SHORTCUT BOX ===== */
+        .shortcut {
+            background: #0f172a;
+            border: 1px solid #1e3a5f;
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .shortcut-title {
+            font-weight: 600;
+            color: #38bdf8;
+            font-size: .85rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            margin-bottom: .5rem;
+        }
+        .shortcut ul { margin: 0; padding-left: 1.25rem; }
+        .shortcut li { font-size: .9rem; color: #bbb; }
+
+        /* ===== TABLE ===== */
+        .table-wrap {
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .9rem;
+        }
+        thead {
+            background: #1a1a2a;
+        }
+        th, td {
+            padding: .85rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #1e1e2e;
+        }
+        th { color: #ff884d; font-weight: 600; }
+        tr:hover td { background: #14141f; }
+
+        /* ===== RECOMMENDATION ===== */
+        .recommend {
+            background: linear-gradient(135deg, #0f1a0f, #141f14);
+            border: 1px solid #2a4a2a;
+            border-radius: 12px;
+            padding: 2rem 2.5rem;
+            margin: 3rem 0;
+        }
+        .recommend h3 { color: #4ade80; margin-top: 0; }
+        .recommend ol {
+            counter-reset: rec;
+            list-style: none;
+            padding: 0;
+        }
+        .recommend ol li {
+            counter-increment: rec;
+            padding: .5rem 0;
+            border-bottom: 1px solid #1e2e1e;
+        }
+        .recommend ol li:last-child { border-bottom: none; }
+        .recommend ol li::before {
+            content: counter(rec) ".";
+            color: #4ade80;
+            font-weight: 700;
+            margin-right: .5rem;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            border-top: 1px solid #1e1e2e;
+            color: #555;
+            font-size: .85rem;
+        }
+        footer a { color: #888; }
+
+        /* ===== BACK TO TOP ===== */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem; right: 2rem;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: #ff6600;
+            color: #fff;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all .3s;
+            box-shadow: 0 4px 16px #ff660044;
+            z-index: 100;
+        }
+        .back-to-top.visible { opacity: 1; visibility: visible; }
+        .back-to-top:hover { background: #ff884d; transform: translateY(-2px); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; margin-top: 2.5rem; }
+            .hero { padding: 3rem 1rem 2rem; }
+            .toc { padding: 1.25rem 1.5rem; }
+            pre { padding: 1rem; font-size: .82rem; }
+            .demo { padding: 1rem; }
+            .recommend { padding: 1.5rem; }
+            .back-to-top { bottom: 1rem; right: 1rem; width: 40px; height: 40px; }
+        }
+
+        /* ===== ANIMATION ===== */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        section { animation: fadeUp .5s ease both; }
+        section:nth-child(2) { animation-delay: .1s; }
+        section:nth-child(3) { animation-delay: .15s; }
+        section:nth-child(4) { animation-delay: .2s; }
+        section:nth-child(5) { animation-delay: .25s; }
+        section:nth-child(6) { animation-delay: .3s; }
+        section:nth-child(7) { animation-delay: .35s; }
+        section:nth-child(8) { animation-delay: .4s; }
+        section:nth-child(9) { animation-delay: .45s; }
+        section:nth-child(10) { animation-delay: .5s; }
+    </style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+    <h1>MCP Servers 2026</h1>
+    <p class="subtitle">Hướng dẫn chi tiết cho Developer — từ tổng quan, setup, demo thực tế đến shortcut/tips cho từng MCP Server</p>
+    <span class="badge">🚀 Model Context Protocol</span>
+    <p class="author">DEVKIT AI</p>
+</header>
+
+<div class="container">
+
+<!-- ===== INTRO ===== -->
+<section>
+    <p><strong>MCP (Model Context Protocol)</strong> là chuẩn mở để kết nối AI models với external tools / data. Nó giúp AI vượt ra ngoài chat — có thể đọc file, query database, browse web, quản lý repo, gửi message… thay vì chỉ trả lời. Được <strong>Anthropic</strong> đề xuất, hiện đang trở thành standard trong Claude Code, Antigravity, OpenCode và nhiều AI coding tools khác.</p>
+    <p><strong>MCP Server</strong> là thành phần chạy độc lập, lắng nghe tool calls từ AI và thực thi trên hệ thống của bạn.</p>
+</section>
+
+<!-- ===== TABLE OF CONTENTS ===== -->
+<div class="toc">
+    <h2>📋 Mục lục</h2>
+    <ol>
+        <li><a href="#s1">Sequential Thinking</a></li>
+        <li><a href="#s2">Filesystem</a></li>
+        <li><a href="#s3">Brave Search</a></li>
+        <li><a href="#s4">GitHub MCP</a></li>
+        <li><a href="#s5">SQLite / PostgreSQL MCP</a></li>
+        <li><a href="#s6">Puppeteer / Playwright</a></li>
+        <li><a href="#s7">Docker MCP</a></li>
+        <li><a href="#s8">Google Drive MCP</a></li>
+        <li><a href="#summary">Bảng tổng hợp &amp; Khuyến nghị</a></li>
+    </ol>
+</div>
+
+<!-- ============================================================ -->
+<!-- 1. SEQUENTIAL THINKING -->
+<!-- ============================================================ -->
+<section id="s1">
+    <div class="section-header">
+        <span class="section-number">1</span>
+        <h2>Sequential Thinking</h2>
+    </div>
+
+    <div class="overview">
+        <p>MCP server này cung cấp khả năng <strong>chain-of-thought có cấu trúc</strong> cho AI. Thay vì AI tự suy luận ngầm, nó chia bài toán thành các bước tư duy rõ ràng, có thể kiểm tra, chỉnh sửa hoặc retry từng bước. Nó <strong>không thực thi code</strong> — chỉ hỗ trợ reasoning.</p>
+    </div>
+
+    <div class="use-case">
+        <span>🧠 Chain-of-thought</span>
+        <span>🐛 Debug phức tạp</span>
+        <span>📐 Multi-step reasoning</span>
+    </div>
+
+    <h3>Setup</h3>
+    <pre><code><span class="hl-prompt">#</span> <span class="hl-comment">Cài dependency (nếu thiếu)</span>
+npm install -g @modelcontextprotocol/server-sequential-thinking
+<span class="hl-prompt">#</span> <span class="hl-comment">Chạy</span>
+npx @modelcontextprotocol/server-sequential-thinking</code></pre>
+
+    <h3>Demo</h3>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt</div>
+        <div class="prompt">"Tôi có API timeout production. Hãy liệt kê từng bước debug theo thứ tự ưu tiên."</div>
+        <div class="demo-title" style="margin-top:1rem">✅ Response</div>
+        <div class="response">→ MCP sẽ chia nhỏ thành:<br>
+            <ol>
+                <li>Kiểm tra health endpoint</li>
+                <li>Check DB connection pool</li>
+                <li>Xem error log chi tiết</li>
+                <li>Đo latency từng hop</li>
+                <li>Rollback deployment gần nhất</li>
+            </ol>
+        </div>
+    </div>
+
+    <h3>Shortcut &amp; Tips</h3>
+    <div class="shortcut">
+        <div class="shortcut-title">⚡ Tips</div>
+        <ul>
+            <li>Dùng khi bạn <strong>không muốn nghĩ hết flow</strong> mà muốn AI thao tác từng bước có logic</li>
+            <li>Có thể kết hợp với Filesystem MCP để vừa suy nghĩ vừa đọc code</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 2. FILESYSTEM -->
+<!-- ============================================================ -->
+<section id="s2">
+    <div class="section-header">
+        <span class="section-number">2</span>
+        <h2>Filesystem</h2>
+    </div>
+
+    <div class="overview">
+        <p>Server này cho phép AI đọc, ghi, di chuyển và quản lý file/folder trên hệ thống local. Nó mở quyền truy cập vào toàn bộ codebase, giúp AI review code, tạo file mới, refactor hàng loạt file — trở thành <strong>"coding partner"</strong> thực thụ.</p>
+    </div>
+
+    <div class="use-case">
+        <span>📂 Đọc/ghi file</span>
+        <span>🔍 Review codebase</span>
+        <span>🔄 Di chuyển folder</span>
+    </div>
+
+    <h3>Setup</h3>
+    <pre><code>npx @modelcontextprotocol/server-filesystem /path/to/project</code></pre>
+
+    <h3>Demo</h3>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 1</div>
+        <div class="prompt">"Đọc file src/auth.ts và tìm lỗi JWT expiration"</div>
+        <div class="response">→ MCP tự navigate, mở file, highlight lỗi trả về</div>
+    </div>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 2</div>
+        <div class="prompt">"Tạo file src/utils/date.ts export formatDate()"</div>
+        <div class="response">→ Tạo file mới, ghi code, xác nhận</div>
+    </div>
+
+    <h3>Shortcut &amp; Tips</h3>
+    <div class="shortcut">
+        <div class="shortcut-title">⚡ Tips</div>
+        <ul>
+            <li>Set quyền <strong>read-only</strong> nếu chỉ review: thêm flag <code>--read-only</code> (nếu server hỗ trợ)</li>
+            <li>Dùng với Claude Code / Antigravity để code thật nhanh</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 3. BRAVE SEARCH -->
+<!-- ============================================================ -->
+<section id="s3">
+    <div class="section-header">
+        <span class="section-number">3</span>
+        <h2>Brave Search</h2>
+    </div>
+
+    <div class="overview">
+        <p>MCP server này wrap API tìm kiếm của Brave Search, cho phép AI thực thi web search trực tiếp từ chat mà không cần mở browser. Kết quả trả về đã được parse sẵn (title, URL, snippet) — nhanh hơn và gọn hơn scraping.</p>
+    </div>
+
+    <div class="use-case">
+        <span>🌐 Tìm kiếm web trong chat</span>
+        <span>⚡ Real-time</span>
+    </div>
+
+    <h3>Setup</h3>
+    <pre><code><span class="hl-prompt">#</span> <span class="hl-comment">Tạo Brave Search API key (miễn phí 2000 req/tháng)</span>
+<span class="hl-keyword">export</span> <span class="hl-var">BRAVE_API_KEY</span>=<span class="hl-string">"..."</span>
+npx @modelcontextprotocol/server-brave-search</code></pre>
+
+    <h3>Demo</h3>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 1</div>
+        <div class="prompt">"Tìm video YouTube 'Best MCP servers 2026' đang có view cao nhất"</div>
+        <div class="response">→ Trả về: tiêu đề, view count, channel, URL</div>
+    </div>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 2</div>
+        <div class="prompt">"So sánh Antigravity 2.0 vs Claude Code 4.8"</div>
+        <div class="response">→ Tổng hợp từ nhiều nguồn khác nhau</div>
+    </div>
+
+    <h3>Shortcut &amp; Tips</h3>
+    <div class="shortcut">
+        <div class="shortcut-title">⚡ Tips</div>
+        <ul>
+            <li>Combine với <strong>youtube-channel-strategy</strong> skill để auto-find trending</li>
+            <li>Tốc độ nhanh hơn browser search vì không cần render page</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 4. GITHUB MCP -->
+<!-- ============================================================ -->
+<section id="s4">
+    <div class="section-header">
+        <span class="section-number">4</span>
+        <h2>GitHub MCP</h2>
+    </div>
+
+    <div class="overview">
+        <p>Server này expose GitHub API qua MCP, biến chat thành GitHub client. AI có thể đọc repo, tạo PR, comment issue, check CI status — mọi thao tác Git thông thường đều có thể làm qua prompt.</p>
+    </div>
+
+    <div class="use-case">
+        <span>📦 Manage repo</span>
+        <span>🔀 PR &amp; Issues</span>
+        <span>✅ CI Status</span>
+    </div>
+
+    <h3>Setup</h3>
+    <pre><code><span class="hl-keyword">export</span> <span class="hl-var">GITHUB_TOKEN</span>=<span class="hl-string">"ghp_..."</span>
+npx @modelcontextprotocol/server-github</code></pre>
+
+    <h3>Demo</h3>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 1</div>
+        <div class="prompt">"Tạo PR từ branch feature/add-login sang main"</div>
+        <div class="response">→ Tự tạo title, body, base/head branch</div>
+    </div>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 2</div>
+        <div class="prompt">"Đọc 5 issues gần nhất trong repo backend"</div>
+        <div class="response">→ List tiêu đề, status, assignee</div>
+    </div>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 3</div>
+        <div class="prompt">"Review PR #42: chỉ ra lỗi tiềm ẩn"</div>
+        <div class="response">→ Đọc diff, comment trực tiếp lên GitHub</div>
+    </div>
+
+    <h3>Shortcut &amp; Tips</h3>
+    <div class="shortcut">
+        <div class="shortcut-title">⚡ Tips</div>
+        <ul>
+            <li>Dùng trong workflow code review: chạy 1 prompt → MCP tự check CI, linter, security</li>
+            <li>Tích hợp với Slack MCP để notify team khi PR merge</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 5. SQLITE / POSTGRESQL MCP -->
+<!-- ============================================================ -->
+<section id="s5">
+    <div class="section-header">
+        <span class="section-number">5</span>
+        <h2>SQLite / PostgreSQL MCP</h2>
+    </div>
+
+    <div class="overview">
+        <p>2 server này kết nối AI trực tiếp với database. AI có thể viết và chạy SQL query, lấy kết quả dạng JSON/table, thậm chí tạo table, migrate schema — tất cả qua chat. Rất mạnh cho data analysis và debugging DB.</p>
+    </div>
+
+    <div class="use-case">
+        <span>🗄️ Query DB trực tiếp từ chat</span>
+        <span>📊 Data analysis</span>
+        <span>🔧 Debug database</span>
+    </div>
+
+    <h3>Setup</h3>
+    <h4>SQLite</h4>
+    <pre><code>npx @modelcontextprotocol/server-sqlite --db-path /path/to/app.db</code></pre>
+
+    <h4>PostgreSQL</h4>
+    <pre><code><span class="hl-keyword">export</span> <span class="hl-var">DATABASE_URL</span>=<span class="hl-string">"postgres://user:pass@localhost:5432/mydb"</span>
+npx @modelcontextprotocol/server-postgres</code></pre>
+
+    <h3>Demo</h3>
+    <div class="demo">
+        <div class="demo-title">📌 SQLite</div>
+        <div class="prompt">"Liệt kê top 10 users mua hàng nhiều nhất tháng 6"</div>
+        <div class="response">→ Trả về JSON sẵn, có thể export CSV hoặc visualize</div>
+    </div>
+    <div class="demo">
+        <div class="demo-title">📌 PostgreSQL</div>
+        <div class="prompt">"Kiểm tra connection pool status"</div>
+        <div class="response">→ <code>SELECT * FROM pg_stat_activity</code></div>
+    </div>
+
+    <h3>Shortcut &amp; Tips</h3>
+    <div class="shortcut">
+        <div class="shortcut-title">⚡ Tips</div>
+        <ul>
+            <li>Kết hợp với Filesystem MCP: đọc CSV → import vào SQLite → query ngay</li>
+            <li>Hữu ích khi demo sinh dữ liệu fake cho video (seed data nhanh)</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 6. PUPPETEER / PLAYWRIGHT -->
+<!-- ============================================================ -->
+<section id="s6">
+    <div class="section-header">
+        <span class="section-number">6</span>
+        <h2>Puppeteer / Playwright</h2>
+    </div>
+
+    <div class="overview">
+        <p>Server này điều khiển Chromium browser headless qua MCP. AI có thể navigate page, click, fill form, chụp screenshot, extract DOM — tự động hóa bất cứ thao tác browser nào mà không cần mở UI. <strong>Playwright</strong> thay thế Puppeteer nếu cần cross-browser (Firefox/WebKit).</p>
+    </div>
+
+    <div class="use-case">
+        <span>🤖 Automate browser</span>
+        <span>🕸️ Scrape</span>
+        <span>🧪 Test UI end-to-end</span>
+    </div>
+
+    <h3>Setup</h3>
+    <pre><code><span class="hl-comment"># Puppeteer</span>
+npx @modelcontextprotocol/server-puppeteer
+
+<span class="hl-comment"># Hoặc Playwright</span>
+npx @modelcontextprotocol/server-playwright</code></pre>
+
+    <h3>Demo</h3>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 1</div>
+        <div class="prompt">"Vào https://devkit.vn, chụp screenshot homepage"</div>
+        <div class="response">→ Chụp ảnh trả về</div>
+    </div>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 2</div>
+        <div class="prompt">"Login devkit.vn với account test, check xem dashboard load không"</div>
+        <div class="response">→ Điền form, submit, check element, báo PASS/FAIL</div>
+    </div>
+
+    <h3>Shortcut &amp; Tips</h3>
+    <div class="shortcut">
+        <div class="shortcut-title">⚡ Tips</div>
+        <ul>
+            <li>Dùng để <strong>record bug</strong> khi QA: prompt 1 câu → chụp screenshot + log network</li>
+            <li>Tự động test form / checkout page cho WooCommerce</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 7. DOCKER MCP -->
+<!-- ============================================================ -->
+<section id="s7">
+    <div class="section-header">
+        <span class="section-number">7</span>
+        <h2>Docker MCP</h2>
+    </div>
+
+    <div class="overview">
+        <p>Server này expose Docker Daemon API, cho phép AI quản lý container trực tiếp từ chat: list, start/stop, xem log, exec, check health. Nó biến terminal docker thành conversation — hữu ích khi deploy hoặc debug microservice.</p>
+    </div>
+
+    <div class="use-case">
+        <span>📋 Quản lý container</span>
+        <span>📜 Xem logs</span>
+        <span>⚙️ Exec commands</span>
+        <span>❤️ Health-check</span>
+    </div>
+
+    <h3>Setup</h3>
+    <pre><code><span class="hl-comment"># Cài docker CLI (đã có rồi thì thôi)</span>
+npx @modelcontextprotocol/server-docker</code></pre>
+
+    <h3>Demo</h3>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 1</div>
+        <div class="prompt">"List containers đang chạy, báo status từng cái"</div>
+        <div class="response">→ Trả về: name, status, uptime, port mapping</div>
+    </div>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 2</div>
+        <div class="prompt">"Xem log container backend-api, tìm lỗi 'connection refused'"</div>
+        <div class="response">→ grep log, highlight dòng lỗi, suggest fix</div>
+    </div>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 3</div>
+        <div class="prompt">"Restart container nginx"</div>
+        <div class="response">→ docker restart nginx → xác nhận thành công</div>
+    </div>
+
+    <h3>Shortcut &amp; Tips</h3>
+    <div class="shortcut">
+        <div class="shortcut-title">⚡ Tips</div>
+        <ul>
+            <li>Dùng trong dev workflow: build → run → check log → restart đều qua chat</li>
+            <li>Combine với Slack MCP để gửi alert khi container down</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 8. GOOGLE DRIVE MCP -->
+<!-- ============================================================ -->
+<section id="s8">
+    <div class="section-header">
+        <span class="section-number">8</span>
+        <h2>Google Drive MCP</h2>
+    </div>
+
+    <div class="overview">
+        <p>Server này tích hợp Google Drive / Docs / Sheets API vào MCP. AI có thể đọc spreadsheet, tạo doc, upload file, quản lý folder — tất cả mà không cần mở Google UI. Rất phù hợp khi dùng Sheets làm CMS hoặc dashboard.</p>
+    </div>
+
+    <div class="use-case">
+        <span>📊 Đọc/ghi spreadsheet</span>
+        <span>📝 Tạo docs</span>
+        <span>📤 Upload file</span>
+        <span>📁 Quản lý folder</span>
+    </div>
+
+    <h3>Setup</h3>
+    <pre><code><span class="hl-keyword">export</span> <span class="hl-var">GOOGLE_APPLICATION_CREDENTIALS</span>=<span class="hl-string">"service_account.json"</span>
+npx @modelcontextprotocol/server-gdrive</code></pre>
+
+    <h3>Demo</h3>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 1</div>
+        <div class="prompt">"Đọc file Google Sheet 'content-calendar' sheet 6, trả về 5 hàng đầu"</div>
+        <div class="response">→ Parse trực tiếp, trả JSON / table</div>
+    </div>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 2</div>
+        <div class="prompt">"Tạo Google Doc 'DEVKIT AI - July Plan' và copy draft vào"</div>
+        <div class="response">→ Tạo file, ghi content, trả về URL</div>
+    </div>
+    <div class="demo">
+        <div class="demo-title">📌 Prompt 3</div>
+        <div class="prompt">"Upload ảnh thumbnail vào folder 'DEVKIT Thumbnails'"</div>
+        <div class="response">→ Upload → lấy share link</div>
+    </div>
+
+    <h3>Shortcut &amp; Tips</h3>
+    <div class="shortcut">
+        <div class="shortcut-title">⚡ Tips</div>
+        <ul>
+            <li>Dùng làm <strong>CMS nội dung</strong> cho kênh YouTube: ghi chủ đề, script, schedule từ Sheets</li>
+            <li>Tự động backup báo cáo GA4 / GSC lên Drive hàng ngày</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 9. SUMMARY & RECOMMENDATION -->
+<!-- ============================================================ -->
+<section id="summary">
+    <div class="section-header">
+        <span class="section-number">📌</span>
+        <h2>Tổng hợp &amp; Khuyến nghị</h2>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nhóm</th>
+                    <th>Server phù hợp</th>
+                    <th>Công dụng chính</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Code</strong></td>
+                    <td>Filesystem, Sequential Thinking, Docker</td>
+                    <td>Viết code nhanh, debug, quản lý môi trường</td>
+                </tr>
+                <tr>
+                    <td><strong>Data</strong></td>
+                    <td>SQLite / PostgreSQL, Google Drive</td>
+                    <td>Query DB, quản lý tài liệu</td>
+                </tr>
+                <tr>
+                    <td><strong>Ops</strong></td>
+                    <td>GitHub, Puppeteer, Docker</td>
+                    <td>Deploy, test, monitor</td>
+                </tr>
+                <tr>
+                    <td><strong>Research</strong></td>
+                    <td>Brave Search, YouTube (qua browser)</td>
+                    <td>Tìm trend, phân tích đối thủ</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="recommend">
+        <h3>🔥 Khuyến nghị order setup cho DEVKIT AI</h3>
+        <ol>
+            <li><strong>Filesystem + Brave Search</strong> — cơ bản nhất, nên có đầu tiên</li>
+            <li><strong>GitHub MCP</strong> — nếu dùng GitHub</li>
+            <li><strong>Sequential Thinking</strong> — debug phức tạp</li>
+            <li><strong>Google Drive</strong> — CMS nội dung</li>
+            <li><strong>Còn lại</strong> theo nhu cầu cụ thể</li>
+        </ol>
+    </div>
+</section>
+
+</div><!-- /.container -->
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    <p>DEVKIT AI &mdash; MCP Servers 2026 &bull; Hướng dẫn toàn tập cho Developer</p>
+    <p><a href="https://github.com/modelcontextprotocol" target="_blank">Model Context Protocol on GitHub</a></p>
+</footer>
+
+<!-- ===== BACK TO TOP ===== -->
+<button class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
+
+<script>
+    // Back-to-top button visibility
+    const btn = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+        btn.classList.toggle('visible', window.scrollY > 400);
+    });
+</script>
+
+</body>
+</html>
