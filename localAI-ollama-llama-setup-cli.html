@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hướng dẫn cài đặt Local AI — Ollama & llama.cpp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface-2: #242837;
+            --border: #2d3348;
+            --text: #e4e7f0;
+            --text-muted: #9198b0;
+            --accent: #ff6600;
+            --accent-glow: rgba(255, 102, 0, 0.15);
+            --green: #22c55e;
+            --blue: #3b82f6;
+            --cyan: #22d3ee;
+            --yellow: #eab308;
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 0;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 64px 24px 56px;
+            background: linear-gradient(180deg, #1a1d27 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, var(--accent) 0%, #ff8844 50%, #ffaa66 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+        .hero p {
+            margin-top: 12px;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 640px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+        }
+
+        /* Layout */
+        .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+        .content { padding: 48px 0 96px; }
+
+        /* TOC */
+        .toc {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            margin-bottom: 48px;
+        }
+        .toc h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 16px;
+        }
+        .toc ol {
+            list-style: none;
+            counter-reset: toc;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 24px;
+        }
+        .toc li {
+            counter-increment: toc;
+            font-size: 0.95rem;
+        }
+        .toc li::before {
+            content: counter(toc);
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            line-height: 22px;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 50%;
+            background: var(--accent-glow);
+            color: var(--accent);
+            margin-right: 10px;
+        }
+        .toc a {
+            color: var(--text);
+            text-decoration: none;
+            border-bottom: 1px dotted transparent;
+            transition: border-color 0.2s;
+        }
+        .toc a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+
+        /* Sections */
+        .section {
+            margin-bottom: 48px;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-header .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .section-header .icon.ollama { background: rgba(255,102,0,0.15); color: var(--accent); }
+        .section-header .icon.cpp { background: rgba(59,130,246,0.15); color: var(--blue); }
+        .section-header .icon.ubuntu { background: rgba(234,179,8,0.15); color: var(--yellow); }
+        .section-header .icon.win { background: rgba(34,211,238,0.15); color: var(--cyan); }
+        .section-header .icon.service { background: rgba(34,197,94,0.15); color: var(--green); }
+        .section-header .icon.tool { background: rgba(255,255,255,0.08); color: var(--text-muted); }
+        .section-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        .section > p {
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            font-size: 0.98rem;
+        }
+
+        /* Sub-headings */
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 28px 0 10px;
+        }
+        h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 20px 0 8px;
+            color: var(--accent);
+        }
+
+        /* Code blocks */
+        pre {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            margin: 10px 0 18px;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.55;
+            position: relative;
+        }
+        pre .lang-tag {
+            position: absolute;
+            top: 6px;
+            right: 10px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+        }
+        code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85em;
+            background: var(--surface-2);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        pre code { background: none; padding: 0; font-size: inherit; }
+
+        /* Info boxes */
+        .info-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin: 12px 0 20px;
+            font-size: 0.92rem;
+        }
+        .info-box.green { border-left-color: var(--green); }
+        .info-box.blue { border-left-color: var(--blue); }
+        .info-box.yellow { border-left-color: var(--yellow); }
+        .info-box .label {
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 4px;
+        }
+        .info-box.green .label { color: var(--green); }
+        .info-box.blue .label { color: var(--blue); }
+        .info-box.yellow .label { color: var(--yellow); }
+
+        /* Lists */
+        ul, ol { padding-left: 22px; margin-bottom: 16px; }
+        li { margin-bottom: 6px; font-size: 0.95rem; }
+        li strong { color: var(--accent); }
+
+        /* Comparison table */
+        .compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 16px 0 24px;
+        }
+        .compare-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+        }
+        .compare-card h4 {
+            color: var(--text);
+            margin: 0 0 4px;
+            font-size: 1.05rem;
+        }
+        .compare-card .sub {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+        .compare-card ul { margin-bottom: 0; }
+        .compare-card li { font-size: 0.9rem; }
+
+        /* Steps */
+        .step {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent-glow);
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .step-body { flex: 1; min-width: 0; }
+        .step-body p { margin-bottom: 6px; font-size: 0.95rem; }
+        .step-body pre { white-space: pre-wrap; word-break: break-word; }
+        .step-body .info-box pre { font-size: 0.78rem; }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 40px 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            .hero h1 { font-size: 1.8rem; }
+            .toc ol { grid-template-columns: 1fr; }
+            .compare { grid-template-columns: 1fr; }
+            .container { padding: 0 16px; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1>🦙 Hướng dẫn cài đặt Local AI</h1>
+    <p>Ollama &amp; llama.cpp — từ khái niệm đến vận hành 24/7 trên Windows &amp; Ubuntu</p>
+</div>
+
+<div class="container content">
+
+    <!-- TOC -->
+    <div class="toc">
+        <h2>📋 Mục lục</h2>
+        <ol>
+            <li><a href="#overview">Tổng quan &amp; khái niệm</a></li>
+            <li><a href="#ollama-install">Cài đặt Ollama</a></li>
+            <li><a href="#llamacpp-install">Cài đặt llama.cpp</a></li>
+            <li><a href="#service">Tạo service chạy 24/7</a></li>
+            <li><a href="#ubuntu">Môi trường Ubuntu</a></li>
+            <li><a href="#windows">Môi trường Windows</a></li>
+            <li><a href="#faq">FAQ &amp; Xử lý sự cố</a></li>
+        </ol>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 1. TỔNG QUAN -->
+    <!-- ============================================================ -->
+    <div class="section" id="overview">
+        <div class="section-header">
+            <div class="icon tool">🧠</div>
+            <h2>Tổng quan &amp; khái niệm</h2>
+        </div>
+
+        <p>
+            <strong>Local AI</strong> là xu hướng chạy các mô hình ngôn ngữ lớn (LLM) ngay trên máy tính cá nhân
+            hoặc server của bạn, thay vì phải gọi API cloud. Hai công cụ phổ biến nhất hiện nay là
+            <strong>Ollama</strong> và <strong>llama.cpp</strong>.
+        </p>
+
+        <div class="compare">
+            <div class="compare-card">
+                <h4>🦙 Ollama</h4>
+                <div class="sub">Dành cho người dùng phổ thông</div>
+                <ul>
+                    <li><strong>Giao diện CLI</strong> đơn giản, dễ dùng</li>
+                    <li>Tự động quản lý model (pull / run / list)</li>
+                    <li>Tích hợp sẵn <strong>REST API</strong> (mặc định port 11434)</li>
+                    <li>Hỗ trợ GPU acceleration (NVIDIA, AMD, Intel)</li>
+                    <li>Có <strong>one-click installer</strong> cho macOS, Windows, Linux</li>
+                    <li>Phù hợp: cá nhân, developer, ai cũng dùng được</li>
+                </ul>
+            </div>
+            <div class="compare-card">
+                <h4>⚙️ llama.cpp</h4>
+                <div class="sub">Dành cho kỹ thuật &amp; tối ưu</div>
+                <ul>
+                    <li><strong>C++ thuần</strong>, chạy được trên CPU, RAM thấp</li>
+                    <li>Hỗ trợ <strong>quantization</strong> đa dạng (GGUF: q4_0, q8_0, ...)</li>
+                    <li><strong>Inference engine</strong> — không có CLI quản lý model</li>
+                    <li>Cung cấp <strong>server HTTP</strong> riêng (llama-server)</li>
+                    <li>Dùng làm backend cho nhiều tool khác (Ollama cũng dùng llama.cpp!)</li>
+                    <li>Phù hợp: kỹ thuật, nhúng, tối ưu hiệu năng</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="info-box blue">
+            <div class="label">💡 Quan hệ giữa hai công cụ</div>
+            <p>
+                <strong>Ollama</strong> thực chất sử dụng <strong>llama.cpp</strong> làm inference engine bên trong
+                (cùng với một số backend khác). Nói cách khác: Ollama = llama.cpp + CLI quản lý model + REST API.
+                Nếu bạn muốn đơn giản, dùng Ollama. Nếu bạn muốn kiểm soát chi tiết, dùng llama.cpp trực tiếp.
+            </p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ============================================================ -->
+    <!-- 2. OLLAMA -->
+    <!-- ============================================================ -->
+    <div class="section" id="ollama-install">
+        <div class="section-header">
+            <div class="icon ollama">🦙</div>
+            <h2>Cài đặt Ollama</h2>
+        </div>
+
+        <h3>2.1. Cài bằng script (Linux / macOS)</h3>
+        <p>Mở terminal và chạy lệnh duy nhất:</p>
+        <pre><span class="lang-tag">Bash</span>curl -fsSL https://ollama.com/install.sh | sh</pre>
+
+        <div class="info-box green">
+            <div class="label">✅ Sau khi cài</div>
+            Kiểm tra: <code>ollama --version</code> — nếu ra số version là OK.
+            Mặc định Ollama đã tự chạy service nền.
+        </div>
+
+        <h3>2.2. Cài bằng .exe (Windows)</h3>
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <p>Truy cập <a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">ollama.com/download</a></p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <p>Nhấn nút <strong>Download for Windows</strong> — tải file <code>OllamaSetup.exe</code> (~300 MB).</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <p>Chạy file <code>OllamaSetup.exe</code> → Next → Install (không cần cấu hình gì thêm).</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+                <p>Sau khi cài, Ollama chạy ngầm dưới dạng <strong>Windows Service</strong> và có sẵn icon ở system tray.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+                <p>Mở <strong>Terminal / PowerShell</strong> và kiểm tra:</p>
+                <pre><span class="lang-tag">PowerShell</span>ollama --version</pre>
+            </div>
+        </div>
+
+        <h3>2.3. Lệnh cơ bản sau khi cài</h3>
+        <pre><span class="lang-tag">Bash</span># Liệt kê model đã tải
+ollama list
+
+# Tải model (ví dụ: Llama 3.2 3B - nhẹ)
+ollama pull llama3.2:3b
+
+# Tải model lớn hơn
+ollama pull llama3.2:8b
+ollama pull qwen2.5:7b
+ollama pull mistral:7b
+
+# Chạy model (chat ngay trong terminal)
+ollama run llama3.2:3b
+
+# Kiểm tra REST API (khi Ollama đang chạy)
+curl http://localhost:11434/api/tags</pre>
+
+        <div class="info-box yellow">
+            <div class="label">📌 Lưu ý model</div>
+            <p>
+                <strong>Model càng lớn càng cần nhiều RAM/VRAM.</strong> Với máy không có GPU mạnh, nên bắt đầu
+                với model 3B-8B tham số. Ollama tự động chọn lượng tử hóa (quantization) phù hợp.<br>
+                Xem danh sách model: <a href="https://ollama.com/library" target="_blank" style="color:var(--accent)">ollama.com/library</a>
+            </p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ============================================================ -->
+    <!-- 3. LLAMA.CPP -->
+    <!-- ============================================================ -->
+    <div class="section" id="llamacpp-install">
+        <div class="section-header">
+            <div class="icon cpp">⚙️</div>
+            <h2>Cài đặt llama.cpp</h2>
+        </div>
+
+        <h3>3.1. Cài bằng git clone + make (Linux / macOS / WSL)</h3>
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <p>Cài dependencies:</p>
+                <pre><span class="lang-tag">Bash</span># Ubuntu/Debian
+sudo apt update
+sudo apt install build-essential cmake git
+
+# macOS (Homebrew)
+brew install cmake git</pre>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <p>Clone và build:</p>
+                <pre><span class="lang-tag">Bash</span>git clone https://github.com/ggerganov/llama.cpp.git
+cd llama.cpp
+
+# Build CPU-only (nhanh, ai cũng chạy được)
+cmake -B build
+cmake --build build --config Release -j
+
+# Hoặc build với CUDA (nếu có GPU NVIDIA)
+cmake -B build -DGGML_CUDA=ON
+cmake --build build --config Release -j</pre>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <p>Add vào PATH (tiện dùng mọi nơi):</p>
+                <pre><span class="lang-tag">Bash</span># Thêm vào ~/.bashrc hoặc ~/.zshrc
+export PATH="$PATH:$HOME/llama.cpp/build/bin"</pre>
+            </div>
+        </div>
+
+        <h3>3.2. Cài bằng .exe / pre-built binary (Windows)</h3>
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <p>Vào <strong><a href="https://github.com/ggerganov/llama.cpp/releases" target="_blank" style="color:var(--accent)">github.com/ggerganov/llama.cpp/releases</a></strong></p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <p>Tìm bản mới nhất, kéo xuống <strong>Assets</strong> và tải file phù hợp:</p>
+                <ul>
+                    <li><code>llama-<strong>bin</strong>-win-<strong>cuda</strong>-x64.zip</code> — nếu có GPU NVIDIA</li>
+                    <li><code>llama-<strong>bin</strong>-win-<strong>avx2</strong>-x64.zip</code> — CPU Intel/AMD đời mới</li>
+                    <li><code>llama-<strong>bin</strong>-win-<strong>avx</strong>-x64.zip</code> — CPU đời cũ hơn</li>
+                </ul>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <p>Giải nén vào thư mục, ví dụ <code>C:\llama.cpp</code></p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+                <p>Thêm thư mục vào PATH (để gõ lệnh từ mọi nơi):</p>
+                <pre><span class="lang-tag">PowerShell</span># Mở PowerShell Admin và chạy:
+[Environment]::SetEnvironmentVariable(
+    "Path",
+    [Environment]::GetEnvironmentVariable("Path", "Machine") + ";C:\llama.cpp",
+    "Machine"
+)</pre>
+                <p>Hoặc: Settings → System → About → Advanced system settings → Environment Variables, thêm <code>C:\llama.cpp</code> vào <strong>Path</strong>.</p>
+            </div>
+        </div>
+
+        <h3>3.3. Build thủ công trên Windows (CMake + Visual Studio)</h3>
+        <p>Nếu muốn tự build (có GPU acceleration tốt hơn):</p>
+        <pre><span class="lang-tag">PowerShell</span># Yêu cầu: Visual Studio 2022 với "Desktop development with C++"
+# Mở "Developer PowerShell for VS 2022" rồi chạy:
+
+git clone https://github.com/ggerganov/llama.cpp.git
+cd llama.cpp
+
+# Build CPU-only
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release -j
+
+# Build với CUDA
+cmake -B build -DGGML_CUDA=ON -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release -j
+
+# Build với Vulkan (AMD / Intel GPU)
+cmake -B build -DGGML_VULKAN=ON -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release -j</pre>
+
+        <h3>3.4. Download model GGUF và chạy thử</h3>
+        <pre><span class="lang-tag">Bash</span># Tải model GGUF (Llama 3.2 3B - ~2 GB)
+# Model GGUF có thể tìm trên Hugging Face
+curl -LO https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf
+
+# Chạy chat
+cd llama.cpp/build/bin
+./llama-cli -m /path/to/Llama-3.2-3B-Instruct-Q4_K_M.gguf \
+    -p "Hello, how are you?" \
+    -n 128
+
+# Chạy server HTTP
+./llama-server -m /path/to/model.gguf \
+    --host 0.0.0.0 \
+    --port 8080
+
+# Kiểm tra server
+curl http://localhost:8080/v1/completions \
+    -H "Content-Type: application/json" \
+    -d '{"prompt":"Hello","max_tokens":50}'</pre>
+
+        <div class="info-box blue">
+            <div class="label">🔍 llama-cli vs llama-server</div>
+            <p>
+                <code>llama-cli</code> (cũ gọi là <code>main</code>) dùng để chạy inference một lần từ CLI.<br>
+                <code>llama-server</code> (cũ gọi là <code>server</code>) mở HTTP server với API tương thích OpenAI,
+                cho phép nhiều ứng dụng kết nối đến.
+            </p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ============================================================ -->
+    <!-- 4. TẠO SERVICE 24/7 (CHI TIẾT TỪNG BƯỚC) -->
+    <!-- ============================================================ -->
+    <div class="section" id="service">
+        <div class="section-header">
+            <div class="icon service">⏱️</div>
+            <h2>Tạo service chạy 24/7</h2>
+        </div>
+        <p>
+            Phần này hướng dẫn <strong>từng bước cụ thể</strong> để biến Ollama và llama.cpp thành service nền —
+            tự động khởi động cùng máy, chạy 24/7 không cần can thiệp tay, tự restart nếu crash.
+        </p>
+
+        <hr style="margin:24px 0">
+
+        <!-- ============================================================ -->
+        <!-- 4.1. OLLAMA SERVICE — UBUNTU -->
+        <!-- ============================================================ -->
+        <h3 style="font-size:1.25rem;font-weight:700">A. Ollama service trên Ubuntu (systemd)</h3>
+
+        <div class="info-box green">
+            <div class="label">✅ Tin vui</div>
+            <p>
+                Khi cài Ollama bằng script <code>curl -fsSL https://ollama.com/install.sh | sh</code>,
+                <strong>systemd service đã được tạo tự động</strong>. Bạn chỉ cần kiểm tra và cấu hình thêm.
+                <strong>Không cần tự tạo file service.</strong>
+            </p>
+        </div>
+
+        <h4>🔹 Bước 1: Kiểm tra service đã chạy chưa</h4>
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <p>Mở terminal và gõ lệnh:</p>
+                <pre><span class="lang-tag">Bash</span>sudo systemctl status ollama</pre>
+                <p><strong>Kết quả mong đợi</strong> — thấy 3 dấu hiệu sau là OK:</p>
+                <pre style="background:#0d1a12;border-color:#22c55e40">● ollama.service - Ollama Service
+   Loaded: loaded (/etc/systemd/system/ollama.service; enabled; preset: enabled)
+   Active: active (running) → 🟢 đang chạy</pre>
+                <p>Nếu thấy <code>Active: inactive (dead)</code> hoặc <code>not found</code>
+                → chưa cài Ollama hoặc service chưa chạy. Quay lại mục 2.1 để cài.</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 2: Bật tự động khởi động cùng máy</h4>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">Bash</span>sudo systemctl enable ollama</pre>
+                <p><strong>Giải thích:</strong> <code>enable</code> tạo symlink trong <code>/etc/systemd/system/multi-user.target.wants/</code>
+                — đảm bảo khi server reboot, Ollama tự chạy lại.</p>
+                <p><strong>Output:</strong> <code>Created symlink /etc/systemd/system/multi-user.target.wants/ollama.service → /etc/systemd/system/ollama.service</code></p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 3: Restart service để áp dụng thay đổi</h4>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">Bash</span>sudo systemctl restart ollama</pre>
+                <p>Luôn chạy <code>restart</code> sau mỗi lần sửa cấu hình.</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 4: Xem log real-time (debug lỗi)</h4>
+        <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">Bash</span>sudo journalctl -u ollama -f --no-hostname</pre>
+                <p><strong>Giải thích từng flag:</strong></p>
+                <ul>
+                    <li><code>-u ollama</code> — chỉ xem log của service ollama</li>
+                    <li><code>-f</code> — follow (log mới hiện real-time)</li>
+                    <li><code>--no-hostname</code> — bỏ tên máy cho gọn</li>
+                </ul>
+                <p>Nhấn <kbd>Ctrl + C</kbd> để thoát khỏi chế độ follow.</p>
+                <p><strong>Xem log cũ (không follow):</strong></p>
+                <pre><span class="lang-tag">Bash</span>sudo journalctl -u ollama --no-hostname -n 50
+# -n 50: chỉ lấy 50 dòng cuối</pre>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 5: Mở API ra ngoài mạng (nếu cần)</h4>
+        <p>Mặc định Ollama chỉ chấp nhận kết nối từ <code>localhost</code>. Để máy khác trong LAN gọi được:</p>
+        <div class="step">
+            <div class="step-num">5a</div>
+            <div class="step-body">
+                <p>Mở override config của systemd service (tạo file drop-in, không sửa file gốc):</p>
+                <pre><span class="lang-tag">Bash</span>sudo systemctl edit ollama</pre>
+                <p>Lệnh này mở trình soạn thảo (nano/micro). Nếu lần đầu, file sẽ trống. Hãy gõ:</p>
+                <pre><span class="lang-tag">Bash</span>[Service]
+Environment="OLLAMA_HOST=0.0.0.0:11434"</pre>
+                <p><strong>Giải thích:</strong> <code>0.0.0.0</code> = lắng nghe tất cả địa chỉ mạng,
+                <code>11434</code> = port mặc định.</p>
+                <p><em>Lưu ý:</em> nếu không quen nano, chạy lệnh sau để dùng echo thay thế:</p>
+                <pre><span class="lang-tag">Bash</span>sudo mkdir -p /etc/systemd/system/ollama.service.d
+echo -e '[Service]\nEnvironment="OLLAMA_HOST=0.0.0.0:11434"' | sudo tee /etc/systemd/system/ollama.service.d/override.conf</pre>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">5b</div>
+            <div class="step-body">
+                <p>Reload systemd và restart:</p>
+                <pre><span class="lang-tag">Bash</span>sudo systemctl daemon-reload
+sudo systemctl restart ollama</pre>
+                <p><code>daemon-reload</code> bắt systemd đọc lại tất cả file cấu hình (kể cả override).</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">5c</div>
+            <div class="step-body">
+                <p>Kiểm tra cổng đã mở:</p>
+                <pre><span class="lang-tag">Bash</span>sudo ss -tlnp | grep 11434</pre>
+                <p>Output sẽ có <code>0.0.0.0:11434</code> thay vì <code>127.0.0.1:11434</code>.</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 6: Thao tác quản lý hàng ngày (cheat sheet)</h4>
+        <pre><span class="lang-tag">Bash</span>sudo systemctl status ollama          # Xem trạng thái (running/stopped)
+sudo systemctl start ollama            # Chạy service
+sudo systemctl stop ollama             # Dừng service
+sudo systemctl restart ollama          # Khởi động lại
+sudo systemctl enable ollama           # Tự động chạy khi boot
+sudo systemctl disable ollama          # Tắt tự động boot
+sudo journalctl -u ollama -f           # Xem log real-time
+sudo journalctl -u ollama -n 100       # Xem 100 dòng log gần nhất</pre>
+
+        <br>
+
+        <!-- ============================================================ -->
+        <!-- 4.2. OLLAMA SERVICE — WINDOWS -->
+        <!-- ============================================================ -->
+        <h3 style="font-size:1.25rem;font-weight:700">4.2. Ollama service trên Windows</h3>
+
+        <div class="info-box green">
+            <div class="label">✅ Tin vui</div>
+            <p>
+                File <code>OllamaSetup.exe</code> tự động cài Ollama làm <strong>Windows Service</strong>.
+                Sau khi cài, Ollama chạy ngầm và có icon ở system tray (gần đồng hồ).
+                <strong>Không cần cài NSSM hay làm gì thêm.</strong>
+            </p>
+        </div>
+
+        <h4>🔹 Bước 1: Kiểm tra service bằng services.msc (giao diện)</h4>
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <p>Nhấn <kbd>Win + R</kbd>, gõ <code>services.msc</code>, Enter.</p>
+                <p>Trong danh sách, tìm dòng <strong>Ollama</strong> (xếp theo chữ O).</p>
+                <p>Kiểm tra cột <strong>Status</strong> = Running, <strong>Startup Type</strong> = Automatic.</p>
+                <p style="color:var(--text-muted);font-size:0.85rem">💡 Nếu không thấy → chưa cài Ollama hoặc cài không thành công.</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 2: Kiểm tra bằng PowerShell</h4>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <p>Mở <strong>PowerShell (Admin)</strong> — nhấp phải Start → Windows Terminal (Admin) / PowerShell (Admin).</p>
+                <pre><span class="lang-tag">PowerShell</span>Get-Service ollama</pre>
+                <p><strong>Output mong đợi:</strong></p>
+                <pre style="background:#0d1a12;border-color:#22c55e40">Status   Name               DisplayName
+------   ----               -----------
+Running  ollama             Ollama</pre>
+                <p>Nếu <code>Status</code> là <code>Stopped</code>:</p>
+                <pre><span class="lang-tag">PowerShell</span>Start-Service ollama</pre>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 3: Đảm bảo tự động khởi động cùng Windows</h4>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">PowerShell</span>Set-Service ollama -StartupType Automatic</pre>
+                <p><strong>3 kiểu StartupType</strong> cần biết:</p>
+                <ul>
+                    <li><code>Automatic</code> — tự động chạy khi Windows boot (khuyên dùng)</li>
+                    <li><code>Manual</code> — chỉ chạy khi ai đó Start-Service hoặc app gọi</li>
+                    <li><code>Disabled</code> — không chạy</li>
+                </ul>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 4: Restart / Stop service</h4>
+        <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">PowerShell</span>Restart-Service ollama      # Khởi động lại
+Stop-Service ollama          # Dừng
+Start-Service ollama         # Chạy lại</pre>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 5: Cấu hình biến môi trường cho Ollama service</h4>
+        <p>Muốn đổi port, thư mục lưu model, hoặc expose ra mạng LAN? Làm theo các bước sau:</p>
+
+        <div class="step">
+            <div class="step-num">5a</div>
+            <div class="step-body">
+                <p><strong>Mở PowerShell (Admin)</strong></p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">5b</div>
+            <div class="step-body">
+                <p>Set biến môi trường ở cấp <strong>Machine</strong> (toàn hệ thống):</p>
+                <pre><span class="lang-tag">PowerShell</span># Expose ra mạng LAN (mọi máy trong mạng đều gọi được)
+[Environment]::SetEnvironmentVariable("OLLAMA_HOST", "0.0.0.0", "Machine")
+
+# Đổi thư mục chứa model (ví dụ qua ổ D cho đỡ tốn ổ C)
+[Environment]::SetEnvironmentVariable("OLLAMA_MODELS", "D:\ollama_models", "Machine")
+
+# Giữ model trong RAM lâu hơn (mặc định 5 phút)
+[Environment]::SetEnvironmentVariable("OLLAMA_KEEP_ALIVE", "30m", "Machine")
+
+# Cho phép xử lý nhiều request cùng lúc
+[Environment]::SetEnvironmentVariable("OLLAMA_NUM_PARALLEL", "4", "Machine")</pre>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">5c</div>
+            <div class="step-body">
+                <p>Restart service để áp dụng:</p>
+                <pre><span class="lang-tag">PowerShell</span>Restart-Service ollama</pre>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">5d</div>
+            <div class="step-body">
+                <p><strong>Kiểm tra:</strong> mở browser trên máy khác trong LAN, gõ <code>http://&lt;địa-chỉ-máy&gt;:11434</code>
+                — nếu thấy <code>Ollama is running</code> là OK.</p>
+            </div>
+        </div>
+
+        <div class="info-box green">
+            <div class="label">🔧 Tất cả biến môi trường Ollama</div>
+            <pre style="margin:6px 0 0;font-size:0.8rem">OLLAMA_HOST=0.0.0.0:11434      # Địa chỉ + port (mặc định 127.0.0.1:11434)
+OLLAMA_MODELS=D:\models        # Thư mục chứa model (mặc định ~/.ollama/models)
+OLLAMA_KEEP_ALIVE=30m          # Giữ model trong RAM 30 phút (mặc định 5m)
+OLLAMA_NUM_PARALLEL=4          # Số request song song (mặc định 1)
+OLLAMA_MAX_LOADED_MODELS=2     # Số model tối đa giữ trong RAM cùng lúc
+OLLAMA_DEBUG=1                 # Bật log debug (dùng khi cần tra lỗi)</pre>
+        </div>
+
+        <hr style="margin:32px 0">
+
+        <!-- ============================================================ -->
+        <!-- 4.3. LLAMA.CPP SERVICE — UBUNTU -->
+        <!-- ============================================================ -->
+        <h3 style="font-size:1.25rem;font-weight:700">4.3. Tạo llama-server service trên Ubuntu (systemd)</h3>
+
+        <div class="info-box yellow">
+            <div class="label">⚠️ Khác với Ollama</div>
+            <p>
+                llama.cpp <strong>không có cơ chế tự cài service</strong>. Bạn phải tự tạo file <code>.service</code>
+                thủ công. Làm theo từng bước dưới đây.
+            </p>
+        </div>
+
+        <h4>🔹 Bước 1: Xác định đường dẫn tuyệt đối của llama-server và model</h4>
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <p>Gõ lệnh để lấy đường dẫn đầy đủ:</p>
+                <pre><span class="lang-tag">Bash</span>which llama-server
+# Output mẫu: /home/ubuntu/llama.cpp/build/bin/llama-server
+
+ls -lh /home/ubuntu/models/phi-3-mini-q4.gguf
+# Output mẫu: -rw-r--r-- ... 2.3G ... /home/ubuntu/models/phi-3-mini-q4.gguf</pre>
+                <p><strong>Ghi nhớ 2 đường dẫn này</strong> — sẽ dùng ở bước 2.
+                Nếu <code>which llama-server</code> không ra, dùng đường dẫn tuyệt đối tới file build được.</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 2: Tạo file service</h4>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">Bash</span>sudo tee /etc/systemd/system/llamaserver.service > /dev/null << 'EOF'
+[Unit]
+Description=llama.cpp HTTP Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+ExecStart=/home/ubuntu/llama.cpp/build/bin/llama-server \
+    -m /home/ubuntu/models/phi-3-mini-q4.gguf \
+    --host 0.0.0.0 \
+    --port 8080 \
+    --ctx-size 4096 \
+    --threads 8
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOF</pre>
+                <p><strong>Giải thích từng dòng trong file service:</strong></p>
+                <table style="width:100%;border-collapse:collapse;margin:8px 0;font-size:0.88rem">
+                    <tr><td style="padding:4px 8px;border:1px solid var(--border);color:var(--accent)"><code>After=network-online.target</code></td>
+                        <td style="padding:4px 8px;border:1px solid var(--border)">Chỉ chạy service <strong>sau khi</strong> mạng đã hoạt động</td></tr>
+                    <tr><td style="padding:4px 8px;border:1px solid var(--border);color:var(--accent)"><code>User=ubuntu</code></td>
+                        <td style="padding:4px 8px;border:1px solid var(--border)">Chạy dưới user ubuntu (không chạy root — bảo mật hơn)</td></tr>
+                    <tr><td style="padding:4px 8px;border:1px solid var(--border);color:var(--accent)"><code>ExecStart=...</code></td>
+                        <td style="padding:4px 8px;border:1px solid var(--border)">Đường dẫn tuyệt đối đến llama-server + argument</td></tr>
+                    <tr><td style="padding:4px 8px;border:1px solid var(--border);color:var(--accent)"><code>Restart=on-failure</code></td>
+                        <td style="padding:4px 8px;border:1px solid var(--border)">Tự động restart nếu crash hoặc exit code != 0</td></tr>
+                    <tr><td style="padding:4px 8px;border:1px solid var(--border);color:var(--accent)"><code>RestartSec=5</code></td>
+                        <td style="padding:4px 8px;border:1px solid var(--border)">Chờ 5 giây trước khi restart (tránh restart liên tục)</td></tr>
+                    <tr><td style="padding:4px 8px;border:1px solid var(--border);color:var(--accent)"><code>StandardOutput=journal</code></td>
+                        <td style="padding:4px 8px;border:1px solid var(--border)">Ghi log vào journald (xem bằng journalctl)</td></tr>
+                    <tr><td style="padding:4px 8px;border:1px solid var(--border);color:var(--accent)"><code>WantedBy=multi-user.target</code></td>
+                        <td style="padding:4px 8px;border:1px solid var(--border)">Chạy ở runlevel đa người dùng (mặc định, không cần GUI)</td></tr>
+                </table>
+                <p style="font-size:0.9rem;color:var(--text-muted)">⚠️ <strong>Quan trọng:</strong> thay <code>/home/ubuntu</code> bằng username thật của bạn
+                (vd: <code>/home/yourname/</code>). Gõ <code>whoami</code> để biết username.</p>
+
+                <div class="info-box" style="margin-top:12px;border-left-color:var(--yellow)">
+                    <div class="label">📌 1 file service mặc định chỉ chạy được 1 model</div>
+                    <p>
+                        Dòng <code>-m /home/ubuntu/models/phi-3-mini-q4.gguf</code> load <strong>1 model duy nhất</strong>
+                        vào RAM. Muốn đổi model thì phải sửa file service + restart.
+                    </p>
+                    <p style="margin-top:8px"><strong>🔹 Cách 1: Tạo nhiều file service — mỗi file 1 model, 1 port</strong></p>
+                    <pre style="font-size:0.78rem"># /etc/systemd/system/llamaserver-phi3.service
+ExecStart=.../llama-server -m /home/models/phi3.gguf  --port 8080 ...
+
+# /etc/systemd/system/llamaserver-llama3.service
+ExecStart=.../llama-server -m /home/models/llama3.gguf --port 8081 ...
+
+# Chạy tất cả cùng lúc:
+sudo systemctl start llamaserver-phi3 llamaserver-llama3</pre>
+                    <p style="margin-top:8px"><strong>🔹 Cách 2: Dùng wrapper script — 1 file service dùng được nhiều model</strong></p>
+                    <p>Tạo script <code>/usr/local/bin/llamaserver-wrapper.sh</code>:</p>
+                    <pre style="font-size:0.78rem">#!/bin/bash
+# Script này đọc model từ biến môi trường MODEL_PATH
+# Nếu không set, dùng model mặc định
+MODEL="${MODEL_PATH:-/home/models/phi3-mini-q4.gguf}"
+
+exec /home/ubuntu/llama.cpp/build/bin/llama-server \
+    -m "$MODEL" \
+    --host 0.0.0.0 \
+    --port "${PORT:-8080}" \
+    --ctx-size "${CTX:-4096}" \
+    "$@"</pre>
+                    <pre style="font-size:0.78rem">sudo chmod +x /usr/local/bin/llamaserver-wrapper.sh</pre>
+                    <p>File service <code>llamaserver.service</code> gọi script này:</p>
+                    <pre style="font-size:0.78rem">[Service]
+ExecStart=/usr/local/bin/llamaserver-wrapper.sh
+Environment=MODEL_PATH=/home/models/llama3.gguf
+Environment=PORT=8080</pre>
+                    <p>Muốn đổi model — chỉ cần sửa dòng <code>Environment=MODEL_PATH=...</code> và restart:</p>
+                    <pre style="font-size:0.78rem">sudo systemctl edit llamaserver    # sửa MODEL_PATH
+sudo systemctl restart llamaserver</pre>
+                    <p style="margin-top:10px"><strong>🔹 Cách 3: Dùng Ollama</strong> (đơn giản nhất) — tự động swap model theo request, không cần restart:
+                        <code style="display:inline-block;margin-top:4px">ollama pull phi3:mini &amp;&amp; ollama pull llama3.2:3b</code>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 3: Phân quyền file service</h4>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">Bash</span>sudo chmod 644 /etc/systemd/system/llamaserver.service</pre>
+                <p>Quyền <code>644</code> = chủ sở hữu đọc-ghi, mọi người khác chỉ đọc (an toàn cho file systemd).</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 4: Báo systemd đọc file mới</h4>
+        <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">Bash</span>sudo systemctl daemon-reload</pre>
+                <p>Mỗi khi thêm/sửa/xoá file <code>.service</code>, phải chạy lệnh này để systemd nhận diện.</p>
+                <p>Kiểm tra systemd đã thấy service chưa:</p>
+                <pre><span class="lang-tag">Bash</span>sudo systemctl list-units --type=service | grep llamaserver
+# Hoặc dùng:
+systemctl cat llamaserver   # In ra nội dung file service (xác nhận đúng)</pre>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 5: Kích hoạt tự động khởi động cùng máy</h4>
+        <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">Bash</span>sudo systemctl enable llamaserver</pre>
+                <p><strong>Output:</strong></p>
+                <pre style="background:#0d1a12;border-color:#22c55e40">Created symlink /etc/systemd/system/multi-user.target.wants/llamaserver.service → /etc/systemd/system/llamaserver.service.</pre>
+                <p>Nếu thấy <code>File exists</code> là đã enable trước đó — không sao.</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 6: Khởi động service</h4>
+        <div class="step">
+            <div class="step-num">6</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">Bash</span>sudo systemctl start llamaserver</pre>
+                <p>Không có output là <strong>tốt</strong> (thành công).</p>
+                <p>Nếu lỗi, xem ngay bước 7 để biết cách debug.</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 7: Kiểm tra trạng thái</h4>
+        <div class="step">
+            <div class="step-num">7</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">Bash</span>sudo systemctl status llamaserver</pre>
+                <p><strong>Output tốt — service đang chạy:</strong></p>
+                <pre style="background:#0d1a12;border-color:#22c55e40">● llamaserver.service - llama.cpp HTTP Server
+     Loaded: loaded (/etc/systemd/system/llamaserver.service; enabled; vendor preset: enabled)
+     Active: active (running) since Sat 2026-07-04 10:30:00 UTC; 5s ago
+   Main PID: 12345 (llama-server)
+      Tasks: 15 (limit: 4915)
+     Memory: 1.2G
+        CPU: 3.2s
+     CGroup: /system.slice/llamaserver.service
+             └─12345 /home/ubuntu/llama.cpp/build/bin/llama-server ...</pre>
+                <p><strong>Output lỗi — cần debug:</strong></p>
+                <pre style="background:#1a0d0d;border-color:#ef444440">● llamaserver.service - llama.cpp HTTP Server
+     Loaded: loaded (/etc/systemd/system/llamaserver.service; enabled; vendor preset: enabled)
+     Active: failed (Result: exit-code) since Sat 2026-07-04 10:31:00 UTC; 2s ago
+    Process: 12346 ExecStart=/home/ubuntu/llama-server ... (code=exited, status=1/FAILURE)</pre>
+                <p>Nếu lỗi → chạy lệnh sau để xem chi tiết:</p>
+                <pre><span class="lang-tag">Bash</span>sudo journalctl -u llamaserver -n 30 --no-hostname</pre>
+                <p>Các lỗi thường gặp:</p>
+                <ul>
+                    <li><code>Exec format error</code> — file llama-server không có quyền chạy → <code>chmod +x /path/llama-server</code></li>
+                    <li><code>No such file or directory</code> — sai đường dẫn model hoặc binary</li>
+                    <li><code>Cannot allocate memory</code> — không đủ RAM để load model (xem FAQ)</li>
+                    <li><code>Address already in use</code> — port 8080 đã có app khác dùng → đổi port khác</li>
+                </ul>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 8: Xem log real-time</h4>
+        <div class="step">
+            <div class="step-num">8</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">Bash</span>sudo journalctl -u llamaserver -f --no-hostname</pre>
+                <p>Thấy dòng <code>HTP server listening on http://0.0.0.0:8080</code> là OK.</p>
+                <p>Nhấn <kbd>Ctrl + C</kbd> để thoát.</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 9: Test API</h4>
+        <div class="step">
+            <div class="step-num">9</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">Bash</span>curl http://localhost:8080/v1/completions \
+    -H "Content-Type: application/json" \
+    -d '{"prompt":"Xin chào, bạn là ai?","max_tokens":50}'</pre>
+                <p>Nếu trả về JSON có <code>choices[0].text</code> → service hoạt động 100%.</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 10: Thao tác quản lý hàng ngày</h4>
+        <pre><span class="lang-tag">Bash</span>sudo systemctl start llamaserver        # Chạy
+sudo systemctl stop llamaserver         # Dừng
+sudo systemctl restart llamaserver      # Khởi động lại
+sudo systemctl status llamaserver       # Xem trạng thái
+sudo systemctl enable llamaserver       # Tự động boot
+sudo systemctl disable llamaserver      # Tắt tự động boot
+sudo journalctl -u llamaserver -f       # Log real-time
+sudo journalctl -u llamaserver -n 50    # 50 dòng log gần nhất</pre>
+
+        <h4>🔹 Bước 11 (nâng cao): Log rotation — tránh đầy ổ cứng vì log</h4>
+        <div class="step">
+            <div class="step-num">11</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">Bash</span># Giới hạn log journald tối đa 500MB
+sudo journalctl --vacuum-size=500M
+
+# Hoặc cấu hình vĩnh viễn:
+sudo sed -i 's/#SystemMaxUse=/SystemMaxUse=500M/' /etc/systemd/journald.conf
+sudo systemctl restart systemd-journald</pre>
+            </div>
+        </div>
+
+        <hr style="margin:32px 0">
+
+        <!-- ============================================================ -->
+        <!-- 4.4. LLAMA.CPP SERVICE — WINDOWS (NSSM) -->
+        <!-- ============================================================ -->
+        <h3 style="font-size:1.25rem;font-weight:700">4.4. Tạo llama-server service trên Windows (NSSM)</h3>
+
+        <div class="info-box yellow">
+            <div class="label">⚠️ Tại sao không làm như Ollama?</div>
+            <p>
+                llama-server là file <code>.exe</code> đơn thuần — không có installer, không tự đăng ký service.
+                Để chạy nền 24/7 ta cần dùng <strong>NSSM (Non-Sucking Service Manager)</strong>,
+                một tool nhỏ gọn chuyên biến bất kỳ .exe nào thành Windows Service.
+            </p>
+        </div>
+
+        <h4>🔹 Bước 1: Tải và giải nén NSSM</h4>
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <p>Vào trang <a href="https://nssm.cc/download" target="_blank" style="color:var(--accent)">nssm.cc/download</a></p>
+                <p>Kéo xuống mục <strong>Latest release</strong>, nhấn <code>nssm-2.24.zip</code> (hoặc bản mới nhất).</p>
+                <p>Giải nén file zip. Trong thư mục có:</p>
+                <pre style="font-size:0.8rem">nssm-2.24/
+├── win32/
+│   └── nssm.exe       ← cho Windows 32-bit
+└── win64/
+    └── nssm.exe       ← cho Windows 64-bit (dùng cái này)</pre>
+                <p>Tạo thư mục <code>C:\nssm</code> và copy <code>nssm.exe</code> (bản win64) vào đó:</p>
+                <pre><span class="lang-tag">PowerShell</span># Mở PowerShell (thường, không cần Admin) tại thư mục giải nén
+New-Item -ItemType Directory -Force -Path "C:\nssm"
+Copy-Item ".\win64\nssm.exe" "C:\nssm\nssm.exe"</pre>
+                <p>Kiểm tra:</p>
+                <pre><span class="lang-tag">PowerShell</span>& "C:\nssm\nssm.exe" --version</pre>
+                <p>Nếu ra số version là OK.</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 2: Xác định đường dẫn llama-server.exe và model</h4>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <p>Đảm bảo bạn biết chính xác:</p>
+                <ul>
+                    <li><strong>Đường dẫn llama-server.exe</strong>, vd: <code>C:\llama.cpp\llama-server.exe</code></li>
+                    <li><strong>Đường dẫn file model .gguf</strong>, vd: <code>C:\models\Phi-3-mini-4k-instruct-q4.gguf</code></li>
+                    <li><strong>Port</strong> muốn dùng, vd: <code>8080</code></li>
+                </ul>
+                <p>Kiểm tra llama-server chạy được (chạy tay 1 lần):</p>
+                <pre><span class="lang-tag">PowerShell</span>& "C:\llama.cpp\llama-server.exe" --version</pre>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 3: Mở PowerShell Admin</h4>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <p><strong>Cách mở:</strong> nhấp phải Start → <strong>Windows Terminal (Admin)</strong>
+                hoặc <strong>PowerShell (Admin)</strong> → Yes (UAC).</p>
+                <p>Kiểm tra đã là Admin chưa:</p>
+                <pre><span class="lang-tag">PowerShell</span>$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+$isAdmin
+# Output: True</pre>
+                <p>Nếu ra <code>False</code> → đóng lại, mở đúng Admin.</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 4: Tạo service bằng GUI (dễ làm lần đầu)</h4>
+        <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+                <p>Chạy lệnh sau trong PowerShell Admin:</p>
+                <pre><span class="lang-tag">PowerShell</span>C:\nssm\nssm.exe install llamaserver</pre>
+                <p>Một cửa sổ GUI hiện ra. Điền các thông tin sau:</p>
+
+                <table style="width:100%;border-collapse:collapse;margin:10px 0;font-size:0.9rem">
+                    <tr style="background:var(--surface-2)">
+                        <th style="padding:6px 10px;border:1px solid var(--border);text-align:left">Tab</th>
+                        <th style="padding:6px 10px;border:1px solid var(--border);text-align:left">Trường</th>
+                        <th style="padding:6px 10px;border:1px solid var(--border);text-align:left">Giá trị</th>
+                    </tr>
+                    <tr>
+                        <td style="padding:6px 10px;border:1px solid var(--border)"><strong>Application</strong></td>
+                        <td style="padding:6px 10px;border:1px solid var(--border)">Path</td>
+                        <td style="padding:6px 10px;border:1px solid var(--border)"><code>C:\llama.cpp\llama-server.exe</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:6px 10px;border:1px solid var(--border)">Application</td>
+                        <td style="padding:6px 10px;border:1px solid var(--border)">Startup directory</td>
+                        <td style="padding:6px 10px;border:1px solid var(--border)"><code>C:\llama.cpp</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:6px 10px;border:1px solid var(--border)">Application</td>
+                        <td style="padding:6px 10px;border:1px solid var(--border)">Arguments</td>
+                        <td style="padding:6px 10px;border:1px solid var(--border)"><code>-m C:\models\Phi-3-mini-4k-instruct-q4.gguf --host 0.0.0.0 --port 8080 --ctx-size 4096</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:6px 10px;border:1px solid var(--border)">Details</td>
+                        <td style="padding:6px 10px;border:1px solid var(--border)">Display name</td>
+                        <td style="padding:6px 10px;border:1px solid var(--border)"><code>llamaserver - llama.cpp AI Server</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding:6px 10px;border:1px solid var(--border)">Details</td>
+                        <td style="padding:6px 10px;border:1px solid var(--border)">Startup type</td>
+                        <td style="padding:6px 10px;border:1px solid var(--border)">Automatic (có sẵn)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:6px 10px;border:1px solid var(--border)">Log on</td>
+                        <td style="padding:6px 10px;border:1px solid var(--border)">Log on as</td>
+                        <td style="padding:6px 10px;border:1px solid var(--border)"><code>Local System account</code> (mặc định)</td>
+                    </tr>
+                </table>
+
+                <p>Nhấn <strong>Install service</strong> → thành công sẽ thấy popup <code>Service "llamaserver" installed successfully!</code></p>
+                <p>Nếu báo lỗi <code>Service already exists</code> → service đã có, dùng <code>nssm edit llamaserver</code> để sửa.</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 4B: Cách khác — tạo service bằng command-line (không GUI)</h4>
+        <div class="step">
+            <div class="step-num">4B</div>
+            <div class="step-body">
+                <p>Nếu không thích GUI, dùng lệnh sau — thay path cho đúng máy bạn:</p>
+                <pre><span class="lang-tag">PowerShell</span>$nssm = "C:\nssm\nssm.exe"
+$exe  = "C:\llama.cpp\llama-server.exe"
+$args = '-m C:\models\Phi-3-mini-4k-instruct-q4.gguf --host 0.0.0.0 --port 8080 --ctx-size 4096'
+
+# Tạo service
+& $nssm install llamaserver $exe $args
+
+# Đặt tên hiển thị
+& $nssm set llamaserver Description "llama.cpp AI Inference Server - chạy 24/7"
+
+# Tự động khởi động cùng Windows
+& $nssm set llamaserver Start SERVICE_AUTO_START
+
+# (Tùy chọn) Ghi log ra file riêng thay vì Windows Event Log
+& $nssm set llamaserver AppStdout C:\llama.cpp\logs\stdout.log
+& $nssm set llamaserver AppStderr C:\llama.cpp\logs\stderr.log</pre>
+                <p>Chạy lần lượt từng dòng hoặc copy cả block vào PowerShell Admin.</p>
+                <p>Kiểm tra service đã đăng ký:</p>
+                <pre><span class="lang-tag">PowerShell</span>& "C:\nssm\nssm.exe" status llamaserver</pre>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 5: Khởi động service</h4>
+        <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">PowerShell</span># Cách 1: dùng NSSM
+& "C:\nssm\nssm.exe" start llamaserver
+
+# Cách 2: dùng PowerShell cmdlet
+Start-Service llamaserver</pre>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 6: Kiểm tra service đã chạy</h4>
+        <div class="step">
+            <div class="step-num">6</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">PowerShell</span># Cách 1: Get-Service
+Get-Service llamaserver
+
+# Output mong đợi:
+# Status   Name               DisplayName
+# ------   ----               -----------
+# Running  llamaserver        llamaserver - llama.cpp AI Server
+
+# Cách 2: kiểm tra port đã listen
+netstat -an | findstr :8080
+# Output: TCP    0.0.0.0:8080   0.0.0.0:0    LISTENING
+
+# Cách 3: test API
+curl.exe -X POST http://localhost:8080/v1/completions `
+    -H "Content-Type: application/json" `
+    -d '{"prompt":"Hello","max_tokens":20}'</pre>
+                <p>Nếu thấy JSON response → service OK!</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 7: Quản lý service hàng ngày</h4>
+        <pre><span class="lang-tag">PowerShell</span># Bằng PowerShell cmdlet
+Start-Service llamaserver           # Bắt đầu
+Stop-Service llamaserver            # Dừng
+Restart-Service llamaserver         # Khởi động lại
+Get-Service llamaserver             # Xem trạng thái
+Set-Service llamaserver -StartupType Automatic   # Tự động boot
+
+# Bằng NSSM
+& "C:\nssm\nssm.exe" start llamaserver
+& "C:\nssm\nssm.exe" stop llamaserver
+& "C:\nssm\nssm.exe" restart llamaserver
+& "C:\nssm\nssm.exe" status llamaserver
+
+# Sửa cấu hình service (mở lại GUI)
+& "C:\nssm\nssm.exe" edit llamaserver
+
+# Xoá service
+& "C:\nssm\nssm.exe" remove llamaserver confirm</pre>
+
+        <div class="info-box green">
+            <div class="label">🪟 Mẹo: xem log llama-server trên Windows</div>
+            <p>Nếu không set <code>AppStdout</code> ở bước 4B, log của llama-server ghi vào <strong>Windows Event Viewer</strong>.</p>
+            <pre style="margin:6px 0 0;font-size:0.8rem"># Mở Event Viewer
+eventvwr.msc
+
+# Windows Logs → Application → filter nguồn "llamaserver"
+
+# Hoặc dùng PowerShell
+Get-WinEvent -LogName Application -ProviderName llamaserver -MaxEvents 20 | Format-Table TimeCreated,Message -Wrap</pre>
+        </div>
+
+        <hr style="margin:32px 0">
+
+        <!-- ============================================================ -->
+        <!-- 4.5. LLAMA.CPP SERVICE — WINDOWS (TASK SCHEDULER) -->
+        <!-- ============================================================ -->
+        <h3 style="font-size:1.25rem;font-weight:700">4.5. Cách thay thế: dùng Task Scheduler (không cần NSSM)</h3>
+
+        <div class="info-box blue">
+            <div class="label">💡 Khi nào dùng Task Scheduler thay vì NSSM?</div>
+            <p>
+                Task Scheduler có sẵn trong Windows, không cần cài thêm gì. Tuy nhiên không mạnh bằng NSSM
+                (không tự restart khi crash, không quản lý log tốt). Dùng Task Scheduler nếu bạn <strong>không muốn cài NSSM</strong>
+                hoặc chỉ cần chạy đơn giản.
+            </p>
+        </div>
+
+        <h4>🔹 Bước 1: Mở Task Scheduler</h4>
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <p>Nhấn <kbd>Win + R</kbd>, gõ <code>taskschd.msc</code>, Enter.</p>
+                <p>Hoặc Start → gõ "Task Scheduler".</p>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 2: Tạo task bằng PowerShell Admin</h4>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">PowerShell</span># Mở PowerShell Admin
+
+$action = New-ScheduledTaskAction -Execute "C:\llama.cpp\llama-server.exe" `
+    -Argument "-m C:\models\Phi-3-mini-4k-instruct-q4.gguf --host 0.0.0.0 --port 8080 --ctx-size 4096"
+
+$trigger = New-ScheduledTaskTrigger -AtStartup
+
+$settings = New-ScheduledTaskSettingsSet `
+    -AllowStartIfOnBatteries `
+    -DontStopIfGoingOnBatteries `
+    -StartWhenAvailable
+
+Register-ScheduledTask -TaskName "llamaserver" `
+    -Action $action `
+    -Trigger $trigger `
+    -Settings $settings `
+    -RunLevel Highest `
+    -Description "llama.cpp AI Server - chạy 24/7"
+
+Start-ScheduledTask -TaskName "llamaserver"</pre>
+                <p><strong>Giải thích tham số:</strong></p>
+                <ul>
+                    <li><code>-AtStartup</code> — chạy khi Windows boot</li>
+                    <li><code>-RunLevel Highest</code> — chạy với quyền cao nhất (tránh bị block)</li>
+                    <li><code>-StartWhenAvailable</code> — nếu lỡ giờ chạy (do shutdown) thì chạy khi máy bật lại</li>
+                    <li><code>AllowStartIfOnBatteries / DontStopIfGoingOnBatteries</code> — chạy cả khi laptop dùng pin</li>
+                </ul>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 3: Kiểm tra</h4>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <pre><span class="lang-tag">PowerShell</span>Get-ScheduledTask -TaskName "llamaserver" | Format-List
+
+# Test API
+curl.exe -X POST http://localhost:8080/v1/completions `
+    -H "Content-Type: application/json" `
+    -d '{"prompt":"Hi","max_tokens":20}'</pre>
+            </div>
+        </div>
+
+        <h4>🔹 Bước 4: Quản lý</h4>
+        <pre><span class="lang-tag">PowerShell</span>Start-ScheduledTask -TaskName "llamaserver"
+Stop-ScheduledTask -TaskName "llamaserver"
+Get-ScheduledTask -TaskName "llamaserver" | Get-ScheduledTaskInfo
+
+# Xoá task
+Unregister-ScheduledTask -TaskName "llamaserver" -Confirm:$false</pre>
+
+        <hr style="margin:32px 0">
+
+        <!-- ============================================================ -->
+        <!-- SO SÁNH CÁC CÁCH -->
+        <!-- ============================================================ -->
+        <h3 style="font-size:1.25rem;font-weight:700">4.6. So sánh các phương pháp tạo service</h3>
+
+        <div class="compare">
+            <div class="compare-card">
+                <h4>✅ Ollama (cả Ubuntu & Windows)</h4>
+                <div class="sub">Tự động — không cần làm gì</div>
+                <ul>
+                    <li>Tự tạo service khi cài đặt</li>
+                    <li>Ubuntu: systemd (có sẵn)</li>
+                    <li>Windows: Windows Service (có sẵn)</li>
+                    <li>Chỉ cần <code>systemctl enable / Set-Service Automatic</code></li>
+                    <li>⭐ <strong>Khuyến nghị cho đa số</strong></li>
+                </ul>
+            </div>
+            <div class="compare-card">
+                <h4>⚙️ llama.cpp — Ubuntu (systemd)</h4>
+                <div class="sub">Cần tự tạo file .service</div>
+                <ul>
+                    <li>Tạo file thủ công 1 lần</li>
+                    <li>Tự động restart khi crash</li>
+                    <li>Log qua journald</li>
+                    <li>Kiểm soát được user chạy service</li>
+                    <li>⭐ <strong>Khuyến nghị cho Ubuntu</strong></li>
+                </ul>
+            </div>
+            <div class="compare-card">
+                <h4>⚙️ llama.cpp — Windows (NSSM)</h4>
+                <div class="sub">Cần cài NSSM, sau đó dễ quản lý</div>
+                <ul>
+                    <li>Cài NSSM 1 lần</li>
+                    <li>GUI hoặc CLI đều được</li>
+                    <li>Tự động restart khi crash</li>
+                    <li>Có log riêng</li>
+                    <li>⭐ <strong>Khuyến nghị cho Windows</strong></li>
+                </ul>
+            </div>
+            <div class="compare-card">
+                <h4>⚙️ llama.cpp — Windows (Task Scheduler)</h4>
+                <div class="sub">Không cần cài thêm, nhưng hạn chế</div>
+                <ul>
+                    <li>Có sẵn trong Windows</li>
+                    <li><strong>Không</strong> tự restart khi crash</li>
+                    <li>Khó debug hơn</li>
+                    <li>Dùng tạm nếu không muốn cài NSSM</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="info-box yellow">
+            <div class="label">⚠️ Lưu ý quan trọng khi chạy service</div>
+            <ul>
+                <li><strong>RAM:</strong> model 7B Q4_K_M cần ~4-6 GB RAM. Kiểm tra trước khi enable auto-start.</li>
+                <li><strong>Disk:</strong> file .gguf thường 2-8 GB. Để ý dung lượng ổ cứng.</li>
+                <li><strong>GPU:</strong> nếu dùng CUDA, service chiếm VRAM vĩnh viễn — không release khi không dùng.</li>
+                <li><strong>Bảo mật:</strong> <code>--host 0.0.0.0</code> = mở ra tất cả mạng. Nếu server có IP public, nên đặt reverse proxy (nginx) kèm xác thực hoặc ít nhất dùng <code>--host 127.0.0.1</code> và chỉ mở khi cần.</li>
+                <li><strong>Cold start:</strong> lần đầu service chạy, model phải load từ ổ cứng vào RAM — có thể mất 5-30 giây tuỳ model. Đây là hành vi bình thường.</li>
+            </ul>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ============================================================ -->
+    <!-- 5. UBUNTU -->
+    <!-- ============================================================ -->
+    <div class="section" id="ubuntu">
+        <div class="section-header">
+            <div class="icon ubuntu">🐧</div>
+            <h2>Môi trường Ubuntu (22.04 / 24.04)</h2>
+        </div>
+
+        <h3>5.1. Cài đặt toàn bộ — script một chạy</h3>
+        <pre><span class="lang-tag">Bash</span>#!/bin/bash
+set -e
+
+echo "=== Cập nhật hệ thống ==="
+sudo apt update && sudo apt upgrade -y
+
+echo "=== Cài dependencies ==="
+sudo apt install -y build-essential cmake git curl wget
+
+echo "=== Cài Ollama ==="
+curl -fsSL https://ollama.com/install.sh | sh
+
+echo "=== Build llama.cpp ==="
+cd ~
+git clone https://github.com/ggerganov/llama.cpp.git
+cd llama.cpp
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release -j$(nproc)
+
+echo "=== Thêm llama.cpp vào PATH ==="
+echo 'export PATH="$PATH:$HOME/llama.cpp/build/bin"' >> ~/.bashrc
+
+echo "=== Kiểm tra ==="
+ollama --version
+echo "✅ Ollama OK"
+
+echo "=== Tải thử model nhẹ ==="
+ollama pull llama3.2:3b
+
+echo ""
+echo "🎉 Hoàn tất! Chạy 'ollama run llama3.2:3b' để chat."
+echo "   llama-server: cd ~/llama.cpp && ./build/bin/llama-server -m <model.gguf> -p 8080"</pre>
+
+        <h3>5.2. Hỗ trợ GPU NVIDIA (CUDA)</h3>
+        <pre><span class="lang-tag">Bash</span># Kiểm tra có GPU NVIDIA không
+nvidia-smi
+
+# Cài CUDA toolkit (bản 12.x mới nhất)
+sudo apt install -y nvidia-cuda-toolkit
+# Hoặc tải từ NVIDIA: https://developer.nvidia.com/cuda-downloads
+
+# Build llama.cpp với CUDA
+cd ~/llama.cpp
+cmake -B build -DGGML_CUDA=ON -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release -j$(nproc)</pre>
+
+        <h3>5.3. Reverse proxy (nginx) cho Ollama / llama-server</h3>
+        <pre><span class="lang-tag">Bash</span>sudo apt install -y nginx
+
+# Tạo cấu hình
+sudo tee /etc/nginx/sites-available/ollama > /dev/null <<'EOF'
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:11434;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_buffering off;
+        proxy_request_buffering off;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        # Giới hạn kích thước request (cho phép prompt lớn)
+        client_max_body_size 100m;
+    }
+}
+EOF
+
+sudo ln -s /etc/nginx/sites-available/ollama /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx</pre>
+
+        <div class="info-box blue">
+            <div class="label">🔐 Bảo mật với Basic Auth</div>
+            <pre style="margin: 8px 0 0; font-size:0.8rem">sudo apt install -y apache2-utils
+sudo htpasswd -c /etc/nginx/.htpasswd admin
+# Thêm vào server block:  auth_basic "Restricted"; auth_basic_user_file /etc/nginx/.htpasswd;</pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ============================================================ -->
+    <!-- 6. WINDOWS -->
+    <!-- ============================================================ -->
+    <div class="section" id="windows">
+        <div class="section-header">
+            <div class="icon win">🪟</div>
+            <h2>Môi trường Windows (10 / 11)</h2>
+        </div>
+
+        <h3>6.1. Tổng quan các bước</h3>
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <p><strong>Tải Ollama</strong> từ <a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">ollama.com/download</a> (file .exe) — cài đặt đơn giản.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <p><strong>Tải llama.cpp</strong> từ <a href="https://github.com/ggerganov/llama.cpp/releases" target="_blank" style="color:var(--accent)">GitHub Releases</a> (file .zip) — giải nén.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <p><strong>Cài Git for Windows</strong> (nếu muốn tự build): <a href="https://git-scm.com/download/win" target="_blank" style="color:var(--accent)">git-scm.com</a></p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+                <p><strong>Cài Visual Studio 2022</strong> (nếu muốn tự build): chọn workload "Desktop development with C++".<br>Hoặc cài <strong>CMake</strong> riêng: <a href="https://cmake.org/download/" target="_blank" style="color:var(--accent)">cmake.org/download</a></p>
+            </div>
+        </div>
+
+        <h3>6.2. Script PowerShell cài tự động</h3>
+        <pre><span class="lang-tag">PowerShell</span># ===== install-local-ai.ps1 =====
+# Chạy với PowerShell Admin
+
+Write-Host "=== Cài đặt Local AI trên Windows ===" -ForegroundColor Cyan
+
+# Kiểm tra admin
+if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Host "❌ Cần chạy PowerShell với quyền Administrator!" -ForegroundColor Red
+    exit 1
+}
+
+# --- 1. Kiểm tra Ollama ---
+if (Get-Command ollama -ErrorAction SilentlyContinue) {
+    Write-Host "✅ Ollama đã cài: $(ollama --version)" -ForegroundColor Green
+} else {
+    Write-Host "⬇️  Đang tải Ollama installer..." -ForegroundColor Yellow
+    $url = "https://ollama.com/download/OllamaSetup.exe"
+    $out = "$env:TEMP\OllamaSetup.exe"
+    Invoke-WebRequest -Uri $url -OutFile $out
+    Write-Host "▶️  Đang cài Ollama (chạy ngầm)..." -ForegroundColor Yellow
+    Start-Process -Wait -FilePath $out -ArgumentList "/S"
+    # Refresh PATH
+    $env:Path = [Environment]::GetEnvironmentVariable("Path", "Machine")
+    Write-Host "✅ Đã cài Ollama" -ForegroundColor Green
+}
+
+# --- 2. Tải llama.cpp pre-built ---
+$llamaDir = "C:\llama.cpp"
+if (Test-Path "$llamaDir\llama-server.exe") {
+    Write-Host "✅ llama.cpp đã có tại $llamaDir" -ForegroundColor Green
+} else {
+    Write-Host "⬇️  Đang tải llama.cpp binaries..." -ForegroundColor Yellow
+    $url = "https://github.com/ggerganov/llama.cpp/releases/latest/download/llama-bin-win-avx2-x64.zip"
+    $zip = "$env:TEMP\llama.zip"
+    Invoke-WebRequest -Uri $url -OutFile $zip
+    New-Item -ItemType Directory -Force -Path $llamaDir | Out-Null
+    Expand-Archive -Path $zip -DestinationPath $llamaDir -Force
+    Write-Host "✅ Đã giải nén vào $llamaDir" -ForegroundColor Green
+
+    # Thêm vào PATH
+    $currentPath = [Environment]::GetEnvironmentVariable("Path", "Machine")
+    if ($currentPath -notlike "*$llamaDir*") {
+        [Environment]::SetEnvironmentVariable("Path", "$currentPath;$llamaDir", "Machine")
+        Write-Host "✅ Đã thêm $llamaDir vào PATH" -ForegroundColor Green
+    }
+}
+
+Write-Host ""
+Write-Host "🎉 Hoàn tất!" -ForegroundColor Cyan
+Write-Host "   ollama run llama3.2:3b    # Chat ngay"
+Write-Host "   llama-server -h          # Xem options"</pre>
+
+        <p><strong>Cách chạy script:</strong></p>
+        <pre><span class="lang-tag">PowerShell</span># Mở PowerShell (Admin)
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\install-local-ai.ps1</pre>
+
+        <h3>6.3. Chạy llama-server như một ứng dụng (không service)</h3>
+        <pre><span class="lang-tag">PowerShell</span># Tạo file start-llama.ps1
+$model = "C:\models\Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+
+# Tải model nếu chưa có
+if (-not (Test-Path $model)) {
+    Write-Host "⬇️  Đang tải model..."
+    $dir = Split-Path $model -Parent
+    New-Item -ItemType Directory -Force -Path $dir | Out-Null
+    $url = "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+    Invoke-WebRequest -Uri $url -OutFile $model
+}
+
+Write-Host "🚀 Đang khởi động llama-server..."
+& "C:\llama.cpp\llama-server.exe" -m $model --host 0.0.0.0 --port 8080 --ctx-size 8192</pre>
+
+        <h3>6.4. Kiểm tra kết nối</h3>
+        <pre><span class="lang-tag">PowerShell</span># Gọi API (giống OpenAI API)
+$body = @{
+    model = "llama"
+    messages = @(@{role="user"; content="Xin chào, bạn khỏe không?"})
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:11434/v1/chat/completions" `
+    -Method Post -Body $body -ContentType "application/json" |
+    Select-Object -ExpandProperty choices |
+    Select-Object -ExpandProperty message |
+    Select-Object -ExpandProperty content</pre>
+    </div>
+
+    <hr>
+
+    <!-- ============================================================ -->
+    <!-- 7. FAQ -->
+    <!-- ============================================================ -->
+    <div class="section" id="faq">
+        <div class="section-header">
+            <div class="icon tool">❓</div>
+            <h2>FAQ &amp; Xử lý sự cố</h2>
+        </div>
+
+        <h4>❓ Ollama không nhận GPU trên Windows?</h4>
+        <p>Ollama tự động dùng GPU nếu có CUDA. Kiểm tra:</p>
+        <pre><span class="lang-tag">PowerShell</span>ollama run llama3.2:3b
+# Mở Task Manager → GPU → xem "CUDA" hoặc "Compute" có hoạt động không</pre>
+
+        <h4>❓ llama.cpp build lỗi "CUDA not found"?</h4>
+        <div class="info-box yellow">
+            <div class="label">Giải pháp</div>
+            <p>
+                Cài CUDA Toolkit từ NVIDIA (phiên bản 12.x). Đảm bảo <code>nvcc</code> có trong PATH.
+                Hoặc bỏ flag <code>-DGGML_CUDA=ON</code> để build CPU-only.
+            </p>
+        </div>
+
+        <h4>❓ Lỗi "out of memory" / "Killed" khi chạy model?</h4>
+        <p>Model quá lớn so với RAM. Giải pháp:</p>
+        <ul>
+            <li>Dùng model nhỏ hơn (3B thay vì 8B)</li>
+            <li>Dùng quantization thấp hơn (Q4_K_M thay vì Q8_0)</li>
+            <li>Trên Ubuntu: thêm swap <code>sudo fallocate -l 16G /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile</code></li>
+        </ul>
+
+        <h4>❓ Ollama trên Ubuntu không chạy được do port 11434 đã dùng?</h4>
+        <pre><span class="lang-tag">Bash</span>sudo systemctl edit ollama
+# Thêm:
+[Service]
+Environment="OLLAMA_HOST=127.0.0.1:11435"
+sudo systemctl restart ollama</pre>
+
+        <h4>❓ Làm sao để dùng OpenAI SDK gọi local model?</h4>
+        <p>ollama và llama-server đều hỗ trợ API tương thích OpenAI. Chỉ cần đổi base_url:</p>
+        <pre><span class="lang-tag">Python</span>from openai import OpenAI
+
+# Thay vì mặc định https://api.openai.com/v1
+client = OpenAI(
+    base_url="http://localhost:11434/v1",  # Ollama
+    # base_url="http://localhost:8080/v1", # llama-server
+    api_key="ollama"  # không dùng nhưng cần có
+)
+
+response = client.chat.completions.create(
+    model="llama3.2:3b",  # Ollama: tên model; llama-server: bất kỳ
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+print(response.choices[0].message.content)</pre>
+
+        <h4>❓ Làm sao xoá model để giải phóng dung lượng?</h4>
+        <pre><span class="lang-tag">Bash</span># Ollama
+ollama list                          # Xem danh sách + dung lượng
+ollama rm llama3.2:3b                # Xoá model
+
+# llama.cpp (chỉ cần xoá file .gguf)
+rm /path/to/model.gguf</pre>
+
+        <h4>❓ Tăng tốc inference?</h4>
+        <ul>
+            <li><strong>GPU:</strong> dùng CUDA (NVIDIA), Vulkan (AMD), hoặc Metal (Apple Silicon)</li>
+            <li><strong>CPU:</strong> build với <code>-DGGML_NATIVE=ON</code> để tận dụng instruction set tối đa</li>
+            <li><strong>Context size:</strong> giảm <code>--ctx-size</code> (mặc định 2048, 8192, 16384) nếu không cần context dài</li>
+            <li><strong>Threads:</strong> chỉnh <code>--threads</code> bằng số core CPU (không phải số thread)</li>
+        </ul>
+
+        <div class="info-box green">
+            <div class="label">📚 Tài nguyên tham khảo</div>
+            <ul>
+                <li><a href="https://ollama.com" target="_blank" style="color:var(--accent)">Ollama</a> — trang chủ</li>
+                <li><a href="https://github.com/ggerganov/llama.cpp" target="_blank" style="color:var(--accent)">llama.cpp GitHub</a></li>
+                <li><a href="https://huggingface.co/models?library=gguf" target="_blank" style="color:var(--accent)">Hugging Face — GGUF models</a></li>
+                <li><a href="https://huggingface.co/bartowski" target="_blank" style="color:var(--accent)">bartowski GGUF</a> — model GGUF quality-of-life</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="text-align:center;padding:48px 0 24px;border-top:1px solid var(--border);margin-top:24px">
+        <p style="color:var(--text-muted);font-size:0.85rem">
+            🦙 Hướng dẫn Local AI — Ollama &amp; llama.cpp<br>
+            Biên soạn cho mục đích học tập &amp; phát triển
+        </p>
+    </div>
+
+</div>
+
+</body>
+</html>
