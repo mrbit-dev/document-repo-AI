@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Hướng dẫn cài đặt OmniRoute trên Ubuntu Server</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:900px;margin:40px auto;line-height:1.6}
+pre{background:#f4f4f4;padding:12px;border-radius:6px;overflow:auto}
+code{font-family:Consolas,monospace}
+h1,h2{color:#1f4e79}
+</style>
+</head>
+<body>
+<h1>Cài đặt OmniRoute trên Ubuntu Server (24/7)</h1>
+
+<h2>1. Cập nhật hệ thống</h2>
+<pre><code>sudo apt update
+sudo apt upgrade -y</code></pre>
+
+<h2>2. Cài Node.js 22 LTS (kèm npm)</h2>
+<pre><code>curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs
+
+node -v
+npm -v</code></pre>
+
+<p><b>Lưu ý:</b> npm sẽ được cài cùng Node.js.</p>
+
+<h2>3. Cài OmniRoute</h2>
+<pre><code>sudo npm install -g omniroute
+
+omniroute --version</code></pre>
+
+<h2>4. Chạy thử</h2>
+<pre><code>omniroute</code></pre>
+
+<h2>5. Chạy OmniRoute 24/7 bằng systemd</h2>
+
+<p>Tạo file service:</p>
+
+<pre><code>sudo nano /etc/systemd/system/omniroute.service</code></pre>
+
+<p>Nội dung:</p>
+
+<pre><code>[Unit]
+Description=OmniRoute AI Gateway
+Documentation=https://github.com/diegosouzapw/OmniRoute
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+# User chạy service
+User=root
+Group=root
+
+# Thư mục làm việc
+WorkingDirectory=/root
+
+# Đọc file .env nếu có
+EnvironmentFile=-/root/.omniroute/.env
+
+# Một số biến môi trường
+Environment=NODE_ENV=production
+Environment=NO_COLOR=1
+
+# Chạy OmniRoute
+ExecStart=/usr/bin/omniroute --no-open
+
+# Tự restart khi lỗi
+Restart=always
+RestartSec=5
+
+# Timeout khi dừng
+TimeoutStopSec=20
+
+# Log
+StandardOutput=journal
+StandardError=journal
+
+# Tăng giới hạn file
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+
+<h2>6. Kích hoạt service</h2>
+
+<pre><code>sudo systemctl daemon-reload
+sudo systemctl enable omniroute
+sudo systemctl start omniroute</code></pre>
+
+<h2>7. Kiểm tra trạng thái</h2>
+
+<pre><code>systemctl status omniroute</code></pre>
+
+<h2>8. Xem log realtime</h2>
+
+<pre><code>journalctl -u omniroute -f</code></pre>
+
+<h2>9. Quản lý service</h2>
+
+<pre><code>sudo systemctl restart omniroute
+sudo systemctl stop omniroute
+sudo systemctl disable omniroute</code></pre>
+
+<hr>
+<p>Nếu gặp lỗi <code>Unexpected token 'with'</code>, hãy kiểm tra đang dùng Node.js 22 trở lên và cài lại OmniRoute.</p>
+</body>
+</html>
