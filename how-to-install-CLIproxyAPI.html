@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLIProxyAPI — Hướng dẫn cài đặt nhanh</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: #0d1117;
+            color: #e6edf3;
+            line-height: 1.8;
+            padding: 24px;
+        }
+        .container { max-width: 860px; margin: 0 auto; }
+        header {
+            text-align: center;
+            padding: 40px 20px 32px;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 32px;
+        }
+        header h1 {
+            font-size: 2.2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #58a6ff, #3fb950);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        header p { color: #8b949e; font-size: 1.1em; margin-top: 8px; }
+        .step {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 24px 28px;
+            margin-bottom: 16px;
+        }
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .num {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            background: #1f6feb;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+        .step h2 { font-size: 1.15em; color: #f0f6fc; }
+        .step p { color: #c9d1d9; margin: 6px 0; }
+        code {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9em;
+            background: #21262d;
+            padding: 2px 8px;
+            border-radius: 6px;
+            color: #f0f6fc;
+        }
+        pre {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin: 10px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+        pre code { background: none; padding: 0; font-size: 0.85em; line-height: 1.6; }
+        .copy-btn {
+            position: absolute;
+            top: 8px; right: 10px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #8b949e;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 0.7em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover { background: #30363d; color: #e6edf3; }
+        .ok {
+            background: #1c3a2a;
+            border-left: 4px solid #3fb950;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .ok strong { color: #3fb950; }
+        .warn {
+            background: #3a2a1c;
+            border-left: 4px solid #d29922;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .warn strong { color: #d29922; }
+        .info {
+            background: #1c2a3a;
+            border-left: 4px solid #58a6ff;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .info strong { color: #58a6ff; }
+        .table-wrap { overflow-x: auto; margin: 10px 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #30363d; padding: 10px 14px; text-align: left; }
+        th { background: #21262d; color: #58a6ff; font-weight: 600; }
+        td { color: #c9d1d9; }
+        .tag {
+            display: inline-block;
+            padding: 1px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 700;
+        }
+        .tag-get { background: #1f6feb33; color: #58a6ff; }
+        .tag-post { background: #3fb95033; color: #3fb950; }
+        .footer {
+            text-align: center;
+            padding: 32px 20px;
+            color: #8b949e;
+            border-top: 1px solid #30363d;
+            margin-top: 32px;
+            font-size: 0.9em;
+        }
+        @media (max-width: 640px) {
+            .step { padding: 18px; }
+            header h1 { font-size: 1.6em; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <header>
+        <h1>⚡ CLIProxyAPI — Cài đặt nhanh</h1>
+        <p>Ubuntu &bull; systemd 24/7 &bull; UFW &bull; Web UI</p>
+    </header>
+
+    <!-- B1 -->
+    <div class="step">
+        <div class="step-header"><div class="num">1</div><h2>Cập nhật hệ thống</h2></div>
+        <pre><code>sudo apt update && sudo apt upgrade -y
+sudo apt install -y wget curl tar unzip</code></pre>
+    </div>
+
+    <!-- B2 -->
+    <div class="step">
+        <div class="step-header"><div class="num">2</div><h2>Tạo thư mục dự án &amp; cd vào</h2></div>
+        <pre><code>mkdir -p ~/cliproxyapi
+cd ~/cliproxyapi</code></pre>
+    </div>
+
+    <!-- B3 -->
+    <div class="step">
+        <div class="step-header"><div class="num">3</div><h2>Tải CLIProxyAPI mới nhất</h2></div>
+        <pre><code>wget https://github.com/router-for-me/CLIProxyAPI/releases/download/v7.2.94/CLIProxyAPI_7.2.94_linux_amd64.tar.gz</code></pre>
+    </div>
+
+    <!-- B4 -->
+    <div class="step">
+        <div class="step-header"><div class="num">4</div><h2>Giải nén &amp; kiểm tra</h2></div>
+        <pre><code>tar -xzf CLIProxyAPI_7.2.94_linux_amd64.tar.gz
+chmod +x cli-proxy-api
+ls -lh</code></pre>
+        <div class="ok"><strong>✅ Phải thấy file <code>cli-proxy-api</code> trong danh sách.</strong></div>
+    </div>
+
+    <!-- B5 -->
+    <div class="step">
+        <div class="step-header"><div class="num">5</div><h2>Mở port UFW</h2></div>
+        <pre><code>sudo ufw allow 8317/tcp
+sudo ufw status</code></pre>
+    </div>
+
+    <!-- B6 -->
+    <div class="step">
+        <div class="step-header"><div class="num">6</div><h2>Tạo file config.yaml</h2></div>
+        <pre><code>nano ~/cliproxyapi/config.yaml</code></pre>
+        <p>Dán nội dung sau:</p>
+        <pre><code>host: ""
+port: 8317
+auth-dir: ~/cliproxyapi
+api-keys:
+  - your-secret-api-key
+debug: false
+logging-to-file: true
+routing:
+  strategy: round-robin
+remote-management:
+  allow-remote: true
+  secret-key: "your-management-key"
+  disable-control-panel: false</code></pre>
+        <div class="info"><strong>📝</strong> <kbd>Ctrl+O</kbd> → <kbd>Enter</kbd> → <kbd>Ctrl+X</kbd></div>
+    </div>
+
+    <!-- B7 -->
+    <div class="step">
+        <div class="step-header"><div class="num">7</div><h2>Chạy thử dịch vụ</h2></div>
+        <pre><code>cd ~/cliproxyapi && ./cli-proxy-api -config config.yaml</code></pre>
+        <div class="ok"><strong>✅ Thấy <code>Listening on :8317</code></strong> là OK! Giữ nguyên terminal này.</div>
+        <p>Mở terminal thứ hai, kiểm tra health:</p>
+        <pre><code>curl http://127.0.0.1:8317/health</code></pre>
+        <div class="ok"><strong>✅ Kết quả:</strong> <code>{"status":"ok"}</code></div>
+        <p>Xong thì về terminal cũ nhấn <kbd>Ctrl+C</kbd> để dừng.</p>
+    </div>
+
+    <!-- B8 -->
+    <div class="step">
+        <div class="step-header"><div class="num">8</div><h2>Tạo file systemd service</h2></div>
+        <pre><code>sudo nano /etc/systemd/system/cliproxyapi.service</code></pre>
+        <p>Dán nội dung sau:</p>
+        <pre><code>[Unit]
+Description=CLIProxyAPI
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/root/cliproxyapi
+ExecStart=/root/cliproxyapi/cli-proxy-api -config /root/cliproxyapi/config.yaml
+Restart=always
+RestartSec=5
+LimitNOFILE=65535
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+        <div class="info"><strong>📝</strong> <kbd>Ctrl+O</kbd> → <kbd>Enter</kbd> → <kbd>Ctrl+X</kbd></div>
+    </div>
+
+    <!-- B9 -->
+    <div class="step" style="border-color: #3fb950;">
+        <div class="step-header"><div class="num" style="background:#3fb950;">9</div><h2>Kích hoạt service 24/7</h2></div>
+        <pre><code>sudo systemctl daemon-reload
+sudo systemctl enable cliproxyapi
+sudo systemctl start cliproxyapi
+sudo systemctl status cliproxyapi</code></pre>
+        <div class="ok"><strong>✅ Phải thấy <code>active (running)</code> — từ giờ chạy 24/7!</strong></div>
+        <p>Xem log nếu muốn:</p>
+        <pre><code>journalctl -u cliproxyapi -f
+# Ctrl+C để thoát xem log</code></pre>
+    </div>
+
+    <!-- B10 -->
+    <div class="step">
+        <div class="step-header"><div class="num">10</div><h2>Kiểm tra IP binding</h2></div>
+        <pre><code>ss -tulpn | grep 8317</code></pre>
+        <div class="ok"><strong>✅ Phải thấy <code>0.0.0.0:8317</code></strong> — truy cập được từ máy khác.</div>
+        <div class="warn"><strong>⚠️ Nếu chỉ thấy <code>127.0.0.1</code>:</strong> sửa <code>host: ""</code> trong config.yaml, rồi <code>sudo systemctl restart cliproxyapi</code>.</div>
+    </div>
+
+    <!-- B11 -->
+    <div class="step">
+        <div class="step-header"><div class="num">11</div><h2>Đăng nhập Provider &amp; Management Key</h2></div>
+        <p><strong>Tạo Management Key (để đăng nhập Web UI):</strong></p>
+        <pre><code>echo "mk-$(openssl rand -hex 24)"</code></pre>
+        <p>Copy kết quả, chạy:</p>
+        <pre><code>nano ~/cliproxyapi/config.yaml
+# Sửa dòng secret-key: "mk-3d0a9b6..." (chuỗi vừa tạo)</code></pre>
+        <p>Sau đó restart service:</p>
+        <pre><code>sudo systemctl restart cliproxyapi</code></pre>
+
+        <p><strong>Đăng nhập Provider:</strong></p>
+        <pre><code>cd ~/cliproxyapi
+
+# Claude
+./cli-proxy-api -claude-login
+
+# hoặc Gemini
+./cli-proxy-api -gemini-login
+
+# hoặc Codex
+./cli-proxy-api -codex-login</code></pre>
+        <div class="warn"><strong>⚠️</strong> Cần có tài khoản / API key của provider tương ứng.</div>
+    </div>
+
+    <!-- B12 -->
+    <div class="step">
+        <div class="step-header"><div class="num">12</div><h2>Truy cập Web UI</h2></div>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Giao diện</th><th>Địa chỉ</th></tr>
+                <tr><td>Trang chủ</td><td><code>http://&lt;IP&gt;:8317</code></td></tr>
+                <tr><td>Web UI quản trị</td><td><code>http://&lt;IP&gt;:8317/management.html</code></td></tr>
+            </table>
+        </div>
+        <p>Ví dụ: <code>http://192.168.1.20:8317/management.html</code></p>
+        <div class="info"><strong>🔑</strong> Đăng nhập bằng Management Key đã tạo.</div>
+    </div>
+
+    <!-- ENDPOINTS -->
+    <div class="step">
+        <div class="step-header"><div class="num">🔌</div><h2>Các API Endpoint</h2></div>
+        <p><strong>Base URL:</strong> <code>http://&lt;IP&gt;:8317</code></p>
+        <div class="table-wrap">
+            <table>
+                <tr><th>Phương thức</th><th>Endpoint</th><th>Mô tả</th></tr>
+                <tr><td><span class="tag tag-post">POST</span></td><td><code>/v1/chat/completions</code></td><td>Chat Completions (OpenAI compatible)</td></tr>
+                <tr><td><span class="tag tag-get">GET</span></td><td><code>/v1/models</code></td><td>Danh sách model</td></tr>
+                <tr><td><span class="tag tag-get">GET</span></td><td><code>/health</code></td><td>Health check</td></tr>
+                <tr><td><span class="tag tag-get">GET</span></td><td><code>/management.html</code></td><td>Web UI quản trị</td></tr>
+            </table>
+        </div>
+        <pre><code>curl http://127.0.0.1:8317/v1/models \
+  -H "Authorization: Bearer your-secret-api-key"</code></pre>
+    </div>
+
+    <!-- B13 -->
+    <div class="step">
+        <div class="step-header"><div class="num">13</div><h2>Kiểm tra sau reboot</h2></div>
+        <pre><code>sudo reboot
+# sau khi máy lên, kiểm tra:
+systemctl status cliproxyapi</code></pre>
+        <div class="ok"><strong>✅ Phải thấy <code>active (running)</code></strong></div>
+    </div>
+
+    <!-- DONE -->
+    <div class="step" style="border-color: #3fb950;">
+        <div class="step-header"><div class="num" style="background:#3fb950;">🎯</div><h2>Xong!</h2></div>
+        <ul>
+            <li>✅ CLIProxyAPI chạy <strong>24/7</strong> bằng systemd</li>
+            <li>✅ API tại <code>http://IP:8317/v1</code></li>
+            <li>✅ Web UI tại <code>http://IP:8317</code></li>
+            <li>✅ Cổng 8317 đã mở (UFW)</li>
+            <li>✅ Sẵn sàng gắn Nginx + domain + SSL nếu cần</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        Nguồn: <a href="https://github.com/router-for-me/CLIProxyAPI">github.com/router-for-me/CLIProxyAPI</a>
+    </div>
+
+</div>
+
+<script>
+document.querySelectorAll('pre').forEach(pre => {
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 Copy';
+    btn.onclick = async () => {
+        const code = pre.querySelector('code');
+        if (!code) return;
+        try {
+            await navigator.clipboard.writeText(code.textContent);
+            btn.textContent = '✅ Copied!';
+            setTimeout(() => { btn.textContent = '📋 Copy'; }, 2000);
+        } catch { btn.textContent = '❌ Failed'; }
+    };
+    pre.appendChild(btn);
+});
+</script>
+</body>
+</html>
