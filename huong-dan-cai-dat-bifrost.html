@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hướng Dẫn Cài Bifrost AI Gateway trên Ubuntu</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.7;
+        }
+        .container { max-width: 820px; margin: 0 auto; padding: 40px 20px 80px; }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .sub {
+            text-align: center;
+            color: #64748b;
+            font-size: 1.05rem;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin-bottom: 16px;
+        }
+        .step h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 12px;
+        }
+        .step h2 .num {
+            display: inline-block;
+            background: #3b82f6;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            text-align: center;
+            line-height: 28px;
+            border-radius: 7px;
+            font-size: 0.85rem;
+            margin-right: 10px;
+        }
+
+        .code-block {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .code-block .header {
+            padding: 6px 14px;
+            background: #1a2332;
+            border-bottom: 1px solid #1e293b;
+            font-size: 0.78rem;
+            color: #64748b;
+            font-family: monospace;
+        }
+        .code-block pre {
+            padding: 14px 18px;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #e2e8f0;
+        }
+        .code-block pre .comment { color: #64748b; }
+
+        code {
+            background: #1a2332;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88rem;
+            color: #93c5fd;
+        }
+
+        .note {
+            background: #0f172a;
+            border-left: 3px solid #3b82f6;
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            color: #93c5fd;
+        }
+        .note.green { border-left-color: #22c55e; color: #86efac; }
+        .note.yellow { border-left-color: #f59e0b; color: #fbbf24; }
+
+        hr { border: none; border-top: 1px solid #1e293b; margin: 30px 0; }
+
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #475569;
+            font-size: 0.85rem;
+            border-top: 1px solid #1e293b;
+        }
+        .footer a { color: #60a5fa; text-decoration: none; }
+
+        @media (max-width: 640px) {
+            h1 { font-size: 1.5rem; }
+            .step { padding: 16px 18px; }
+            .code-block pre { font-size: 0.78rem; padding: 10px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>🚀 Cài Bifrost AI Gateway trên Ubuntu</h1>
+<p class="sub">Không Docker · Chạy 24/7 · Gán Domain + SSL</p>
+
+<!-- Bước 1 -->
+<div class="step">
+    <h2><span class="num">1</span> Cập nhật Ubuntu &amp; cài gói cần thiết</h2>
+    <div class="code-block">
+        <div class="header">Bash</div>
+        <pre>sudo apt update && sudo apt upgrade -y
+sudo apt install -y curl git build-essential nginx</pre>
+    </div>
+</div>
+
+<!-- Bước 2 -->
+<div class="step">
+    <h2><span class="num">2</span> Cài Node.js 22 LTS</h2>
+    <div class="code-block">
+        <div class="header">Bash</div>
+        <pre>curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs
+
+<span class="comment"># Kiểm tra</span>
+node -v   <span class="comment"># → v22.x.x</span>
+npm -v    <span class="comment"># → 10.x.x</span></pre>
+    </div>
+</div>
+
+<!-- Bước 3 -->
+<div class="step">
+    <h2><span class="num">3</span> Chạy thử Bifrost (30 giây)</h2>
+    <div class="code-block">
+        <div class="header">Bash</div>
+        <pre>npx -y @maximhq/bifrost</pre>
+    </div>
+    <p>Lần đầu sẽ tải binary ~30-60s. Sau đó thấy <code>Listening on :8080</code>.</p>
+    <p>Mở trình duyệt: <code>http://IP-VPS:8080</code> — Web UI sẽ xuất hiện.</p>
+    <div class="note yellow">
+        ⏹️ Tạm dừng bằng <kbd>Ctrl+C</kbd> trước khi qua bước sau.
+    </div>
+</div>
+
+<!-- Bước 4 -->
+<div class="step">
+    <h2><span class="num">4</span> Mở firewall</h2>
+    <div class="code-block">
+        <div class="header">Bash</div>
+        <pre>sudo ufw allow 8080/tcp
+sudo ufw reload
+sudo ufw status</pre>
+    </div>
+</div>
+
+<!-- Bước 5 -->
+<div class="step">
+    <h2><span class="num">5</span> Thêm Provider (OpenAI, Anthropic...)</h2>
+    <p>Vào Web UI → <strong>Providers</strong> → <strong>Add Provider</strong></p>
+    <p>Nhập API Key của từng provider. Ví dụ:</p>
+    <ul style="margin-left: 20px; color: #94a3b8;">
+        <li>OpenAI → <code>sk-xxxxxxxx</code></li>
+        <li>Anthropic → <code>sk-ant-xxxx</code></li>
+        <li>DeepSeek, OpenRouter, Gemini...</li>
+    </ul>
+</div>
+
+<!-- Bước 6 -->
+<div class="step">
+    <h2><span class="num">6</span> Test API</h2>
+    <div class="code-block">
+        <div class="header">Bash</div>
+        <pre><span class="comment"># Xem danh sách model</span>
+curl http://localhost:8080/v1/models
+
+<span class="comment"># Test chat</span>
+curl http://localhost:8080/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-4.1-mini",
+    "messages": [{"role": "user", "content": "Hello"}]
+  }'</pre>
+    </div>
+    <div class="note green">✅ Bifrost dùng chuẩn OpenAI API — SDK nào cũng chỉ cần đổi <code>base_url</code>.</div>
+</div>
+
+<!-- Bước 7 -->
+<div class="step">
+    <h2><span class="num">7</span> Chạy Bifrost như service (24/7)</h2>
+    <p>Tạo file service:</p>
+    <div class="code-block">
+        <div class="header">sudo nano /etc/systemd/system/bifrost.service</div>
+        <pre>[Unit]
+Description=Bifrost AI Gateway
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root
+ExecStart=/usr/bin/npx -y @maximhq/bifrost
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target</pre>
+    </div>
+    <p>Kích hoạt &amp; chạy:</p>
+    <div class="code-block">
+        <div class="header">Bash</div>
+        <pre>sudo systemctl daemon-reload
+sudo systemctl enable bifrost
+sudo systemctl start bifrost
+
+<span class="comment"># Kiểm tra</span>
+sudo systemctl status bifrost
+
+<span class="comment"># Xem log real-time</span>
+journalctl -u bifrost -f</pre>
+    </div>
+</div>
+
+<!-- Bước 8 -->
+<div class="step">
+    <h2><span class="num">8</span> Gán domain + SSL (Nginx)</h2>
+    <p>Ví dụ domain: <code>ai.example.com</code>. Nhớ trỏ record A về IP VPS trước.</p>
+    <div class="code-block">
+        <div class="header">sudo nano /etc/nginx/sites-available/bifrost</div>
+        <pre>server {
+    listen 80;
+    server_name ai.example.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}</pre>
+    </div>
+    <p>Kích hoạt &amp; SSL:</p>
+    <div class="code-block">
+        <div class="header">Bash</div>
+        <pre>sudo ln -s /etc/nginx/sites-available/bifrost /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+
+<span class="comment"># Cài SSL tự động</span>
+sudo apt install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d ai.example.com</pre>
+    </div>
+    <div class="note green">✅ Certbot tự redirect HTTP → HTTPS và gia hạn tự động.</div>
+</div>
+
+<!-- Bước 9 -->
+<div class="step">
+    <h2><span class="num">9</span> Dùng trong code</h2>
+    <div class="code-block">
+        <div class="header">Python — OpenAI SDK</div>
+        <pre>from openai import OpenAI
+
+client = OpenAI(
+    api_key="anything",
+    base_url="https://ai.example.com/openai/v1"
+)
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+print(response.choices[0].message.content)</pre>
+    </div>
+    <div class="code-block" style="margin-top:10px;">
+        <div class="header">Python — Anthropic SDK</div>
+        <pre>from anthropic import Anthropic
+
+client = Anthropic(
+    api_key="anything",
+    base_url="https://ai.example.com/anthropic"
+)</pre>
+    </div>
+    <div class="note green">✅ Chỉ cần đổi <code>base_url</code>, code cũ vẫn chạy.</div>
+</div>
+
+<hr>
+
+<div class="step" style="border-color: #f59e0b;">
+    <h2>🛠️ Lệnh hữu ích</h2>
+    <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+        <tr><td style="padding:6px 10px; border-bottom:1px solid #1e293b;"><code>sudo systemctl restart bifrost</code></td><td style="padding:6px 10px; border-bottom:1px solid #1e293b; color:#94a3b8;">Khởi động lại</td></tr>
+        <tr><td style="padding:6px 10px; border-bottom:1px solid #1e293b;"><code>sudo systemctl stop bifrost</code></td><td style="padding:6px 10px; border-bottom:1px solid #1e293b; color:#94a3b8;">Dừng</td></tr>
+        <tr><td style="padding:6px 10px; border-bottom:1px solid #1e293b;"><code>journalctl -u bifrost -f</code></td><td style="padding:6px 10px; border-bottom:1px solid #1e293b; color:#94a3b8;">Xem log</td></tr>
+        <tr><td style="padding:6px 10px; border-bottom:1px solid #1e293b;"><code>sudo certbot renew --dry-run</code></td><td style="padding:6px 10px; border-bottom:1px solid #1e293b; color:#94a3b8;">Kiểm tra SSL auto-renew</td></tr>
+        <tr><td style="padding:6px 10px;"><code>sudo systemctl reload nginx</code></td><td style="padding:6px 10px; color:#94a3b8;">Reload Nginx</td></tr>
+    </table>
+</div>
+
+<div class="footer">
+    <p><a href="https://github.com/maximhq/bifrost" target="_blank">github.com/maximhq/bifrost</a></p>
+</div>
+
+</div>
+
+</body>
+</html>
