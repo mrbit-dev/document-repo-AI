@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hướng dẫn cài đặt Nginx Proxy Gateway cho VPS Ubuntu + SSL</title>
+<style>
+  :root {
+    --bg: #f6f8fa;
+    --card: #ffffff;
+    --text: #1f2933;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --accent: #0a84ff;
+    --accent-dark: #0066cc;
+    --code-bg: #0d1117;
+    --code-text: #c9d1d9;
+    --code-green: #7ee787;
+    --code-cyan: #79c0ff;
+    --success: #16a34a;
+    --warn: #d97706;
+    --danger: #dc2626;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding-bottom: 60px;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+  /* ===== Header ===== */
+  header {
+    background: linear-gradient(135deg, #0a84ff 0%, #0b4ea2 100%);
+    color: #fff;
+    padding: 48px 0 40px;
+    margin-bottom: 36px;
+  }
+  header .container { display: flex; flex-direction: column; gap: 10px; }
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.35);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    width: fit-content;
+  }
+  h1 { font-size: 30px; font-weight: 700; line-height: 1.3; }
+  header p { font-size: 15px; opacity: .92; max-width: 640px; }
+
+  /* ===== Sections ===== */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 30px;
+    margin-bottom: 28px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  h2 {
+    font-size: 21px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  h2 .step-num {
+    flex: none;
+    width: 34px; height: 34px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  h2 .step-num.done { background: var(--success); }
+  h2 .step-num.warn { background: var(--warn); }
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 22px 0 10px;
+    color: var(--accent-dark);
+  }
+  p { margin: 8px 0; }
+  ul, ol { margin: 8px 0 8px 22px; }
+  li { margin: 5px 0; }
+  code.inline {
+    background: #eef2f6;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 1px 7px;
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    font-size: 13px;
+    color: #c0285e;
+  }
+
+  /* ===== Code blocks ===== */
+  .code-block {
+    position: relative;
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: 10px;
+    margin: 14px 0;
+    overflow: hidden;
+  }
+  .code-block .code-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,.06);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    padding: 8px 16px;
+    font-size: 12px;
+    color: #8b949e;
+  }
+  .copy-btn {
+    background: none;
+    border: 1px solid rgba(255,255,255,.2);
+    color: #c9d1d9;
+    border-radius: 6px;
+    padding: 2px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,.12); }
+  .copy-btn.copied { background: var(--success); border-color: var(--success); color: #fff; }
+  pre {
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+  pre .c  { color: #8b949e; } /* comment */
+  pre .g  { color: #7ee787; } /* green command */
+  pre .d  { color: #79c0ff; } /* dim / blue */
+  pre .y  { color: #d29922; } /* yellow */
+
+  /* ===== Notes ===== */
+  .note {
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .note.info { background: #e8f3ff; border-left: 4px solid var(--accent); color: #0b4ea2; }
+  .note.success { background: #eafaf1; border-left: 4px solid var(--success); color: #14532d; }
+  .note.warn { background: #fff7e8; border-left: 4px solid var(--warn); color: #78350f; }
+  .note.danger { background: #feecec; border-left: 4px solid var(--danger); color: #7f1d1d; }
+  .note strong { display: block; margin-bottom: 2px; }
+
+  /* ===== Architecture diagram ===== */
+  .arch {
+    background: #0f172a;
+    border-radius: 12px;
+    padding: 22px;
+    margin: 18px 0;
+    color: #e2e8f0;
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    font-size: 13px;
+    overflow-x: auto;
+  }
+  .arch .box {
+    display: inline-block;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 6px 16px;
+    margin: 4px 0;
+  }
+  .arch .box.green { border-color: #34d399; color: #6ee7b7; }
+  .arch .box.blue { border-color: #38bdf8; color: #7dd3fc; }
+  .arch .box.purple { border-color: #a78bfa; color: #c4b5fd; }
+  .arch .center { text-align: center; }
+
+  /* ===== Table ===== */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 9px 14px;
+    text-align: left;
+  }
+  th { background: #f1f5f9; font-weight: 600; }
+  tr:nth-child(even) td { background: #fafbfc; }
+  td code.inline { background: none; border: none; padding: 0; }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 30px;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 640px) {
+    h1 { font-size: 23px; }
+    .card { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <span class="badge">Nginx • Ubuntu VPS • Reverse Proxy • SSL</span>
+    <h1>Hướng dẫn cài đặt Nginx làm Proxy Gateway cho VPS Ubuntu</h1>
+    <p>Trỏ domain, cài Nginx Reverse Proxy về ứng dụng nội bộ (127.0.0.1:PORT), và cấp SSL miễn phí Let's Encrypt.</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ================= KIẾN TRÚC ================= -->
+  <section class="card">
+    <h2><span class="step-num warn">⚙</span> Kiến trúc tổng quan</h2>
+    <p>Dùng <strong>Nginx</strong> làm Reverse Proxy để "mở khóa" ứng dụng đang chạy bên trong VPS ra Internet thông qua tên miền + HTTPS. Người dùng chỉ cần nhớ domain, không cần nhớ IP hay port.</p>
+    <div class="arch">
+      <div class="center">
+        <div class="box">🌐 Internet</div><br>
+        <span style="color:#8b949e">│</span> &nbsp;<span style="color:#8b949e">agent.example.com</span><br>
+        <span style="color:#8b949e">│</span> &nbsp;<span style="color:#8b949e">Port 80 / 443 (HTTPS)</span><br>
+        <span style="color:#8b949e">▼</span><br>
+        <div class="box blue">🖥️ Nginx (Reverse Proxy + SSL)</div><br>
+        <span style="color:#8b949e">│</span> &nbsp;<span style="color:#8b949e">proxy_pass → http://127.0.0.1:20128</span><br>
+        <span style="color:#8b949e">▼</span><br>
+        <div class="box green">🚀 Ứng dụng nội bộ (OmniRoute)</div><br>
+        <span style="color:#8b949e">│</span> &nbsp;<span style="color:#8b949e">Lắng nghe trên 127.0.0.1:20128</span><br>
+        <span style="color:#8b949e">▼</span><br>
+        <div class="box purple">📦 Port 20128 (chỉ truy cập từ bên trong VPS)</div>
+      </div>
+    </div>
+    <div class="note info">
+      <strong>Lưu ý an toàn:</strong> Nếu ứng dụng của bạn đang lắng nghe trên <code class="inline">0.0.0.0:20128</code> (mọi interface), hãy đổi về <code class="inline">127.0.0.1:20128</code> (chỉ local) để không lộ port ra ngoài. Nginx sẽ là "cánh cổng" duy nhất.
+    </div>
+  </section>
+
+  <!-- ================= BƯỚC 0 ================= -->
+  <section class="card">
+    <h2><span class="step-num">0</span> Chuẩn bị</h2>
+    <ul>
+      <li>VPS đã cài hệ điều hành <strong>Ubuntu 20.04 / 22.04 / 24.04</strong> và có IP công khai.</li>
+      <li>Một domain (ví dụ <code class="inline">devkit.vn</code>) mà bạn kiểm soát được phần DNS.</li>
+      <li>Ứng dụng của bạn đang chạy trên VPS, lắng nghe tại <code class="inline">127.0.0.1:20128</code>.</li>
+      <li>Truy cập SSH vào VPS bằng user có quyền <code class="inline">sudo</code>.</li>
+    </ul>
+    <div class="note success">
+      <strong>Mẹo:</strong> Nên chạy các lệnh với <code class="inline">sudo</code> ngay từ đầu để tránh bị lỗi "Permission denied".
+    </div>
+  </section>
+
+  <!-- ================= BƯỚC 1 ================= -->
+  <section class="card">
+    <h2><span class="step-num">1</span> Trỏ domain về VPS</h2>
+    <p>Vào nơi quản lý DNS của domain (nhà đăng ký tên miền hoặc panel DNS đang dùng), tạo bản ghi <strong>A record</strong>:</p>
+    <table>
+      <tr><th>Type</th><th>Name</th><th>Value</th><th>Ghi chú</th></tr>
+      <tr><td><code class="inline">A</code></td><td><code class="inline">agent</code></td><td><code class="inline">203.0.113.151</code></td><td>IP công khai của VPS bạn</td></tr>
+    </table>
+    <p>Ví dụ: bản ghi này sẽ tạo ra hostname <code class="inline">agent.example.com</code> trỏ tới IP của VPS.</p>
+    <div class="note warn">
+      <strong>Chú ý:</strong> Đợi khoảng <strong>vài phút đến vài giờ</strong> để DNS cập nhật. Kiểm tra nhanh bằng lệnh:
+    </div>
+    <div class="code-block">
+      <div class="code-head"><span>Kiểm tra DNS</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">ping</span> agent.example.com</pre>
+    </div>
+    <p>Nếu kết quả trả về đúng IP <code class="inline">203.0.113.151</code> là DNS đã hoạt động.</p>
+  </section>
+
+  <!-- ================= BƯỚC 2 ================= -->
+  <section class="card">
+    <h2><span class="step-num">2</span> Cài đặt Nginx</h2>
+    <p>Cập nhật package và cài Nginx:</p>
+    <div class="code-block">
+      <div class="code-head"><span>Cài Nginx</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">sudo apt update</span>
+<span class="g">sudo apt install nginx -y</span></pre>
+    </div>
+    <p>Kiểm tra trạng thái Nginx:</p>
+    <div class="code-block">
+      <div class="code-head"><span>Kiểm tra trạng thái</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">sudo systemctl status nginx</span></pre>
+    </div>
+    <p>Nếu mới cài, Nginx tự động chạy. Truy cập <code class="inline">http://IP_VPS</code> trên trình duyệt sẽ thấy trang chào mừng mặc định của Nginx.</p>
+  </section>
+
+  <!-- ================= BƯỚC 3 ================= -->
+  <section class="card">
+    <h2><span class="step-num">3</span> Tạo Virtual Host (server block)</h2>
+    <p>Tạo file cấu hình cho domain:</p>
+    <div class="code-block">
+      <div class="code-head"><span>Tạo file cấu hình site</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">sudo nano</span> /etc/nginx/sites-available/agent.example.com</pre>
+    </div>
+    <p>Dán nội dung sau vào file:</p>
+    <div class="code-block">
+      <div class="code-head"><span>agent.example.com</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="c"># /etc/nginx/sites-available/agent.example.com</span>
+<span class="d">server</span> {
+    <span class="d">listen</span> 80;
+    <span class="d">server_name</span> agent.example.com;
+
+    <span class="d">location</span> / {
+        <span class="d">proxy_pass</span> http://127.0.0.1:20128;
+        <span class="d">proxy_http_version</span> 1.1;
+        <span class="d">proxy_set_header</span> Host $host;
+        <span class="d">proxy_set_header</span> X-Real-IP $remote_addr;
+        <span class="d">proxy_set_header</span> X-Forwarded-For $proxy_add_x_forwarded_for;
+        <span class="d">proxy_set_header</span> X-Forwarded-Proto $scheme;
+        <span class="d">proxy_set_header</span> Upgrade $http_upgrade;
+        <span class="d">proxy_set_header</span> Connection <span class="y">"upgrade"</span>;
+    }
+}</pre>
+    </div>
+    <div class="note info">
+      <strong>Giải thích các dòng quan trọng:</strong>
+      <ul style="margin-top:6px">
+        <li><code class="inline">proxy_pass http://127.0.0.1:20128;</code> — chuyển toàn bộ request đến ứng dụng của bạn.</li>
+        <li><code class="inline">Upgrade</code> + <code class="inline">Connection "upgrade"</code> — hỗ trợ <strong>WebSocket</strong> (cần thiết nếu ứng dụng dùng chat/realtime).</li>
+        <li><code class="inline">X-Forwarded-Proto $scheme</code> — giúp ứng dụng biết người dùng đang truy cập qua HTTP hay HTTPS.</li>
+      </ul>
+    </div>
+    <p>Lưu file: trong nano, nhấn <code class="inline">Ctrl+O</code> → <code class="inline">Enter</code> để lưu, rồi <code class="inline">Ctrl+X</code> để thoát.</p>
+  </section>
+
+  <!-- ================= BƯỚC 4 ================= -->
+  <section class="card">
+    <h2><span class="step-num">4</span> Enable site và kiểm tra cấu hình</h2>
+    <p>Tạo liên kết (symlink) từ <code class="inline">sites-available</code> sang <code class="inline">sites-enabled</code> để kích hoạt site:</p>
+    <div class="code-block">
+      <div class="code-head"><span>Enable site</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">sudo ln -s</span> /etc/nginx/sites-available/agent.example.com /etc/nginx/sites-enabled/
+<span class="c"># Vô hiệu hóa site mặc định (trang chào mừng):</span>
+<span class="g">sudo rm -f</span> /etc/nginx/sites-enabled/default</pre>
+    </div>
+    <p>Kiểm tra cú pháp cấu hình:</p>
+    <div class="code-block">
+      <div class="code-head"><span>Test cấu hình</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">sudo nginx -t</span></pre>
+    </div>
+    <p>Nếu kết quả báo:</p>
+    <div class="code-block">
+      <div class="code-head"><span>Kết quả mong muốn</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">nginx: the configuration file /etc/nginx/nginx.conf syntax is ok</span>
+<span class="g">nginx: configuration file /etc/nginx/nginx.conf test is successful</span></pre>
+    </div>
+    <p>thì reload Nginx để áp dụng thay đổi:</p>
+    <div class="code-block">
+      <div class="code-head"><span>Reload Nginx</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">sudo systemctl reload nginx</span></pre>
+    </div>
+    <p>Truy cập <code class="inline">http://agent.example.com</code> — nếu thấy ứng dụng của bạn là thành công! 🎉</p>
+  </section>
+
+  <!-- ================= BƯỚC 5 ================= -->
+  <section class="card">
+    <h2><span class="step-num">5</span> Mở Firewall</h2>
+    <p>Nếu VPS đang bật <strong>UFW</strong> (Uncomplicated Firewall), cần cho phép lưu lượng web đi qua:</p>
+    <div class="code-block">
+      <div class="code-head"><span>Mở firewall cho Nginx</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">sudo ufw allow</span> <span class="y">'Nginx Full'</span></pre>
+    </div>
+    <p><code class="inline">'Nginx Full'</code> sẽ mở cả port <code class="inline">80</code> (HTTP) và <code class="inline">443</code> (HTTPS). Kiểm tra trạng thái:</p>
+    <div class="code-block">
+      <div class="code-head"><span>Kiểm tra firewall</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">sudo ufw status</span></pre>
+    </div>
+    <div class="note warn">
+      <strong>Quan trọng:</strong> Nếu ứng dụng của bạn chạy trên <code class="inline">127.0.0.1:20128</code> (chỉ local), không cần mở port 20128 trong firewall — Nginx sẽ truy cập qua localhost. Đây là cách an toàn nhất.
+    </div>
+    <p>Nếu không dùng UFW, hãy đảm bảo bảo mật của nhà cung cấp VPS (Security Group) đã cho phép port 80/443 từ Internet.</p>
+  </section>
+
+  <!-- ================= BƯỚC 6 ================= -->
+  <section class="card">
+    <h2><span class="step-num">6</span> Cài SSL miễn phí với Let's Encrypt</h2>
+    <p>Cài <strong>Certbot</strong> và plugin Nginx:</p>
+    <div class="code-block">
+      <div class="code-head"><span>Cài Certbot</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">sudo apt install certbot python3-certbot-nginx -y</span></pre>
+    </div>
+    <p>Chạy lệnh cấp SSL tự động (Certbot sẽ tự sửa cấu hình Nginx):</p>
+    <div class="code-block">
+      <div class="code-head"><span>Cấp SSL cho domain</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">sudo certbot --nginx -d agent.example.com</span></pre>
+    </div>
+    <p>Khi được hỏi về redirect HTTP → HTTPS, chọn:</p>
+    <div class="code-block">
+      <div class="code-head"><span>Lựa chọn redirect</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="c">Please choose whether or not to redirect HTTP traffic to HTTPS:</span>
+<span class="y">1: No redirect</span>
+<span class="g">2: Redirect</span> - Make all requests redirect to secure HTTPS access. <span class="y">&lt;= CHỌN SỐ NÀY</span></pre>
+    </div>
+    <p>Nhập <code class="inline">2</code> và Enter. Certbot sẽ tự động:</p>
+    <ul>
+      <li>Cấp chứng chỉ SSL, cấu hình HTTPS trên domain.</li>
+      <li>Thiết lập tự động redirect từ <code class="inline">http://</code> sang <code class="inline">https://</code>.</li>
+    </ul>
+    <p>Thành công rồi! Bây giờ bạn có thể truy cập an toàn bằng HTTPS:</p>
+    <div class="note success">
+      <strong>✔ HTTPS hoạt động</strong><br>
+      Trước đây: <code class="inline">http://203.0.113.151:20128</code> (lộ IP + port, không bảo mật)<br>
+      Bây giờ: <code class="inline">https://agent.example.com</code> ✅ (đẹp, bảo mật, có ổ khóa SSL)
+    </div>
+  </section>
+
+  <!-- ================= BƯỚC 7 ================= -->
+  <section class="card">
+    <h2><span class="step-num">7</span> Tự động gia hạn SSL</h2>
+    <p>Chứng chỉ Let's Encrypt chỉ có hiệu lực <strong>90 ngày</strong>. Certbot cài sẵn một timer tự động gia hạn. Kiểm tra timer đang hoạt động:</p>
+    <div class="code-block">
+      <div class="code-head"><span>Kiểm tra timer gia hạn</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">sudo systemctl list-timers | grep certbot</span></pre>
+    </div>
+    <p>Thử gia hạn giả lập để chắc chắn mọi thứ hoạt động:</p>
+    <div class="code-block">
+      <div class="code-head"><span>Gia hạn thử</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">sudo certbot renew --dry-run</span></pre>
+    </div>
+    <p>Nếu không thấy lỗi, hệ thống sẽ tự động gia hạn trước khi hết hạn. Không cần làm gì thêm.</p>
+  </section>
+
+  <!-- ================= KIỂM TRA ================= -->
+  <section class="card">
+    <h2><span class="step-num done">✓</span> Tổng kết kiểm tra</h2>
+    <p>Danh sách kiểm tra sau khi hoàn tất:</p>
+    <table>
+      <tr><th>#</th><th>Kiểm tra</th><th>Lệnh / Cách kiểm tra</th></tr>
+      <tr><td>1</td><td>DNS hoạt động</td><td><code class="inline">ping agent.example.com</code> → đúng IP VPS</td></tr>
+      <tr><td>2</td><td>Nginx chạy</td><td><code class="inline">sudo systemctl status nginx</code> → active</td></tr>
+      <tr><td>3</td><td>Cấu hình đúng</td><td><code class="inline">sudo nginx -t</code> → syntax is ok</td></tr>
+      <tr><td>4</td><td>HTTP hoạt động</td><td>Mở <code class="inline">http://agent.example.com</code> → thấy ứng dụng</td></tr>
+      <tr><td>5</td><td>HTTPS hoạt động</td><td>Mở <code class="inline">https://agent.example.com</code> → có ổ khóa, không cảnh báo</td></tr>
+      <tr><td>6</td><td>SSL tự gia hạn</td><td><code class="inline">sudo certbot renew --dry-run</code> → không lỗi</td></tr>
+    </table>
+  </section>
+
+  <!-- ================= XỬ LÝ SỰ CỐ ================= -->
+  <section class="card">
+    <h2><span class="step-num">!</span> Xử lý sự cố thường gặp</h2>
+
+    <h3>❌ Truy cập http://agent.example.com bị trang chào mừng Nginx (Welcome to nginx)</h3>
+    <p>Site mặc định chưa được tắt. Chạy:</p>
+    <div class="code-block">
+      <div class="code-head"><span>Fix</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><span class="g">sudo rm -f</span> /etc/nginx/sites-enabled/default
+<span class="g">sudo systemctl reload nginx</span></pre>
+    </div>
+
+    <h3>❌ Lỗi 502 Bad Gateway</h3>
+    <p>Nginx không kết nối được ứng dụng. Kiểm tra:</p>
+    <ul>
+      <li>Ứng dụng đã chạy chưa? Kiểm tra: <code class="inline">sudo ss -tlnp | grep 20128</code></li>
+      <li>Ứng dụng lắng nghe đúng <code class="inline">127.0.0.1:20128</code> chưa (không phải port khác)?</li>
+      <li>Địa chỉ trong <code class="inline">proxy_pass</code> khớp với port thực tế của ứng dụng chưa?</li>
+    </ul>
+
+    <h3>❌ Lỗi 404 Not Found</h3>
+    <p>Thường do <code class="inline">proxy_pass</code> sai đường dẫn, hoặc Nginx đang trỏ tới thư mục mặc định thay vì proxy. Kiểm tra lại nội dung file cấu hình.</p>
+
+    <h3>❌ WebSocket không hoạt động</h3>
+    <p>Đảm bảo file cấu hình có đủ 2 dòng header Upgrade/Connection như ở Bước 3.</p>
+
+    <h3>❌ Certbot báo lỗi "Domain not found" / "Unable to verify"</h3>
+    <p>DNS chưa trỏ đúng IP hoặc port 80 chưa được mở. Kiểm tra lại Bước 1 và Bước 5.</p>
+
+    <h3>❌ "Cannot connect to the Docker daemon" / ứng dụng dùng Docker</h3>
+    <p>Nếu OmniRoute (hoặc ứng dụng của bạn) chạy trong Docker, xem cấu hình đã publish port ra <code class="inline">127.0.0.1:20128</code> chưa, ví dụ: <code class="inline">-p 127.0.0.1:20128:20128</code>. Lúc đó Nginx vẫn proxy tới <code class="inline">http://127.0.0.1:20128</code> như bình thường.</p>
+  </section>
+
+  <!-- ================= REFERENCE ================= -->
+  <section class="card">
+    <h2><span class="step-num">↗</span> Tài liệu tham khảo</h2>
+    <ul>
+      <li>Nginx Reverse Proxy: <code class="inline">https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/</code></li>
+      <li>Certbot hướng dẫn Nginx: <code class="inline">https://certbot.eff.org/instructions</code></li>
+      <li>Ubuntu UFW: <code class="inline">https://help.ubuntu.com/community/UFW</code></li>
+    </ul>
+  </section>
+
+  <footer>
+    Hướng dẫn tổng hợp từ các bước thực tế cài đặt Nginx + SSL cho VPS Ubuntu.<br>
+    Thời gian hoàn thành: khoảng 15–30 phút. Chúc bạn thành công! 🚀
+  </footer>
+
+</div>
+
+<script>
+function copyCode(btn) {
+  var pre = btn.closest('.code-block').querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function () {
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(function () {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 1500);
+  });
+}
+</script>
+
+</body>
+</html>
