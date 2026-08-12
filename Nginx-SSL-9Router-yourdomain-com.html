@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nginx + SSL cho 9Router - yourdomain.com</title>
+<style>
+:root {
+  --bg:#0b1120; --card:#111827; --card2:#172033; --text:#e5e7eb;
+  --muted:#94a3b8; --accent:#38bdf8; --green:#34d399; --yellow:#fbbf24;
+  --red:#fb7185; --border:#263449; --code:#070b13;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#07101f,#0f172a);color:var(--text);
+font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.65}
+.container{max-width:1050px;margin:auto;padding:32px 20px 70px}
+.hero{padding:32px;border:1px solid var(--border);border-radius:18px;background:rgba(17,24,39,.88);
+box-shadow:0 20px 60px rgba(0,0,0,.25)}
+h1{margin:0 0 8px;font-size:32px;color:#fff}
+h2{margin-top:42px;color:#fff;border-bottom:1px solid var(--border);padding-bottom:10px}
+h3{color:var(--accent);margin-top:28px}
+p{color:#cbd5e1}
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;background:#082f49;color:#7dd3fc;
+font-size:13px;margin:4px 4px 4px 0}
+.note,.warning,.success{padding:16px 18px;border-radius:12px;margin:18px 0;border:1px solid}
+.note{background:#0c2235;border-color:#164e63}
+.warning{background:#2b2110;border-color:#785b18}
+.success{background:#09251c;border-color:#176b4c}
+pre{background:var(--code);border:1px solid var(--border);padding:17px;border-radius:10px;
+overflow:auto;color:#d1fae5;font-size:14px}
+code{font-family:Consolas,Monaco,monospace}
+.inline{background:#1e293b;padding:2px 6px;border-radius:5px;color:#bae6fd}
+.flow{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:20px;
+font-family:Consolas,monospace;white-space:pre;overflow:auto;color:#c4b5fd}
+ol li,ul li{margin:8px 0}
+.check{color:var(--green);font-weight:700}
+.small{color:var(--muted);font-size:14px}
+a{color:#7dd3fc}
+.top{position:sticky;top:0;background:rgba(7,16,31,.92);backdrop-filter:blur(8px);
+border-bottom:1px solid var(--border);padding:10px 0;z-index:5}
+.nav{max-width:1050px;margin:auto;padding:0 20px;font-size:14px}
+hr{border:0;border-top:1px solid var(--border);margin:35px 0}
+</style>
+</head>
+<body>
+<div class="top"><div class="nav">9Router → Nginx Reverse Proxy → Let's Encrypt SSL</div></div>
+
+<div class="container">
+<section class="hero">
+<h1>Hướng dẫn Nginx + SSL cho 9Router</h1>
+<p>Cấu hình domain <strong>yourdomain.com</strong> truy cập 9Router đang chạy HTTPS trên port <strong>20128</strong> của VPS Ubuntu.</p>
+<span class="badge">Ubuntu</span>
+<span class="badge">Nginx</span>
+<span class="badge">Let's Encrypt</span>
+<span class="badge">9Router :20128</span>
+<span class="badge">Domain: yourdomain.com</span>
+</section>
+
+<h2>1. Mô hình hoạt động</h2>
+<div class="flow">Internet
+   │
+   │ https://yourdomain.com
+   ▼
+┌─────────────────────────────┐
+│ VPS Ubuntu                  │
+│                             │
+│ Nginx :443                  │
+│    │                        │
+│    └── reverse proxy ─────► │ 9Router :20128
+│                             │
+└─────────────────────────────┘</div>
+
+<div class="note">
+<strong>Nguyên tắc:</strong> Không cần public port 20128. Chỉ public port 80 và 443.
+Nginx nhận HTTPS rồi chuyển tiếp request vào 9Router.
+</div>
+
+<h2>2. Kiểm tra 9Router</h2>
+<p>SSH vào VPS:</p>
+<pre><code>ssh root@IP_VPS</code></pre>
+
+<p>Kiểm tra port 20128:</p>
+<pre><code>sudo ss -tulpn | grep 20128</code></pre>
+
+<p>Vì 9Router đang chạy HTTPS, kiểm tra:</p>
+<pre><code>curl -k -I https://127.0.0.1:20128</code></pre>
+
+<p>Nếu thấy <code class="inline">HTTP/1.1 200 OK</code>, <code class="inline">302</code> hoặc response HTTP hợp lệ thì backend đang hoạt động.</p>
+
+<h2>3. Kiểm tra DNS</h2>
+<p>Domain phải trỏ về IP public của VPS.</p>
+
+<pre><code>dig +short yourdomain.com
+curl -4 ifconfig.me</code></pre>
+
+<div class="warning">
+<strong>Quan trọng:</strong> Hai lệnh trên phải trả về cùng IP public của VPS.
+Nếu khác nhau, hãy sửa bản ghi DNS trước khi chạy Certbot.
+</div>
+
+<p>DNS cần có dạng:</p>
+<pre><code>A    yourdomain.com    IP_PUBLIC_CUA_VPS</code></pre>
+
+<h2>4. Cài Nginx</h2>
+<pre><code>sudo apt update
+sudo apt install nginx -y
+sudo systemctl enable --now nginx
+sudo systemctl status nginx</code></pre>
+
+<p>Kiểm tra Nginx:</p>
+<pre><code>sudo ss -tulpn | grep -E ':80|:443'</code></pre>
+
+<h2>5. Mở firewall</h2>
+<p>Nếu VPS dùng UFW:</p>
+<pre><code>sudo ufw status
+
+sudo ufw allow OpenSSH
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+
+sudo ufw status</code></pre>
+
+<div class="success">
+<strong>Không cần mở port 20128 ra Internet.</strong> Nên để 9Router chỉ phục vụ phía sau Nginx.
+</div>
+
+<h2>6. Tạo cấu hình Nginx Reverse Proxy</h2>
+<p>Tạo file:</p>
+<pre><code>sudo nano /etc/nginx/sites-available/yourdomain.com</code></pre>
+
+<p>Dán toàn bộ cấu hình sau:</p>
+<pre><code>server {
+    listen 80;
+    listen [::]:80;
+
+    server_name yourdomain.com;
+
+    location / {
+        proxy_pass https://127.0.0.1:20128;
+
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_ssl_verify off;
+    }
+}</code></pre>
+
+<p>Lưu file trong nano:</p>
+<pre><code>CTRL + O
+ENTER
+CTRL + X</code></pre>
+
+<div class="note">
+<strong>Vì 9Router đang chạy HTTPS:</strong> cấu hình phải dùng
+<code class="inline">proxy_pass https://127.0.0.1:20128;</code>.
+Nếu 9Router thực tế chạy HTTP thì đổi thành
+<code class="inline">proxy_pass http://127.0.0.1:20128;</code>.
+</div>
+
+<h2>7. Enable website</h2>
+<pre><code>sudo ln -s /etc/nginx/sites-available/yourdomain.com /etc/nginx/sites-enabled/yourdomain.com
+
+sudo rm -f /etc/nginx/sites-enabled/default
+
+sudo nginx -t
+sudo systemctl reload nginx</code></pre>
+
+<p>Kết quả của <code class="inline">nginx -t</code> phải là:</p>
+<pre><code>syntax is ok
+test is successful</code></pre>
+
+<h2>8. Test HTTP trước khi cấp SSL</h2>
+<pre><code>curl -I http://yourdomain.com</code></pre>
+
+<p>Hoặc:</p>
+<pre><code>curl -v http://yourdomain.com</code></pre>
+
+<p>Nếu Nginx proxy đúng, request sẽ được chuyển vào 9Router.</p>
+
+<h2>9. Cài Certbot</h2>
+<pre><code>sudo apt install snapd -y
+sudo snap install snapd
+sudo snap refresh snapd
+
+sudo snap install --classic certbot
+
+sudo ln -s /snap/bin/certbot /usr/local/bin/certbot
+
+certbot --version</code></pre>
+
+<h2>10. Cấp SSL Let's Encrypt</h2>
+<pre><code>sudo certbot --nginx -d yourdomain.com</code></pre>
+
+<p>Certbot sẽ hỏi email và điều khoản sử dụng. Khi được hỏi có redirect HTTP sang HTTPS hay không, nên chọn:</p>
+<pre><code>2</code></pre>
+
+<p>Certbot sẽ tự chỉnh cấu hình Nginx để sử dụng certificate.</p>
+
+<h2>11. Kiểm tra Nginx và HTTPS</h2>
+<pre><code>sudo nginx -t
+sudo systemctl reload nginx
+
+sudo ss -tulpn | grep -E ':80|:443'</code></pre>
+
+<p>Sau đó mở:</p>
+<pre><code>https://yourdomain.com</code></pre>
+
+<div class="success">
+<strong>Luồng hoàn chỉnh:</strong><br>
+https://yourdomain.com → Nginx :443 → HTTPS proxy → https://127.0.0.1:20128 → 9Router
+</div>
+
+<h2>12. Kiểm tra certificate</h2>
+<pre><code>sudo certbot certificates</code></pre>
+
+<p>Phải thấy certificate cho:</p>
+<pre><code>Certificate Name: yourdomain.com
+Domains: yourdomain.com</code></pre>
+
+<h2>13. Kiểm tra tự động gia hạn SSL</h2>
+<pre><code>sudo certbot renew --dry-run</code></pre>
+
+<p>Nếu thành công, Certbot đã có thể mô phỏng quá trình renewal.</p>
+
+<h2>14. Các lệnh kiểm tra nhanh khi bị lỗi</h2>
+
+<h3>Kiểm tra 9Router</h3>
+<pre><code>sudo ss -tulpn | grep 20128
+curl -k -I https://127.0.0.1:20128</code></pre>
+
+<h3>Kiểm tra Nginx</h3>
+<pre><code>sudo nginx -t
+sudo systemctl status nginx
+sudo journalctl -u nginx -n 100 --no-pager</code></pre>
+
+<h3>Xem log access/error</h3>
+<pre><code>sudo tail -f /var/log/nginx/access.log
+sudo tail -f /var/log/nginx/error.log</code></pre>
+
+<h3>Kiểm tra DNS</h3>
+<pre><code>dig +short yourdomain.com
+curl -4 ifconfig.me</code></pre>
+
+<h3>Kiểm tra firewall</h3>
+<pre><code>sudo ufw status verbose</code></pre>
+
+<h2>15. Nếu Certbot báo lỗi</h2>
+
+<div class="warning">
+<strong>Lỗi thường gặp:</strong> domain chưa trỏ đúng IP, port 80 bị firewall chặn, firewall của nhà cung cấp VPS chặn port 80/443, hoặc DNS chưa cập nhật.
+</div>
+
+<p>Kiểm tra:</p>
+<pre><code>dig +short yourdomain.com
+curl -4 ifconfig.me
+
+sudo ufw status verbose
+
+sudo ss -tulpn | grep -E ':80|:443|:20128'</code></pre>
+
+<p>Nếu VPS có Security Group / Cloud Firewall riêng của nhà cung cấp, cũng phải mở:</p>
+<pre><code>TCP 80
+TCP 443</code></pre>
+
+<h2>16. Bảo mật khuyến nghị</h2>
+<ul>
+<li><span class="check">✓</span> Public port <strong>80</strong> và <strong>443</strong>.</li>
+<li><span class="check">✓</span> Không public port <strong>20128</strong> nếu không cần.</li>
+<li><span class="check">✓</span> 9Router nên bind localhost nếu có thể.</li>
+<li><span class="check">✓</span> Sử dụng HTTPS cho domain.</li>
+<li><span class="check">✓</span> Giữ Ubuntu, Nginx và 9Router cập nhật.</li>
+<li><span class="check">✓</span> Dùng mật khẩu mạnh cho giao diện 9Router.</li>
+</ul>
+
+<hr>
+
+<h2>17. Bộ lệnh đầy đủ để làm từ đầu</h2>
+<p class="small">Chỉ chạy phần này sau khi DNS <strong>yourdomain.com</strong> đã trỏ đúng IP public của VPS và 9Router đang chạy HTTPS trên port 20128.</p>
+
+<pre><code>sudo apt update
+sudo apt install nginx snapd -y
+
+sudo systemctl enable --now nginx
+
+sudo ufw allow OpenSSH
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+
+sudo nano /etc/nginx/sites-available/yourdomain.com
+
+sudo ln -s /etc/nginx/sites-available/yourdomain.com /etc/nginx/sites-enabled/yourdomain.com
+sudo rm -f /etc/nginx/sites-enabled/default
+
+sudo nginx -t
+sudo systemctl reload nginx
+
+sudo snap install snapd
+sudo snap refresh snapd
+sudo snap install --classic certbot
+
+sudo ln -s /snap/bin/certbot /usr/local/bin/certbot
+
+sudo certbot --nginx -d yourdomain.com
+
+sudo nginx -t
+sudo systemctl reload nginx
+
+sudo certbot certificates
+sudo certbot renew --dry-run</code></pre>
+
+<h2>18. Kết quả cuối cùng</h2>
+<div class="flow">Người dùng
+    │
+    │ https://yourdomain.com
+    ▼
+Internet / DNS
+    │
+    ▼
+VPS Ubuntu
+    │
+    ▼
+Nginx :443
+    │
+    │ Reverse Proxy
+    ▼
+9Router HTTPS :20128</div>
+
+<div class="success">
+<strong>URL cuối cùng:</strong><br>
+https://yourdomain.com
+<br><br>
+Không cần truy cập <code class="inline">:20128</code> từ bên ngoài.
+</div>
+
+<p class="small">Tài liệu cấu hình cho mô hình: Ubuntu VPS + Nginx + Let's Encrypt + 9Router HTTPS port 20128.</p>
+</div>
+</body>
+</html>
