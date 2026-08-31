@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hermes Agent v0.16 vs v0.20.2</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="description" content="So sánh Hermes Agent v0.16.0 và v0.20.2 — kiến trúc, Desktop, MCP, routing, auth, cron, Telegram, Windows và production readiness.">
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased">
+  <div class="min-h-screen">
+    <header class="border-b border-slate-800 bg-slate-950/95">
+      <div class="mx-auto max-w-6xl px-6 py-16 lg:py-20">
+        <div class="mb-5 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-medium text-cyan-300">
+          NousResearch / Hermes Agent
+        </div>
+        <h1 class="max-w-4xl text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">
+          Hermes Agent
+          <span class="text-cyan-400">v0.16.0</span>
+          <span class="text-slate-500">→</span>
+          <span class="text-emerald-400">v0.20.2</span>
+        </h1>
+        <p class="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
+          So sánh phiên bản cũ v0.16.0 với bản release mới nhất được đề cập
+          <strong class="text-white">v0.20.2 (tag v2026.8.16)</strong>.
+          Trọng tâm: Agent Core, Desktop, MCP, model routing, profile/auth, Gateway,
+          Cron, Telegram, Windows và mức độ sẵn sàng cho production.
+        </p>
+
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="https://github.com/NousResearch/hermes-agent/releases/tag/v2026.8.16"
+             target="_blank" rel="noopener noreferrer"
+             class="rounded-xl bg-cyan-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-cyan-300">
+            Xem Release chính thức
+          </a>
+          <a href="https://github.com/NousResearch/hermes-agent"
+             target="_blank" rel="noopener noreferrer"
+             class="rounded-xl border border-slate-700 bg-slate-900 px-5 py-3 font-bold text-white transition hover:border-slate-500">
+            GitHub Repository
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-6 py-12 lg:py-16">
+      <section class="grid gap-5 md:grid-cols-3">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+          <div class="text-sm text-slate-400">Phiên bản cũ</div>
+          <div class="mt-2 text-3xl font-black text-cyan-300">v0.16.0</div>
+          <div class="mt-2 text-slate-400">05/06/2026</div>
+        </div>
+        <div class="rounded-2xl border border-emerald-400/30 bg-emerald-400/5 p-6">
+          <div class="text-sm text-slate-400">Bản mới</div>
+          <div class="mt-2 text-3xl font-black text-emerald-300">v0.20.2</div>
+          <div class="mt-2 text-slate-400">16/08/2026 · tag v2026.8.16</div>
+        </div>
+        <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+          <div class="text-sm text-slate-400">Định hướng</div>
+          <div class="mt-2 text-3xl font-black text-white">Agent Platform</div>
+          <div class="mt-2 text-slate-400">Multi-gateway · MCP · Profiles · Automation</div>
+        </div>
+      </section>
+
+      <section class="mt-14">
+        <div class="mb-6">
+          <p class="text-sm font-bold uppercase tracking-widest text-cyan-400">01 · Tổng quan</p>
+          <h2 class="mt-2 text-3xl font-black">v0.16 và v0.20.2 khác nhau ở đâu?</h2>
+        </div>
+        <div class="overflow-x-auto rounded-2xl border border-slate-800">
+          <table class="w-full min-w-[900px] text-left text-sm">
+            <thead class="bg-slate-900">
+              <tr class="border-b border-slate-800">
+                <th class="px-5 py-4 font-bold text-slate-300">Hạng mục</th>
+                <th class="px-5 py-4 font-bold text-cyan-300">v0.16.0</th>
+                <th class="px-5 py-4 font-bold text-emerald-300">v0.20.2</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800 bg-slate-950">
+              <tr><td class="px-5 py-4 font-semibold">Desktop</td><td class="px-5 py-4 text-slate-400">Đã có Desktop, profiles, artifacts, notifications</td><td class="px-5 py-4">Multi-gateway Connections, profile-scoped refresh</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">MCP</td><td class="px-5 py-4 text-slate-400">MCP integration cơ bản</td><td class="px-5 py-4">Health checks + deep links</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">Model routing</td><td class="px-5 py-4 text-slate-400">Routing/provider còn nhiều edge case</td><td class="px-5 py-4">Persisted model routes</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">Auth</td><td class="px-5 py-4 text-slate-400">Profile/auth còn một số vấn đề isolation</td><td class="px-5 py-4">Auth resolution theo profile scope</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">Gateway</td><td class="px-5 py-4 text-slate-400">Gateway/session architecture mới</td><td class="px-5 py-4">/loop completion, model routes, Telegram DM topics</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">Cron</td><td class="px-5 py-4 text-slate-400">Có automation định kỳ</td><td class="px-5 py-4">Cron hardening</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">Telegram</td><td class="px-5 py-4 text-slate-400">Integration cơ bản</td><td class="px-5 py-4">DM topics</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">LiteLLM / Claude</td><td class="px-5 py-4 text-slate-400">Chưa có điểm nhấn tương ứng</td><td class="px-5 py-4">Prompt caching cho LiteLLM Claude trên OpenAI wire</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">Windows</td><td class="px-5 py-4 text-slate-400">Còn nhiều edge case</td><td class="px-5 py-4">Update probes + installer/update improvements</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="mt-16">
+        <div class="mb-8">
+          <p class="text-sm font-bold uppercase tracking-widest text-cyan-400">02 · Kiến trúc</p>
+          <h2 class="mt-2 text-3xl font-black">Từ Agent Framework → Agent Platform</h2>
+        </div>
+        <div class="grid gap-6 lg:grid-cols-2">
+          <div class="rounded-2xl border border-cyan-400/20 bg-cyan-400/5 p-7">
+            <div class="mb-4 text-xl font-black text-cyan-300">v0.16.0</div>
+            <pre class="overflow-x-auto rounded-xl bg-slate-950 p-5 text-sm leading-7 text-slate-300"><code>Hermes Agent
+├── CLI
+├── Gateway
+├── Desktop
+├── Profiles
+├── MCP
+└── Tools</code></pre>
+            <p class="mt-5 leading-7 text-slate-300">
+              Một nền tảng agent đã khá hoàn chỉnh, đặc biệt sau “Surface Release”,
+              nhưng vẫn còn nhiều edge case ở Desktop, profile, provider và Windows.
+            </p>
+          </div>
+
+          <div class="rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-7">
+            <div class="mb-4 text-xl font-black text-emerald-300">v0.20.2</div>
+            <pre class="overflow-x-auto rounded-xl bg-slate-950 p-5 text-sm leading-7 text-slate-300"><code>Hermes Agent
+├── CLI
+├── Desktop
+│   ├── Connections
+│   ├── Profiles
+│   ├── Multi-gateway
+│   └── MCP health/deep links
+├── Gateway
+│   ├── Persistent model routes
+│   ├── /loop
+│   ├── Telegram DM topics
+│   └── Cron
+├── Provider / Auth
+│   ├── Profile scopes
+│   ├── Fallback
+│   └── Prompt caching
+└── Installer / Update
+    ├── Linux
+    └── Windows</code></pre>
+            <p class="mt-5 leading-7 text-slate-300">
+              Kiến trúc ngày càng phù hợp với multi-provider, multi-profile,
+              multi-gateway và các workflow automation dài hạn.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-16">
+        <div class="mb-8">
+          <p class="text-sm font-bold uppercase tracking-widest text-cyan-400">03 · Những thay đổi đáng chú ý</p>
+          <h2 class="mt-2 text-3xl font-black">10 điểm nâng cấp quan trọng</h2>
+        </div>
+
+        <div class="grid gap-5 md:grid-cols-2">
+          <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div class="text-2xl">01</div>
+            <h3 class="mt-3 text-xl font-black">Multi-gateway Connections</h3>
+            <p class="mt-3 leading-7 text-slate-400">Desktop có registry cho nhiều Gateway và hỗ trợ profile-scoped refresh, phù hợp với local gateway, VPS gateway và nhiều môi trường riêng biệt.</p>
+          </article>
+          <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div class="text-2xl">02</div>
+            <h3 class="mt-3 text-xl font-black">MCP Health Checks</h3>
+            <p class="mt-3 leading-7 text-slate-400">Khả năng kiểm tra trạng thái MCP tốt hơn, cùng deep links giúp quản lý MCP thuận tiện hơn trong Desktop.</p>
+          </article>
+          <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div class="text-2xl">03</div>
+            <h3 class="mt-3 text-xl font-black">Persisted Model Routes</h3>
+            <p class="mt-3 leading-7 text-slate-400">Model/provider routing được lưu bền vững hơn, hữu ích khi làm việc với nhiều provider và nhiều session.</p>
+          </article>
+          <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div class="text-2xl">04</div>
+            <h3 class="mt-3 text-xl font-black">Profile-scoped Auth</h3>
+            <p class="mt-3 leading-7 text-slate-400">Credential resolution theo scope của profile giúp giảm tình trạng auth bị dùng chéo giữa các profile.</p>
+          </article>
+          <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div class="text-2xl">05</div>
+            <h3 class="mt-3 text-xl font-black">Gateway /loop</h3>
+            <p class="mt-3 leading-7 text-slate-400">Hỗ trợ loop completion tốt hơn cho workflow agent có nhiều vòng suy luận, tool call và kiểm tra kết quả.</p>
+          </article>
+          <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div class="text-2xl">06</div>
+            <h3 class="mt-3 text-xl font-black">Telegram DM Topics</h3>
+            <p class="mt-3 leading-7 text-slate-400">Tổ chức hội thoại Telegram tốt hơn khi agent được sử dụng như một bot hoặc remote assistant.</p>
+          </article>
+          <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div class="text-2xl">07</div>
+            <h3 class="mt-3 text-xl font-black">Prompt Caching</h3>
+            <p class="mt-3 leading-7 text-slate-400">Hỗ trợ prompt caching cho LiteLLM Claude trên OpenAI wire, hữu ích với context và tool definitions lớn.</p>
+          </article>
+          <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div class="text-2xl">08</div>
+            <h3 class="mt-3 text-xl font-black">Cron Hardening</h3>
+            <p class="mt-3 leading-7 text-slate-400">Automation định kỳ được tiếp tục harden, phù hợp với các agent chạy task tự động.</p>
+          </article>
+          <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div class="text-2xl">09</div>
+            <h3 class="mt-3 text-xl font-black">Windows Update Probes</h3>
+            <p class="mt-3 leading-7 text-slate-400">Cải thiện quá trình phát hiện update và độ ổn định của installer/update path trên Windows.</p>
+          </article>
+          <article class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div class="text-2xl">10</div>
+            <h3 class="mt-3 text-xl font-black">Installer Robustness</h3>
+            <p class="mt-3 leading-7 text-slate-400">Độ bền của installer và update flow được cải thiện cho Linux và Windows.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="mt-16">
+        <div class="mb-8">
+          <p class="text-sm font-bold uppercase tracking-widest text-cyan-400">04 · Đánh giá</p>
+          <h2 class="mt-2 text-3xl font-black">v0.16 vs v0.20.2</h2>
+        </div>
+        <div class="overflow-x-auto rounded-2xl border border-slate-800">
+          <table class="w-full min-w-[760px] text-left text-sm">
+            <thead class="bg-slate-900">
+              <tr class="border-b border-slate-800">
+                <th class="px-5 py-4">Tiêu chí</th>
+                <th class="px-5 py-4 text-cyan-300">v0.16</th>
+                <th class="px-5 py-4 text-emerald-300">v0.20.2</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800">
+              <tr><td class="px-5 py-4 font-semibold">Agent Core</td><td class="px-5 py-4">★★★★☆</td><td class="px-5 py-4">★★★★★</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">CLI</td><td class="px-5 py-4">★★★★☆</td><td class="px-5 py-4">★★★★★</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">Desktop</td><td class="px-5 py-4">★★★☆☆</td><td class="px-5 py-4">★★★★★</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">Multi-profile</td><td class="px-5 py-4">★★★☆☆</td><td class="px-5 py-4">★★★★★</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">Multi-gateway</td><td class="px-5 py-4">★★☆☆☆</td><td class="px-5 py-4">★★★★★</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">MCP</td><td class="px-5 py-4">★★★☆☆</td><td class="px-5 py-4">★★★★★</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">Provider routing</td><td class="px-5 py-4">★★★☆☆</td><td class="px-5 py-4">★★★★★</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">Auth isolation</td><td class="px-5 py-4">★★★☆☆</td><td class="px-5 py-4">★★★★★</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">Cron</td><td class="px-5 py-4">★★★☆☆</td><td class="px-5 py-4">★★★★★</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">Windows</td><td class="px-5 py-4">★★★☆☆</td><td class="px-5 py-4">★★★★½</td></tr>
+              <tr><td class="px-5 py-4 font-semibold">Production readiness</td><td class="px-5 py-4">★★★☆☆</td><td class="px-5 py-4">★★★★½</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="mt-4 text-sm text-slate-500">Thang điểm trên mang tính đánh giá tổng hợp để dễ hình dung, không phải benchmark chính thức của NousResearch.</p>
+      </section>
+
+      <section class="mt-16">
+        <div class="mb-8">
+          <p class="text-sm font-bold uppercase tracking-widest text-cyan-400">05 · Quy mô thay đổi</p>
+          <h2 class="mt-2 text-3xl font-black">Hermes đang phát triển rất nhanh</h2>
+        </div>
+        <div class="grid gap-6 md:grid-cols-2">
+          <div class="rounded-2xl border border-cyan-400/20 bg-cyan-400/5 p-7">
+            <h3 class="text-xl font-black text-cyan-300">v0.16.0</h3>
+            <p class="mt-2 text-slate-400">So với v0.15.2</p>
+            <ul class="mt-5 space-y-3 text-slate-300">
+              <li>• 874 commits</li>
+              <li>• 542 merged PR</li>
+              <li>• 1,962 files changed</li>
+              <li>• +205,216 / −46,217 lines</li>
+              <li>• 399 issues closed</li>
+              <li>• 170 contributors</li>
+            </ul>
+          </div>
+          <div class="rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-7">
+            <h3 class="text-xl font-black text-emerald-300">v0.20.2</h3>
+            <p class="mt-2 text-slate-400">Riêng khoảng v0.20.1 → v0.20.2</p>
+            <ul class="mt-5 space-y-3 text-slate-300">
+              <li>• ~967 commits</li>
+              <li>• ~1,279 files changed</li>
+              <li>• +128,522 / −7,622 lines</li>
+              <li>• ~397 merged PR</li>
+              <li>• Patch release để downstream consumers sử dụng</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-16 rounded-3xl border border-amber-400/20 bg-amber-400/5 p-7 lg:p-10">
+        <p class="text-sm font-bold uppercase tracking-widest text-amber-300">06 · Lưu ý version</p>
+        <h2 class="mt-2 text-3xl font-black">v0.20.2 là patch release</h2>
+        <p class="mt-5 max-w-4xl leading-8 text-slate-300">
+          v0.20.2 không phải một major feature release độc lập. Đây là patch release,
+          tập trung vào fix, hardening, stability và integration improvements. Release note
+          cũng cho biết changelog được tuyển chọn đầy đủ từ v0.20.0 sẽ được trình bày trong
+          v0.21.0.
+        </p>
+        <div class="mt-7 rounded-2xl bg-slate-950 p-6 font-mono text-sm text-slate-300">
+          v0.20.0 → v0.20.1 → <span class="text-emerald-400">v0.20.2</span> → v0.21.0
+        </div>
+      </section>
+
+      <section class="mt-16">
+        <div class="mb-8">
+          <p class="text-sm font-bold uppercase tracking-widest text-cyan-400">07 · Có nên nâng cấp?</p>
+          <h2 class="mt-2 text-3xl font-black">Khuyến nghị</h2>
+        </div>
+        <div class="grid gap-5 lg:grid-cols-3">
+          <div class="rounded-2xl border border-emerald-400/30 bg-emerald-400/5 p-7">
+            <div class="text-3xl">✓</div>
+            <h3 class="mt-4 text-xl font-black">Nên upgrade</h3>
+            <p class="mt-3 leading-7 text-slate-300">Nếu đang ở v0.16 và dùng Hermes cho VPS, MCP, coding agent, nhiều provider, profile, Telegram/Discord, cron hoặc Desktop.</p>
+          </div>
+          <div class="rounded-2xl border border-slate-800 bg-slate-900 p-7">
+            <div class="text-3xl">⚠</div>
+            <h3 class="mt-4 text-xl font-black">Backup trước</h3>
+            <p class="mt-3 leading-7 text-slate-300">Backup config, auth, profiles, MCP, custom providers, fallback providers, skills, memory, cron và gateway trước khi nâng cấp hệ thống đang chạy.</p>
+          </div>
+          <div class="rounded-2xl border border-cyan-400/30 bg-cyan-400/5 p-7">
+            <div class="text-3xl">→</div>
+            <h3 class="mt-4 text-xl font-black">Nếu không gấp</h3>
+            <p class="mt-3 leading-7 text-slate-300">Có thể theo dõi v0.21.0 nếu muốn một release có changelog được tổng hợp đầy đủ từ v0.20.0 trở đi.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-16">
+        <div class="mb-8">
+          <p class="text-sm font-bold uppercase tracking-widest text-cyan-400">08 · Use case</p>
+          <h2 class="mt-2 text-3xl font-black">v0.20.2 phù hợp với ai?</h2>
+        </div>
+        <div class="rounded-2xl border border-slate-800 bg-slate-900 p-7">
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-xl bg-slate-950 p-5"><div class="font-black">🧑‍💻 Coding Agent</div><p class="mt-2 text-sm text-slate-400">Provider routing, profiles, tools và MCP.</p></div>
+            <div class="rounded-xl bg-slate-950 p-5"><div class="font-black">🖥️ VPS Agent</div><p class="mt-2 text-sm text-slate-400">Gateway, cron và remote workflows.</p></div>
+            <div class="rounded-xl bg-slate-950 p-5"><div class="font-black">🔌 MCP Platform</div><p class="mt-2 text-sm text-slate-400">Health checks và quản lý MCP tốt hơn.</p></div>
+            <div class="rounded-xl bg-slate-950 p-5"><div class="font-black">🤖 Automation</div><p class="mt-2 text-sm text-slate-400">Cron và agent loop cho task tự động.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-16 rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 p-8 lg:p-10">
+        <p class="text-sm font-bold uppercase tracking-widest text-cyan-400">Kết luận</p>
+        <h2 class="mt-2 text-3xl font-black">Từ “Agent” đến “Agent Platform”</h2>
+        <p class="mt-5 max-w-4xl text-lg leading-8 text-slate-300">
+          Khoảng cách từ Hermes Agent v0.16.0 đến v0.20.2 là rất đáng kể.
+          Nếu v0.16 tập trung đưa Desktop, Profiles, Gateway và MCP thành một hệ thống agent hoàn chỉnh,
+          thì v0.20.2 tiếp tục củng cố nền tảng theo hướng multi-gateway, multi-profile,
+          provider routing, automation và production stability.
+        </p>
+        <div class="mt-8 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-6">
+          <div class="text-sm font-bold text-emerald-300">VERDICT</div>
+          <div class="mt-2 text-2xl font-black">Nếu đang dùng v0.16 → nên nâng cấp lên v0.20.2</div>
+          <p class="mt-2 text-slate-400">Đặc biệt khi anh sử dụng MCP, nhiều model/provider, profiles, Gateway hoặc automation.</p>
+        </div>
+      </section>
+
+      <section class="mt-16">
+        <div class="mb-6">
+          <h2 class="text-2xl font-black">Nguồn chính thức</h2>
+        </div>
+        <div class="space-y-3">
+          <a href="https://github.com/NousResearch/hermes-agent/releases/tag/v2026.8.16" target="_blank" rel="noopener noreferrer"
+             class="block rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-cyan-400/50">
+            <div class="font-bold text-cyan-300">Hermes Agent v2026.8.16 / v0.20.2</div>
+            <div class="mt-1 text-sm text-slate-400">Release notes chính thức trên GitHub</div>
+          </a>
+          <a href="https://github.com/NousResearch/hermes-agent/releases" target="_blank" rel="noopener noreferrer"
+             class="block rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-cyan-400/50">
+            <div class="font-bold text-cyan-300">Hermes Agent Releases</div>
+            <div class="mt-1 text-sm text-slate-400">Danh sách toàn bộ release</div>
+          </a>
+          <a href="https://github.com/NousResearch/hermes-agent" target="_blank" rel="noopener noreferrer"
+             class="block rounded-xl border border-slate-800 bg-slate-900 p-5 transition hover:border-cyan-400/50">
+            <div class="font-bold text-cyan-300">NousResearch / hermes-agent</div>
+            <div class="mt-1 text-sm text-slate-400">Repository chính thức</div>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="mt-16 border-t border-slate-800">
+      <div class="mx-auto max-w-6xl px-6 py-8 text-sm text-slate-500">
+        Hermes Agent version comparison · HTML5 + Tailwind CSS · Updated August 2026
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
