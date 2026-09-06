@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeepSeek Harness — Hướng dẫn tổng hợp</title>
+<style>
+:root{
+  --bg:#0b1020;--panel:#11182b;--panel2:#17213a;--text:#e8edf7;
+  --muted:#9eabc2;--accent:#62a8ff;--accent2:#8b7cff;--border:#263452;
+  --code:#0a0f1b;--good:#54d39a;--warn:#ffc857;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.65}
+.container{max-width:1180px;margin:auto;padding:0 24px}
+header{padding:56px 0 40px;background:linear-gradient(135deg,#101a35,#0b1020 65%)}
+.badge{display:inline-block;padding:6px 12px;border:1px solid var(--border);border-radius:999px;color:var(--accent);font-size:13px}
+h1{font-size:44px;line-height:1.1;margin:18px 0 14px}
+h2{font-size:30px;margin-top:52px;border-bottom:1px solid var(--border);padding-bottom:10px}
+h3{font-size:21px;margin-top:30px;color:#dce7ff}
+p{color:#c5cee0}
+.lead{font-size:19px;color:#cbd7ed;max-width:900px}
+nav{position:sticky;top:0;z-index:10;background:rgba(11,16,32,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+nav .inner{display:flex;gap:8px;overflow:auto;padding:10px 24px}
+nav a{color:#b9c6dc;text-decoration:none;white-space:nowrap;padding:7px 10px;border-radius:7px;font-size:14px}
+nav a:hover{background:var(--panel2);color:white}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;margin:18px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:15px}
+.small{font-size:14px;color:var(--muted)}
+code{font-family:Consolas,Monaco,monospace}
+pre{background:var(--code);border:1px solid var(--border);border-radius:10px;padding:17px;overflow:auto;color:#dce7ff}
+.inline{background:#1b2741;padding:2px 6px;border-radius:5px;color:#a9c8ff}
+table{width:100%;border-collapse:collapse;margin:18px 0;background:var(--panel)}
+th,td{text-align:left;padding:12px 14px;border:1px solid var(--border);vertical-align:top}
+th{background:var(--panel2)}
+.callout{border-left:4px solid var(--accent);background:#101a31;padding:16px 18px;margin:20px 0}
+.warn{border-left-color:var(--warn)}
+.good{border-left-color:var(--good)}
+.diagram{background:#0a0f1b;border:1px solid var(--border);border-radius:12px;padding:20px;overflow:auto}
+.diagram pre{border:0;margin:0;padding:0;background:transparent}
+footer{margin-top:70px;padding:35px 0;border-top:1px solid var(--border);color:var(--muted)}
+a{color:#76b5ff}
+ul{padding-left:22px}
+kbd{background:#202b43;border:1px solid #34425f;border-radius:5px;padding:2px 6px}
+</style>
+</head>
+
+<body>
+<header id="top">
+<div class="container">
+<span class="badge">DeepSeek Harness • Developer Guide</span>
+<h1>DeepSeek Harness</h1>
+<p class="lead">Tài liệu tổng hợp từ khái niệm nền tảng đến cài đặt, sử dụng, Agent Loop, Tools, Session, Permission, Sandbox, Plugin, Cordis, Sub-agent, Workflow và hướng xây Agent riêng.</p>
+<p class="small">Tài liệu nên được đối chiếu với repository/documentation chính thức vì DeepSeek Harness đang được phát triển và có thể thay đổi API/config.</p>
+</div>
+</header>
+
+<nav><div class="inner container">
+<a href="#overview">Tổng quan</a><a href="#install">Cài đặt</a><a href="#first">Chạy lần đầu</a>
+<a href="#architecture">Kiến trúc</a><a href="#agent-loop">Agent Loop</a><a href="#tools">Tools</a>
+<a href="#session">Session</a><a href="#security">Permission</a><a href="#modes">Modes</a>
+<a href="#plugins">Plugin</a><a href="#cordis">Cordis</a><a href="#subagents">Sub-agent</a>
+<a href="#roadmap">Roadmap</a>
+</div></nav>
+
+<main class="container">
+
+<section id="overview">
+<h2>1. DeepSeek Harness là gì?</h2>
+<div class="card">
+<p><strong>DeepSeek Harness không phải là một AI model mới.</strong> Nó là một framework/runtime để xây dựng và vận hành AI Agent.</p>
+<p>Cách hiểu đơn giản nhất:</p>
+<div class="diagram"><pre>
+Agent = Model + Harness
+
+Model
+  ↓
+suy luận / quyết định
+  ↓
+Harness
+  ├─ Tools
+  ├─ Filesystem
+  ├─ Shell / Terminal
+  ├─ Session
+  ├─ Permission
+  ├─ Sandbox
+  ├─ Sub-agent
+  ├─ Workflow
+  └─ các plugin khác
+  ↓
+Thực hiện công việc trong môi trường thật
+</pre></div>
+</div>
+
+<div class="callout good">
+<strong>Điểm quan trọng:</strong> Harness biến model từ một hệ thống chủ yếu trả lời bằng text thành một Agent có khả năng quan sát môi trường, gọi tool, thực hiện hành động, kiểm tra kết quả và tiếp tục vòng làm việc.
+</div>
+
+<h3>So sánh chatbot và Agent</h3>
+<table>
+<tr><th>Chatbot</th><th>Agent có Harness</th></tr>
+<tr><td>User → Model → Text</td><td>User → Agent → Model → Tool → Result → Model → ...</td></tr>
+<tr><td>Chủ yếu đưa hướng dẫn/code</td><td>Có thể đọc file, sửa file, chạy command, kiểm tra kết quả</td></tr>
+<tr><td>Không nhất thiết có state lâu dài</td><td>Có session/log/persistence</td></tr>
+</table>
+
+<h3>Tư tưởng kiến trúc</h3>
+<p>DeepSeek Harness nhấn mạnh kiến trúc plugin: các capability được ghép vào runtime thay vì biến mọi thứ thành một khối core cố định.</p>
+</section>
+
+<section id="install">
+<h2>2. Cài đặt</h2>
+<h3>2.1 Cách nhanh nhất</h3>
+<pre><code>npx @deepseek-ai/dsh web</code></pre>
+<p>Sau khi chạy, Web UI mặc định có thể được mở tại:</p>
+<pre><code>http://127.0.0.1:3080</code></pre>
+
+<h3>2.2 Chạy từ source</h3>
+<pre><code>git clone https://github.com/deepseek-ai/deepseek-harness.git
+cd deepseek-harness
+pnpm install
+pnpm run build
+pnpm dsh web</code></pre>
+
+<div class="callout warn">
+<strong>Lưu ý:</strong> Repository đang ở trạng thái Developer Preview. Không nên giả định API/plugin/config sẽ giữ nguyên giữa các phiên bản.
+</div>
+
+<h3>2.3 Windows và Ubuntu</h3>
+<table>
+<tr><th>Windows</th><td>Có thể chạy qua PowerShell/Terminal. Khi làm project thực tế nên chọn một workspace riêng, ví dụ <code>D:\DEVKIT\PROJECT</code>.</td></tr>
+<tr><th>Ubuntu</th><td>Chạy trong Terminal. Với server, nên cân nhắc reverse proxy, firewall, authentication và không expose Web UI trực tiếp ra Internet nếu chưa bảo vệ.</td></tr>
+</table>
+</section>
+
+<section id="first">
+<h2>3. Chạy lần đầu</h2>
+<ol>
+<li>Khởi động Web UI.</li>
+<li>Mở địa chỉ localhost được in ra terminal.</li>
+<li>Cấu hình model/provider và credential.</li>
+<li>Chọn workspace.</li>
+<li>Tạo session.</li>
+<li>Giao một task nhỏ để kiểm tra.</li>
+</ol>
+
+<h3>Prompt test nên dùng</h3>
+<pre><code>Summarize this repository and identify its main packages.</code></pre>
+
+<p>Sau đó thử từng bước:</p>
+<pre><code>List the files in this project.
+
+Read package.json.
+
+Find the main entry point.
+
+Run the project's tests.
+
+If a test fails, explain the failure first.</code></pre>
+
+<div class="callout">
+Nên bắt đầu bằng task không phá hoại. Đừng ngay lập tức cấp quyền rộng rồi yêu cầu Agent “sửa toàn bộ project”.
+</div>
+</section>
+
+<section id="architecture">
+<h2>4. Kiến trúc tổng thể</h2>
+<div class="diagram"><pre>
+                         DeepSeek Harness
+                                │
+                         ┌──────┴──────┐
+                         │   Runtime   │
+                         └──────┬──────┘
+                                │
+             ┌──────────────────┼──────────────────┐
+             ↓                  ↓                  ↓
+            LLM               Agent              Tools
+             │                  │                  │
+             │             Agent Loop              ├─ Filesystem
+             │                  │                  ├─ Bash
+             │                  │                  ├─ Web
+             │                  │                  ├─ LSP
+             │                  │                  └─ Code Runtime
+             │                  │
+             └──────────────────┼──────────────────┘
+                                ↓
+                    Session / Persistence
+                                │
+                 Permission / Sandbox / Approval
+                                │
+                    Plugin / Cordis Runtime
+</pre></div>
+
+<h3>Các subsystem cần nhớ</h3>
+<table>
+<tr><th>Subsystem</th><th>Vai trò</th></tr>
+<tr><td>LLM</td><td>Kết nối model/provider.</td></tr>
+<tr><td>Agent</td><td>Đại diện cho AI Agent.</td></tr>
+<tr><td>Agent Loop</td><td>Điều phối chu trình model → tool → result → model.</td></tr>
+<tr><td>Tools</td><td>Các hành động Agent có thể thực hiện.</td></tr>
+<tr><td>Filesystem</td><td>Đọc/ghi workspace.</td></tr>
+<tr><td>Shell / PTY</td><td>Thực thi command và terminal tương tác.</td></tr>
+<tr><td>Session</td><td>Quản lý lịch sử và trajectory.</td></tr>
+<tr><td>Persistence</td><td>Lưu state/session lâu dài.</td></tr>
+<tr><td>Sandbox</td><td>Giới hạn môi trường Agent.</td></tr>
+<tr><td>Permission / Approval</td><td>Kiểm soát hành động nguy hiểm.</td></tr>
+<tr><td>LSP</td><td>Navigation/hiểu cấu trúc source code.</td></tr>
+<tr><td>Sub-agent</td><td>Agent con xử lý nhiệm vụ chuyên biệt.</td></tr>
+<tr><td>Workflow</td><td>Chuỗi quy trình có cấu trúc.</td></tr>
+<tr><td>Background Jobs</td><td>Tác vụ chạy nền.</td></tr>
+<tr><td>Plugin</td><td>Mở rộng capability của runtime.</td></tr>
+</table>
+</section>
+
+<section id="agent-loop">
+<h2>5. Agent Loop — trái tim của Agent</h2>
+<p>Đây là phần quan trọng nhất cần hiểu nếu muốn xây Agent.</p>
+<div class="diagram"><pre>
+User task
+   ↓
+Agent
+   ↓
+LLM
+   ↓
+Model quyết định:
+"Đã đủ thông tin chưa?"
+   │
+   ├── Có → trả lời / hoàn thành
+   │
+   └── Chưa
+        ↓
+      Tool call
+        ↓
+      Tool execution
+        ↓
+      Tool result
+        ↓
+       LLM
+        ↓
+      Tool call?
+       ↙    ↘
+     Yes     No
+      │       │
+      └──→────┘
+          ↓
+        Done
+</pre></div>
+
+<h3>Ví dụ sửa bug</h3>
+<pre><code>User:
+"Fix the failing tests in this repository."
+
+Agent:
+1. Inspect project
+2. Read package.json
+3. Find test command
+4. Run tests
+5. Inspect failure
+6. Read relevant files
+7. Edit code
+8. Run tests again
+9. If still failing → diagnose and repeat
+10. Report result</code></pre>
+
+<p>Đây là lý do Agent có thể hoàn thành công việc nhiều bước thay vì chỉ sinh một đoạn code.</p>
+</section>
+
+<section id="tools">
+<h2>6. Tools — tay chân của Agent</h2>
+<p>Model tự nó không thể “đi vào” filesystem hay terminal. Harness cung cấp tool để model gọi.</p>
+<div class="diagram"><pre>
+LLM
+ │
+ ├── read_file
+ ├── write_file
+ ├── search
+ ├── bash
+ ├── terminal
+ ├── web
+ ├── LSP
+ └── các custom tools
+</pre></div>
+
+<h3>Tool call concept</h3>
+<pre><code>Model:
+"I need to inspect package.json"
+        ↓
+Tool call:
+read_file("package.json")
+        ↓
+Harness executes
+        ↓
+Tool result
+        ↓
+Model continues</code></pre>
+
+<h3>Custom tool</h3>
+<p>Về mặt ý tưởng, anh có thể tạo một tool riêng như:</p>
+<pre><code>check_vps()</code></pre>
+<p>Tool có thể gọi hệ thống quản trị/VPS rồi trả kết quả về Agent. Ví dụ:</p>
+<pre><code>Agent
+  ↓
+check_vps
+  ↓
+SSH / API
+  ↓
+VPS
+  ↓
+status
+  ↓
+Agent</code></pre>
+</section>
+
+<section id="session">
+<h2>7. Session và Persistence</h2>
+<p>Session không chỉ là một đoạn chat. DSH sử dụng session/event log để ghi lại diễn tiến của Agent.</p>
+<div class="diagram"><pre>
+Session
+├── user/message
+├── turn/start
+├── assistant/chunk
+├── tool/call
+├── tool/result
+├── assistant/chunk
+├── tool/call
+├── tool/result
+└── turn/end
+</pre></div>
+
+<p>Kiểu thiết kế này giúp theo dõi trajectory, resume/replay và dựng lại lịch sử gửi cho model.</p>
+
+<h3>Tại sao quan trọng?</h3>
+<ul>
+<li>Biết Agent đã làm gì.</li>
+<li>Biết tool nào đã được gọi.</li>
+<li>Debug hành vi Agent.</li>
+<li>Resume một công việc.</li>
+<li>Phân tích trajectory để cải thiện Agent.</li>
+</ul>
+</section>
+
+<section id="security">
+<h2>8. Permission, Approval và Sandbox</h2>
+<p>Agent có quyền shell/file thì có thể gây tác động thật. Vì vậy đây là nhóm subsystem không nên bỏ qua.</p>
+
+<table>
+<tr><th>Khái niệm</th><th>Ý nghĩa</th></tr>
+<tr><td>Sandbox</td><td>Giới hạn môi trường Agent có thể truy cập/thao tác.</td></tr>
+<tr><td>Permission</td><td>Xác định Agent được làm gì.</td></tr>
+<tr><td>Approval</td><td>Yêu cầu người dùng xác nhận trước một số hành động.</td></tr>
+</table>
+
+<h3>Nguyên tắc an toàn</h3>
+<pre><code>Development:
+Workspace-limited + approval
+
+Testing:
+Sandbox phù hợp + quyền vừa đủ
+
+Production:
+Least privilege
++ authentication
++ network restrictions
++ logging
++ backup</code></pre>
+
+<div class="callout warn">
+<strong>Không nên:</strong> cấp full access cho Agent rồi chạy các prompt không kiểm soát trên máy/VPS chứa dữ liệu quan trọng.
+</div>
+</section>
+
+<section id="modes">
+<h2>9. Các mode</h2>
+<table>
+<tr><th>Mode</th><th>Mục đích</th></tr>
+<tr><td>Standard</td><td>Runtime/toolset đầy đủ cho sử dụng Agent thông thường.</td></tr>
+<tr><td>Code</td><td>Thiên về việc model điều phối nhiều vòng tool/code execution.</td></tr>
+<tr><td>Minimal</td><td>Môi trường tối thiểu, phù hợp thử nghiệm/benchmark.</td></tr>
+<tr><td>Creator</td><td>Hướng tới việc thử nghiệm và xây capability/Agent.</td></tr>
+</table>
+<p>Các tên/mô tả mode có thể thay đổi theo phiên bản; hãy kiểm tra tài liệu/repository tương ứng với phiên bản đang dùng.</p>
+</section>
+
+<section id="plugins">
+<h2>10. Plugin — phần quan trọng nhất để mở rộng</h2>
+<p>Tư tưởng của DSH là <strong>Everything is a Plugin</strong>. Thay vì sửa core cho từng nhu cầu, capability có thể được đóng gói thành plugin.</p>
+<div class="diagram"><pre>
+DeepSeek Harness
+      │
+      └── Plugin
+          ├── Tool
+          ├── LLM Provider
+          ├── Filesystem
+          ├── Permission
+          ├── UI
+          ├── Jobs
+          ├── Events
+          └── Agent capability
+</pre></div>
+
+<h3>Lifecycle concept</h3>
+<pre><code>PENDING
+  ↓
+LOADING
+  ↓
+ACTIVE
+  ↓
+UNLOADING
+  ↓
+DISPOSED
+
+Nếu lỗi:
+LOADING → FAILED</code></pre>
+
+<h3>Plugin đầu tiên nên làm gì?</h3>
+<p>Nên bắt đầu bằng một plugin nhỏ, ví dụ đăng ký một tool <code>hello</code> hoặc <code>project_info</code>. Sau khi hiểu lifecycle mới chuyển sang custom LLM/provider hoặc plugin có side effects.</p>
+</section>
+
+<section id="cordis">
+<h2>11. Cordis</h2>
+<p>Cordis là framework/runtime plugin bên dưới kiến trúc Harness. Ba khái niệm cần nhớ:</p>
+
+<div class="grid">
+<div class="card"><h3>Context</h3><p>Nơi các service/capability được cung cấp và truy cập.</p></div>
+<div class="card"><h3>Plugin</h3><p>Đơn vị mở rộng đăng ký capability vào runtime.</p></div>
+<div class="card"><h3>Dependency</h3><p>Plugin có thể yêu cầu service/plugin khác trước khi hoạt động.</p></div>
+</div>
+
+<h3>Mô hình tư duy</h3>
+<pre><code>Context
+ ├── LLM service
+ ├── Tools service
+ ├── Session service
+ ├── Shell service
+ ├── Filesystem service
+ └── các service khác
+
+Plugin A → dùng Tools
+Plugin B → dùng LLM
+Plugin C → dùng Session + Tools</code></pre>
+
+<p>Nếu anh muốn đọc source sâu, nên học Cordis sau khi đã hiểu Agent Loop, Tool và Session.</p>
+</section>
+
+<section id="subagents">
+<h2>12. Sub-agent, Workflow và Background Jobs</h2>
+
+<h3>12.1 Sub-agent</h3>
+<div class="diagram"><pre>
+MAIN AGENT
+├── Sub-agent: frontend analysis
+├── Sub-agent: backend analysis
+└── Sub-agent: testing
+         ↓
+     Main Agent
+         ↓
+      Summary
+</pre></div>
+
+<h3>12.2 Workflow</h3>
+<pre><code>Deploy application
+
+1. Pull source
+2. Install dependencies
+3. Build
+4. Test
+5. Restart
+6. Health check
+7. Rollback if necessary</code></pre>
+
+<h3>12.3 Background jobs</h3>
+<p>Dùng cho những công việc cần chạy nền thay vì giữ Agent ở một thao tác duy nhất.</p>
+</section>
+
+<section id="roadmap">
+<h2>13. Roadmap học DeepSeek Harness</h2>
+<div class="card">
+<pre><code>LEVEL 1
+├─ Cài DSH
+├─ Web UI
+├─ Provider
+└─ Workspace
+
+LEVEL 2
+├─ Agent
+├─ Agent Loop
+├─ Tool
+└─ Tool Result
+
+LEVEL 3
+├─ Filesystem
+├─ Shell
+├─ Sandbox
+├─ Permission
+└─ Approval
+
+LEVEL 4
+├─ Session
+├─ Persistence
+├─ Replay / Resume
+└─ Trajectory
+
+LEVEL 5
+├─ Sub-agent
+├─ Workflow
+├─ Background Jobs
+└─ Plan / Goals
+
+LEVEL 6
+├─ Cordis
+├─ Context
+├─ Service
+├─ Event
+└─ Plugin
+
+LEVEL 7
+├─ Custom Tool
+├─ Custom Provider
+├─ Custom Plugin
+└─ Custom Agent
+
+LEVEL 8
+└─ Xây Agent Platform riêng</code></pre>
+</div>
+
+<h2>14. Bài lab thực hành đề xuất</h2>
+<table>
+<tr><th>Lab</th><th>Mục tiêu</th></tr>
+<tr><td>01</td><td>Khởi động Web UI và cấu hình model.</td></tr>
+<tr><td>02</td><td>Cho Agent đọc một repository.</td></tr>
+<tr><td>03</td><td>Cho Agent sửa một file.</td></tr>
+<tr><td>04</td><td>Cho Agent chạy test và xử lý failure.</td></tr>
+<tr><td>05</td><td>Quan sát tool calls và session.</td></tr>
+<tr><td>06</td><td>Thử sandbox/approval.</td></tr>
+<tr><td>07</td><td>Tạo custom tool.</td></tr>
+<tr><td>08</td><td>Tạo plugin đầu tiên.</td></tr>
+<tr><td>09</td><td>Thử custom provider.</td></tr>
+<tr><td>10</td><td>Tạo sub-agent/workflow.</td></tr>
+<tr><td>11</td><td>Tích hợp Agent với API gateway/router.</td></tr>
+<tr><td>12</td><td>Xây một coding agent riêng.</td></tr>
+</table>
+
+<h2>15. Ví dụ kiến trúc nâng cao</h2>
+<p>Nếu muốn dùng Harness như lớp Agent phía trên nhiều model/provider:</p>
+<div class="diagram"><pre>
+                       Your Agent Platform
+                               │
+                       DeepSeek Harness
+                               │
+              ┌────────────────┼────────────────┐
+              ↓                ↓                ↓
+            Tools           Subagents        Workflows
+              │                │                │
+              └────────────────┼────────────────┘
+                               ↓
+                         LLM Provider
+                    ┌──────────┼──────────┐
+                    ↓          ↓          ↓
+                 DeepSeek    OpenAI      Gateway
+                                           │
+                              ┌────────────┼────────────┐
+                              ↓            ↓            ↓
+                           Claude        Gemini         GLM
+</pre></div>
+
+<p>Điểm mạnh của kiến trúc này là tách <strong>Agent logic</strong> khỏi <strong>model routing</strong>. Khi provider thay đổi, Agent layer không nhất thiết phải thay đổi theo.</p>
+
+<h2>16. Checklist trước khi đưa vào sử dụng thật</h2>
+<ul>
+<li>□ Khóa phiên bản DSH/package thay vì luôn dùng latest.</li>
+<li>□ Không cấp quyền filesystem rộng hơn cần thiết.</li>
+<li>□ Hạn chế shell/network access.</li>
+<li>□ Bật approval cho thao tác nguy hiểm.</li>
+<li>□ Có Git/backup trước khi cho Agent sửa project.</li>
+<li>□ Log tool calls và session.</li>
+<li>□ Không để API key trong source code.</li>
+<li>□ Với VPS: không expose UI/API trực tiếp nếu chưa có authentication/reverse proxy/firewall.</li>
+<li>□ Test plugin ở môi trường riêng trước khi đưa vào production.</li>
+</ul>
+
+<h2>17. Nguồn chính thức</h2>
+<ul>
+<li><a href="https://github.com/deepseek-ai/deepseek-harness" target="_blank" rel="noopener">GitHub — deepseek-ai/deepseek-harness</a></li>
+<li><a href="https://deepseek-harness.github.io/deepseek-harness/en/" target="_blank" rel="noopener">DeepSeek Harness Documentation</a></li>
+<li><a href="https://www.deepseek.com/harness/en/" target="_blank" rel="noopener">DeepSeek Harness — giới thiệu</a></li>
+</ul>
+
+<div class="callout">
+<strong>Kết luận:</strong> Nếu chỉ muốn dùng AI coding agent, hãy bắt đầu từ Web UI. Nếu muốn hiểu và xây hệ thống Agent riêng, hãy đi theo thứ tự <strong>Agent Loop → Tools → Session → Permission/Sandbox → Sub-agent → Plugin → Cordis → Custom Agent</strong>.
+</div>
+</section>
+
+</main>
+
+<footer>
+<div class="container">
+DeepSeek Harness — tài liệu tổng hợp học tập. Nội dung kiến trúc/CLI có thể thay đổi theo phiên bản; luôn đối chiếu repository và documentation chính thức trước khi triển khai production.
+</div>
+</footer>
+</body>
+</html>
