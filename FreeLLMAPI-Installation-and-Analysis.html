@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeLLMAPI - Hướng dẫn cài đặt & Phân tích</title>
+<style>
+:root {
+  --bg:#f5f7fb; --card:#fff; --text:#172033; --muted:#64748b;
+  --accent:#2563eb; --accent2:#7c3aed; --border:#e2e8f0;
+  --code:#0f172a; --codeText:#e2e8f0; --good:#15803d; --warn:#b45309;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.7}
+.container{max-width:1050px;margin:auto;padding:32px 20px 70px}
+.hero{background:linear-gradient(135deg,#0f172a,#1e3a8a,#6d28d9);color:white;border-radius:22px;padding:48px 42px;margin-bottom:28px;box-shadow:0 15px 40px #0f172a25}
+.hero h1{font-size:42px;line-height:1.15;margin:0 0 12px}
+.hero p{margin:6px 0;color:#dbeafe;font-size:18px}
+.badges span{display:inline-block;background:#ffffff1c;border:1px solid #ffffff35;border-radius:999px;padding:5px 12px;margin:14px 6px 0 0;font-size:13px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;margin:22px 0;box-shadow:0 5px 18px #0f172a0a}
+h2{font-size:27px;border-left:5px solid var(--accent);padding-left:12px;margin-top:0}
+h3{font-size:20px;color:#1e3a8a}
+p{margin:10px 0}
+ul,ol{padding-left:25px}
+li{margin:7px 0}
+code{font-family:Consolas,Monaco,monospace}
+pre{background:var(--code);color:var(--codeText);padding:18px 20px;border-radius:12px;overflow:auto;border:1px solid #1e293b;font-size:14px;line-height:1.55}
+.inline{background:#e2e8f0;border-radius:5px;padding:2px 6px;color:#0f172a}
+.note,.warning,.success{padding:16px 18px;border-radius:10px;margin:16px 0}
+.note{background:#eff6ff;border-left:4px solid #2563eb}
+.warning{background:#fff7ed;border-left:4px solid #ea580c}
+.success{background:#f0fdf4;border-left:4px solid #16a34a}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+th,td{border:1px solid var(--border);padding:12px;text-align:left;vertical-align:top}
+th{background:#f1f5f9}
+.endpoint{font-family:Consolas,monospace;background:#eef2ff;padding:10px 12px;border-radius:8px;display:block;margin:8px 0}
+.toc a{color:var(--accent);text-decoration:none}
+.toc a:hover{text-decoration:underline}
+footer{text-align:center;color:var(--muted);font-size:13px;margin-top:35px}
+@media(max-width:700px){.hero{padding:32px 24px}.hero h1{font-size:32px}.card{padding:21px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="hero">
+  <h1>FreeLLMAPI</h1>
+  <p>Hướng dẫn cài đặt & phân tích kỹ thuật</p>
+  <p>Ubuntu VPS • Native install • systemd • Nginx/HTTPS • AI Coding Agents</p>
+  <div class="badges">
+    <span>Node.js 20+</span><span>OpenAI-compatible</span><span>SQLite</span>
+    <span>Fallback</span><span>Free Tier Routing</span>
+  </div>
+</header>
+
+<section class="card toc">
+<h2>Mục lục</h2>
+<ol>
+<li><a href="#what">FreeLLMAPI là gì?</a></li>
+<li><a href="#benefits">Lợi ích chính</a></li>
+<li><a href="#analysis">Phân tích ưu và nhược điểm</a></li>
+<li><a href="#architecture">Kiến trúc triển khai</a></li>
+<li><a href="#requirements">Yêu cầu trước khi cài</a></li>
+<li><a href="#install">Hướng dẫn cài đặt</a></li>
+<li><a href="#dashboard">Cấu hình Dashboard</a></li>
+<li><a href="#setup-code">Setup code khi truy cập remote</a></li>
+<li><a href="#test">Test API</a></li>
+<li><a href="#systemd">Tạo systemd service</a></li>
+<li><a href="#check">Reload và kiểm tra service</a></li>
+<li><a href="#nginx">Nginx + HTTPS</a></li>
+<li><a href="#agents">Kết nối Claude Code, OpenCode, Codex</a></li>
+<li><a href="#security">Lưu ý bảo mật và vận hành</a></li>
+<li><a href="#quick">Quy trình cài đặt nhanh</a></li>
+</ol>
+</section>
+
+<section class="card" id="what">
+<h2>1. FreeLLMAPI là gì?</h2>
+<p>
+<strong>FreeLLMAPI</strong> là một LLM gateway/router chạy local hoặc trên máy chủ riêng.
+Nó cho phép gom nhiều free tier và các endpoint OpenAI-compatible vào một API thống nhất.
+Thay vì cấu hình từng provider trong từng ứng dụng, client có thể gọi một endpoint
+FreeLLMAPI và để gateway xử lý routing, theo dõi rate limit và fallback giữa các provider/model.
+</p>
+<div class="note">
+<strong>Điểm cần hiểu rõ:</strong> FreeLLMAPI không tự cấp hàng tỷ token miễn phí.
+Các con số về model/token mà dự án công bố là tổng hợp năng lực free tier của các upstream
+provider mà người dùng kết nối.
+</div>
+<p>
+Dự án hỗ trợ nhiều provider và có thể làm lớp trung gian cho các AI coding agent như
+Claude Code, Codex CLI, OpenCode, Aider, Cline, Continue và các client hỗ trợ API tương thích.
+</p>
+</section>
+
+<section class="card" id="benefits">
+<h2>2. Lợi ích chính</h2>
+<ul>
+<li><strong>Một endpoint:</strong> nhiều provider được gom vào một API duy nhất.</li>
+<li><strong>OpenAI-compatible:</strong> thuận tiện cho nhiều AI coding agent.</li>
+<li><strong>Fallback Chain:</strong> có thể chuyển sang endpoint/model khác khi endpoint ưu tiên gặp lỗi hoặc giới hạn.</li>
+<li><strong>Quản lý API key tập trung:</strong> provider key được cấu hình trong Dashboard.</li>
+<li><strong>Mã hóa key:</strong> provider API key được lưu trong database dưới dạng mã hóa.</li>
+<li><strong>Dashboard:</strong> quản lý provider, key, routing và các thiết lập liên quan.</li>
+<li><strong>Self-host:</strong> có thể chạy trên VPS riêng và không bắt buộc Docker.</li>
+</ul>
+</section>
+
+<section class="card" id="analysis">
+<h2>3. Phân tích ưu và nhược điểm</h2>
+<table>
+<thead><tr><th>Khía cạnh</th><th>Ưu điểm</th><th>Hạn chế / lưu ý</th></tr></thead>
+<tbody>
+<tr><td>Tập trung API</td><td>Một endpoint cho nhiều provider.</td><td>Gateway trở thành điểm phụ thuộc trung tâm.</td></tr>
+<tr><td>Free tier</td><td>Có thể tận dụng quota miễn phí từ nhiều upstream.</td><td>Quota phụ thuộc provider và có thể thay đổi.</td></tr>
+<tr><td>Fallback</td><td>Giảm ảnh hưởng khi provider/model bị rate limit hoặc lỗi.</td><td>Không phải lỗi nào cũng fallback hoàn hảo; model khác nhau có thể cho hành vi khác nhau.</td></tr>
+<tr><td>Bảo mật</td><td>Provider key được mã hóa trong database.</td><td><span class="inline">ENCRYPTION_KEY</span> phải được bảo vệ và giữ nguyên khi nâng cấp.</td></tr>
+<tr><td>Vận hành</td><td>Native + systemd dễ kiểm soát trên Ubuntu.</td><td>Cần tự quản lý Node.js, database, service và reverse proxy.</td></tr>
+<tr><td>Internet</td><td>Có thể đặt sau Nginx/HTTPS.</td><td>Không nên expose trực tiếp port 3001 ra Internet.</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="card" id="architecture">
+<h2>4. Kiến trúc triển khai đề xuất</h2>
+<p>Mô hình phù hợp cho Ubuntu VPS:</p>
+<div class="endpoint">Internet → Nginx :443 → 127.0.0.1:3001 → FreeLLMAPI → Upstream Providers</div>
+<ul>
+<li>FreeLLMAPI lắng nghe nội bộ tại <span class="inline">127.0.0.1:3001</span>.</li>
+<li>Nginx đảm nhiệm HTTPS và reverse proxy.</li>
+<li>Firewall không cần mở trực tiếp port 3001.</li>
+<li>Client/agent bên ngoài truy cập qua domain HTTPS.</li>
+</ul>
+</section>
+
+<section class="card" id="requirements">
+<h2>5. Yêu cầu trước khi cài</h2>
+<ul>
+<li>Ubuntu VPS/server.</li>
+<li><strong>Node.js 20+</strong>.</li>
+<li><strong>npm</strong>.</li>
+<li><strong>Git</strong>.</li>
+<li>Quyền sudo nếu muốn tạo systemd service.</li>
+</ul>
+</section>
+
+<section class="card" id="install">
+<h2>6. Hướng dẫn cài đặt FreeLLMAPI</h2>
+
+<h3>Bước 1: Clone repository và cài dependencies</h3>
+<pre><code>git clone https://github.com/tashfeenahmed/freellmapi.git
+cd freellmapi
+npm install</code></pre>
+
+<h3>Bước 2: Sinh khóa mã hóa cho SQLite</h3>
+<pre><code>cp .env.example .env
+echo "ENCRYPTION_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")" >> .env</code></pre>
+
+<div class="warning">
+<strong>Rất quan trọng:</strong> ENCRYPTION_KEY dùng để mã hóa API key được lưu trong database.
+Hãy backup khóa này. Không được tùy tiện tạo khóa mới trên một installation đang có dữ liệu.
+</div>
+
+<h3>Bước 3: Khởi chạy Development</h3>
+<pre><code>npm run dev</code></pre>
+<p>
+Development khởi chạy backend trên <strong>3001</strong> và Vite dashboard UI trên
+<strong>5173</strong>, kèm HMR.
+</p>
+
+<h3>Production</h3>
+<pre><code>npm run build
+node server/dist/index.js</code></pre>
+<p>
+Sau khi build, server và dashboard cùng được phục vụ trên <strong>port 3001</strong>.
+</p>
+</section>
+
+<section class="card" id="dashboard">
+<h2>7. Cấu hình qua Dashboard</h2>
+<p>Development:</p>
+<div class="endpoint">http://localhost:5173</div>
+<p>Production:</p>
+<div class="endpoint">http://localhost:3001</div>
+
+<ol>
+<li>Vào <strong>Keys</strong>.</li>
+<li>Thêm API key cho từng provider mà bạn đã đăng ký free tier.</li>
+<li>Vào <strong>Fallback Chain</strong>.</li>
+<li>Kéo thả để sắp xếp thứ tự ưu tiên model/provider.</li>
+<li>Copy unified API key dạng <strong>freellmapi-...</strong> tại trang Keys.</li>
+</ol>
+</section>
+
+<section class="card" id="setup-code">
+<h2>8. Setup code khi truy cập Dashboard từ máy remote</h2>
+<p>
+Khi tạo tài khoản đầu tiên từ một thiết bị remote, FreeLLMAPI có thể yêu cầu
+<strong>setup code</strong>. Đây là cơ chế bảo vệ việc tạo tài khoản đầu tiên.
+</p>
+<p>Kiểm tra log:</p>
+<pre><code>sudo journalctl -u freellmapi -n 100 --no-pager</code></pre>
+
+<p>Hoặc lọc setup code:</p>
+<pre><code>sudo journalctl -u freellmapi --no-pager | grep -i -E "setup|code"</code></pre>
+
+<p>Nếu cần theo dõi realtime:</p>
+<pre><code>sudo journalctl -u freellmapi -f</code></pre>
+
+<div class="warning">
+Không nên xóa database hoặc tạo ENCRYPTION_KEY mới để xử lý setup code.
+Việc thay đổi khóa có thể làm các provider key đã mã hóa không thể giải mã.
+</div>
+</section>
+
+<section class="card" id="test">
+<h2>9. Test API</h2>
+<h3>Kiểm tra danh sách model</h3>
+<pre><code>curl http://127.0.0.1:3001/v1/models \
+  -H "Authorization: Bearer freellmapi-..."</code></pre>
+
+<h3>Test Chat Completion</h3>
+<pre><code>curl http://127.0.0.1:3001/v1/chat/completions \
+  -H "Authorization: Bearer freellmapi-..." \
+  -H "Content-Type: application/json" \
+  -d '{"model":"auto","messages":[{"role":"user","content":"Xin chào"}]}'</code></pre>
+
+<div class="success">
+Nếu API trả về danh sách model hoặc response hợp lệ, gateway cơ bản đã hoạt động.
+</div>
+</section>
+
+<section class="card" id="systemd">
+<h2>10. Tạo systemd service</h2>
+<p>Thoát khỏi user <span class="inline">freellmapi</span>:</p>
+<pre><code>exit</code></pre>
+
+<p>Tạo service:</p>
+<pre><code>sudo nano /etc/systemd/system/freellmapi.service</code></pre>
+
+<p>Dán nội dung:</p>
+<pre><code>[Unit]
+Description=FreeLLMAPI
+After=network.target
+
+[Service]
+Type=simple
+User=freellmapi
+Group=freellmapi
+
+WorkingDirectory=/home/freellmapi/freellmapi
+
+EnvironmentFile=/home/freellmapi/freellmapi/.env
+
+ExecStart=/usr/bin/node /home/freellmapi/freellmapi/server/dist/index.js
+
+Restart=always
+RestartSec=5
+
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+
+<p>Lưu file:</p>
+<pre><code>Ctrl + O
+Enter
+Ctrl + X</code></pre>
+</section>
+
+<section class="card" id="check">
+<h2>11. Reload systemd và khởi động</h2>
+<pre><code>sudo systemctl daemon-reload
+sudo systemctl enable freellmapi
+sudo systemctl start freellmapi</code></pre>
+
+<h3>Kiểm tra trạng thái</h3>
+<pre><code>sudo systemctl status freellmapi</code></pre>
+
+<p>Trạng thái mong muốn:</p>
+<pre><code>Active: active (running)</code></pre>
+
+<p>Ví dụ:</p>
+<pre><code>● freellmapi.service - FreeLLMAPI
+     Loaded: loaded
+     Active: active (running)</code></pre>
+
+<h3>Xem log realtime</h3>
+<pre><code>sudo journalctl -u freellmapi -f</code></pre>
+</section>
+
+<section class="card" id="nginx">
+<h2>12. Nginx + HTTPS cho Production</h2>
+<p>
+Nếu cần cho Claude Code, OpenCode, Codex hoặc máy khác truy cập từ Internet,
+nên đặt Nginx phía trước FreeLLMAPI và sử dụng HTTPS.
+</p>
+
+<div class="endpoint">Client/Agent → https://DOMAIN → Nginx :443 → 127.0.0.1:3001 → FreeLLMAPI</div>
+
+<div class="warning">
+Không nên mở trực tiếp port 3001 ra Internet. Chỉ nên expose Nginx trên 80/443
+và để FreeLLMAPI chạy phía sau reverse proxy.
+</div>
+
+<p>Ví dụ kiểm tra firewall:</p>
+<pre><code>sudo ufw status</code></pre>
+
+<p>Thông thường không cần:</p>
+<pre><code>sudo ufw allow 3001</code></pre>
+</section>
+
+<section class="card" id="agents">
+<h2>13. Kết nối AI Coding Agents</h2>
+<table>
+<thead><tr><th>Client</th><th>Base Endpoint</th><th>Ghi chú</th></tr></thead>
+<tbody>
+<tr>
+<td><strong>OpenCode</strong></td>
+<td><span class="inline">https://DOMAIN/v1</span></td>
+<td>Dùng OpenAI-compatible API.</td>
+</tr>
+<tr>
+<td><strong>Codex CLI</strong></td>
+<td><span class="inline">https://DOMAIN/v1</span></td>
+<td>Sử dụng Responses API.</td>
+</tr>
+<tr>
+<td><strong>Claude Code</strong></td>
+<td><span class="inline">https://DOMAIN</span></td>
+<td>Dùng root URL vì Claude Code tự ghép Anthropic Messages path.</td>
+</tr>
+<tr>
+<td><strong>Aider / Cline / Continue</strong></td>
+<td><span class="inline">https://DOMAIN/v1</span></td>
+<td>Tùy cấu hình OpenAI-compatible của từng client.</td>
+</tr>
+</tbody>
+</table>
+
+<div class="note">
+<strong>Lưu ý về /v1:</strong> OpenAI-compatible clients thường dùng
+<code>/v1</code>. Claude Code cần root endpoint theo cách tích hợp Anthropic Messages API.
+</div>
+</section>
+
+<section class="card" id="security">
+<h2>14. Bảo mật và vận hành</h2>
+<ul>
+<li>Backup database và file <span class="inline">.env</span>.</li>
+<li>Đặc biệt bảo vệ <span class="inline">ENCRYPTION_KEY</span>.</li>
+<li>Không commit <span class="inline">.env</span> hoặc API key vào Git.</li>
+<li>Không expose trực tiếp port 3001 nếu không cần thiết.</li>
+<li>Dùng Nginx + HTTPS cho truy cập từ Internet.</li>
+<li>Theo dõi log bằng <span class="inline">journalctl</span> khi có lỗi.</li>
+<li>Free tier của upstream provider có thể thay đổi quota, model, rate limit hoặc điều kiện sử dụng.</li>
+<li>FreeLLMAPI phù hợp cho gateway cá nhân/lab; không nên mặc định xem đây là hệ thống multi-tenant production.</li>
+</ul>
+</section>
+
+<section class="card" id="quick">
+<h2>15. Quy trình cài đặt nhanh</h2>
+<ol>
+<li>Cài Node.js 20+ và npm.</li>
+<li>Clone repository.</li>
+<li>Chạy <code>npm install</code>.</li>
+<li>Tạo <code>.env</code> và <code>ENCRYPTION_KEY</code>.</li>
+<li>Chạy <code>npm run build</code>.</li>
+<li>Tạo user <code>freellmapi</code>.</li>
+<li>Tạo systemd service.</li>
+<li>Enable và start service.</li>
+<li>Mở Dashboard.</li>
+<li>Nhập setup code nếu truy cập remote lần đầu.</li>
+<li>Thêm provider API keys.</li>
+<li>Cấu hình Fallback Chain.</li>
+<li>Lấy unified API key <code>freellmapi-...</code>.</li>
+<li>Test <code>/v1/models</code> và <code>/v1/chat/completions</code>.</li>
+<li>Đặt Nginx + HTTPS trước khi cho agent bên ngoài truy cập.</li>
+</ol>
+</section>
+
+<section class="card">
+<h2>16. Kết luận kỹ thuật</h2>
+<p>
+FreeLLMAPI có thể được xem như một lớp abstraction nằm giữa AI coding agent
+và nhiều LLM provider. Giá trị chính nằm ở việc hợp nhất endpoint, quản lý key,
+routing và fallback.
+</p>
+<p>
+Đối với Ubuntu VPS, mô hình <strong>native + systemd + Nginx/HTTPS</strong> là một
+cách triển khai gọn, dễ kiểm soát và phù hợp khi không muốn dùng Docker.
+Hai thành phần cần đặc biệt bảo vệ là <strong>database</strong> và
+<strong>ENCRYPTION_KEY</strong>.
+</p>
+</section>
+
+<footer>
+FreeLLMAPI Installation & Analysis Guide<br>
+Repository: github.com/tashfeenahmed/freellmapi
+</footer>
+
+</div>
+</body>
+</html>
