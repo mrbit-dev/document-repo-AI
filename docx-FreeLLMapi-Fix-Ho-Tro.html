@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FreeLLMAPI - Bản Fix Hỗ Trợ</title>
+<style>
+body{margin:0;background:#f4f7fb;color:#172033;font:16px/1.7 Arial,sans-serif}
+.wrap{max-width:900px;margin:auto;padding:30px 20px 60px}
+.hero{padding:38px;border-radius:18px;background:linear-gradient(135deg,#0f172a,#2563eb,#6d28d9);color:white}
+.hero h1{margin:0;font-size:36px}.hero p{margin:6px 0;color:#dbeafe}
+.card{background:white;border:1px solid #dbe3ef;border-radius:14px;padding:26px;margin:20px 0}
+h2{color:#1e40af;border-left:5px solid #2563eb;padding-left:10px}
+pre{background:#0f172a;color:#e2e8f0;padding:16px;border-radius:10px;overflow:auto}
+code{font-family:Consolas,monospace}
+.note{background:#eff6ff;border-left:4px solid #2563eb;padding:14px}
+.warn{background:#fff7ed;border-left:4px solid #ea580c;padding:14px}
+.ok{background:#f0fdf4;border-left:4px solid #16a34a;padding:14px}
+footer{text-align:center;color:#64748b;font-size:13px;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+<h1>FreeLLMAPI</h1>
+<p>Bản Fix Hỗ Trợ — Khắc phục lỗi systemd không thể khởi động service</p>
+</header>
+
+<section class="card">
+<div class="note"><strong>Nguyên nhân:</strong> systemd đang yêu cầu file
+<code>/home/freellmapi/freellmapi/.env</code> nhưng file này chưa tồn tại.</div>
+<p>Bản fix dưới đây tạo lại <code>.env</code>, sinh <code>ENCRYPTION_KEY</code>,
+thiết lập quyền, build lại ứng dụng và restart systemd.</p>
+</section>
+
+<section class="card">
+<h2>1. Tạo <code>.env</code></h2>
+<p>Chuyển vào thư mục FreeLLMAPI:</p>
+<pre><code>cd /home/freellmapi/freellmapi</code></pre>
+<p>Tạo file:</p>
+<pre><code>cp .env.example .env</code></pre>
+<p>Kiểm tra:</p>
+<pre><code>ls -la .env</code></pre>
+</section>
+
+<section class="card">
+<h2>2. Tạo <code>ENCRYPTION_KEY</code></h2>
+<p>Chạy:</p>
+<pre><code>echo "ENCRYPTION_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")" >> .env</code></pre>
+<p>Kiểm tra:</p>
+<pre><code>grep -E '^(PORT|NODE_ENV|ENCRYPTION_KEY)=' .env</code></pre>
+<p>Anh sẽ thấy đại loại:</p>
+<pre><code>PORT=3001
+ENCRYPTION_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</code></pre>
+<div class="warn"><strong>Không gửi giá trị thật của ENCRYPTION_KEY.</strong>
+Khóa này dùng để mã hóa dữ liệu nhạy cảm như provider API key.</div>
+<div class="warn">Sau khi đã có dữ liệu, không tự ý tạo ENCRYPTION_KEY mới vì dữ liệu
+đã mã hóa bằng khóa cũ có thể không giải mã được.</div>
+</section>
+
+<section class="card">
+<h2>3. Kiểm tra quyền file</h2>
+<pre><code>chown freellmapi:freellmapi /home/freellmapi/freellmapi/.env
+chmod 600 /home/freellmapi/freellmapi/.env</code></pre>
+</section>
+
+<section class="card">
+<h2>4. Build lại một lần</h2>
+<pre><code>cd /home/freellmapi/freellmapi
+npm run build</code></pre>
+<div class="ok">Nếu build thành công và không có error, tiếp tục bước systemd.</div>
+</section>
+
+<section class="card">
+<h2>5. Reload systemd</h2>
+<pre><code>sudo systemctl daemon-reload</code></pre>
+<p>Sau đó:</p>
+<pre><code>sudo systemctl restart freellmapi</code></pre>
+</section>
+
+<section class="card">
+<h2>6. Kiểm tra</h2>
+<pre><code>sudo systemctl status freellmapi --no-pager -l</code></pre>
+<p>Mục tiêu:</p>
+<pre><code>Active: active (running)</code></pre>
+<div class="ok"><strong>Thành công:</strong> service hiển thị
+<code>Active: active (running)</code>.</div>
+</section>
+
+<section class="card">
+<h2>7. Nếu vẫn lỗi</h2>
+<pre><code>sudo journalctl -u freellmapi -n 100 --no-pager</code></pre>
+<p>Xem log realtime:</p>
+<pre><code>sudo journalctl -u freellmapi -f</code></pre>
+<p>Kiểm tra service:</p>
+<pre><code>sudo systemctl cat freellmapi</code></pre>
+<div class="note">Khi gửi log để hỗ trợ, hãy che API key, password và
+<code>ENCRYPTION_KEY</code>.</div>
+</section>
+
+<section class="card">
+<h2>8. Checklist sau khi fix</h2>
+<ol>
+<li><code>.env</code> tồn tại đúng đường dẫn.</li>
+<li><code>ENCRYPTION_KEY</code> đã được tạo.</li>
+<li>File thuộc user <code>freellmapi</code>.</li>
+<li>Quyền file là <code>600</code>.</li>
+<li><code>npm run build</code> thành công.</li>
+<li>systemd đã reload.</li>
+<li><code>freellmapi.service</code> ở trạng thái <code>active (running)</code>.</li>
+</ol>
+</section>
+
+<footer>FreeLLMAPI — Bản Fix Hỗ Trợ • Ubuntu VPS • Native + systemd</footer>
+</div>
+</body>
+</html>
