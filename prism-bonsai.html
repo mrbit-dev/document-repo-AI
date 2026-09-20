@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hướng dẫn cài đặt Ternary-Bonsai-2-27B với llama.cpp (Prism-ML) & CUDA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-secondary: #111827;
+      --bg-card: rgba(17, 24, 39, 0.85);
+      --border-color: #1f293d;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent-green: #10b981;
+      --accent-cyan: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --code-bg: #030712;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 10% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+                  radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+                  var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.65;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+      padding: 36px 24px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.05));
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .badge-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-cuda { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-prism { background: rgba(6, 182, 212, 0.2); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.3); }
+    .badge-win { background: rgba(139, 92, 246, 0.2); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      background: linear-gradient(to right, #ffffff, #67e8f9, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 28px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(6, 182, 212, 0.4);
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-green));
+      color: #000;
+      font-weight: 800;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin: 18px 0;
+      display: flex;
+      gap: 14px;
+      font-size: 0.95rem;
+    }
+
+    .alert-warning {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fde68a;
+    }
+
+    .alert-tip {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #a7f3d0;
+    }
+
+    .alert-info {
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: #bae6fd;
+    }
+
+    /* Grid & Checklist */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin-top: 16px;
+    }
+
+    .tool-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .tool-box h4 {
+      color: var(--accent-cyan);
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tool-box p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+
+    .btn-link {
+      display: inline-block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      background: rgba(6, 182, 212, 0.15);
+      color: #67e8f9;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+
+    .btn-link:hover {
+      background: rgba(6, 182, 212, 0.3);
+      color: #fff;
+    }
+
+    /* Code blocks */
+    .code-container {
+      position: relative;
+      background: var(--code-bg);
+      border: 1px solid #1e293b;
+      border-radius: 10px;
+      margin: 14px 0;
+      overflow: hidden;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid #1e293b;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent-green);
+      color: #000;
+      font-weight: 600;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.03);
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(255, 255, 255, 0.07);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #fca5a5;
+      font-size: 0.88em;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="badge-group">
+      <span class="badge badge-cuda">NVIDIA CUDA GPU</span>
+      <span class="badge badge-prism">Prism-ML Fork</span>
+      <span class="badge badge-win">Windows 11 / 10</span>
+    </div>
+    <h1>Cẩm Nang Cài Đặt Ternary-Bonsai-2-27B</h1>
+    <p class="subtitle">Hướng dẫn toàn diện từng bước từ chuẩn bị công cụ, biên dịch llama.cpp tùy biến và chạy model tận dụng 100% sức mạnh Card đồ họa RTX.</p>
+  </header>
+
+  <!-- GIẢI THÍCH MODEL & TERNARY -->
+  <section class="card" style="border-color: rgba(16, 185, 129, 0.4); background: linear-gradient(180deg, rgba(16, 185, 129, 0.04), rgba(17, 24, 39, 0.9));">
+    <div class="card-title" style="color: #34d399;">
+      <span>🧠</span> Model Ternary-Bonsai-2-27B là gì & Nén Ternary là sao?
+    </div>
+    
+    <div style="margin-bottom: 20px;">
+      <h3 style="font-size: 1.15rem; color: #67e8f9; margin-bottom: 8px;">1. Model Ternary-Bonsai-2-27B là gì?</h3>
+      <p><strong>Ternary-Bonsai-2-27B</strong> là mô hình suy luận trí tuệ nhân tạo (reasoning model) có quy mô lên tới <strong>27 tỷ tham số (27B)</strong> do tổ chức <strong>Prism-ML</strong> nghiên cứu và phát triển.</p>
+      
+      <div style="display: flex; gap: 16px; margin: 16px 0; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 240px; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 12px; padding: 16px; text-align: center;">
+          <div style="color: #fda4af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Model 27B Truyền Thống (FP16)</div>
+          <div style="font-size: 1.8rem; font-weight: 800; color: #f43f5e; margin: 6px 0;">~54 GB</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted);">Cần 2-3 GPU cao cấp hoặc Server chuyên dụng</div>
+        </div>
+
+        <div style="flex: 1; min-width: 240px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 12px; padding: 16px; text-align: center;">
+          <div style="color: #6ee7b7; font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Ternary-Bonsai-2-27B (PTQ1_0)</div>
+          <div style="font-size: 1.8rem; font-weight: 800; color: #10b981; margin: 6px 0;">~5.95 GB</div>
+          <div style="font-size: 0.85rem; color: #a7f3d0;"><strong>Nhỏ hơn 9.3 lần</strong> - Chạy trọn vẹn trên RTX 3060 12GB!</div>
+        </div>
+      </div>
+      <p style="font-size: 0.95rem; color: #d1d5db;">Mặc dù bị nén hơn 9 lần, model vẫn <strong>giữ lại được 98.2% độ thông minh (intelligence retention)</strong> so với bản gốc 54GB trên các bài kiểm tra suy luận logic.</p>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 24px 0;">
+
+    <div>
+      <h3 style="font-size: 1.15rem; color: #a78bfa; margin-bottom: 8px;">2. Nén Ternary (Lượng tử hóa tam phân) là sao?</h3>
+      <p>Trong mạng nơ-ron AI, mỗi "khớp thần kinh" được lưu trữ bằng một <strong>trọng số (weight)</strong>:</p>
+      
+      <ul style="padding-left: 20px; margin: 12px 0; color: var(--text-muted); font-size: 0.95rem;">
+        <li><strong style="color: #f3f4f6;">Chuẩn FP16 (16-bit)</strong>: Mỗi trọng số là số thực dài (ví dụ: <code>0.481923...</code>), có 65.536 trạng thái khác nhau $\rightarrow$ tốn rất nhiều RAM/VRAM.</li>
+        <li><strong style="color: #f3f4f6;">Nén Ternary (Tam phân ~1.58-bit)</strong>: Toàn bộ các con số phức tạp được quy ước chỉ nhận đúng <strong>3 trạng thái duy nhất</strong>:</li>
+      </ul>
+
+      <div class="grid-2" style="margin-top: 10px;">
+        <div class="tool-box" style="text-align: center; border-color: rgba(16, 185, 129, 0.3);">
+          <div style="font-size: 1.6rem; font-weight: 800; color: #34d399;">+1</div>
+          <p style="color: #f3f4f6; margin: 0; font-weight: 600;">Kích hoạt tích cực</p>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">(GPU thực hiện phép CỘNG)</span>
+        </div>
+        <div class="tool-box" style="text-align: center; border-color: rgba(156, 163, 175, 0.3);">
+          <div style="font-size: 1.6rem; font-weight: 800; color: #9ca3af;">0</div>
+          <p style="color: #f3f4f6; margin: 0; font-weight: 600;">Không kích hoạt</p>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">(GPU BỎ QUA - 0 tính toán)</span>
+        </div>
+        <div class="tool-box" style="text-align: center; border-color: rgba(244, 63, 94, 0.3);">
+          <div style="font-size: 1.6rem; font-weight: 800; color: #f43f5e;">-1</div>
+          <p style="color: #f3f4f6; margin: 0; font-weight: 600;">Ức chế / Đối nghịch</p>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">(GPU thực hiện phép TRỪ)</span>
+        </div>
+      </div>
+
+      <div class="alert alert-tip" style="margin-top: 20px;">
+        <div>🚀</div>
+        <div>
+          <strong>Tại sao Ternary lại là cuộc cách mạng?</strong>
+          <br>Thay vì GPU phải thực hiện hàng ngàn tỷ phép <strong>nhân số thực</strong> cồng kềnh và nóng máy, với Ternary, GPU <strong>chỉ làm phép cộng và trừ cơ bản</strong>. Điều này giúp tăng tốc độ xử lý lên gấp nhiều lần, tiết kiệm điện năng và nhiệt độ card rất mát!
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LÝ DO -->
+  <section class="card">
+    <div class="card-title">
+      <span>💡</span> Tại sao bắt buộc dùng bản fork của Prism-ML?
+    </div>
+    <p>Model <strong>Ternary-Bonsai-2-27B</strong> sử dụng định dạng nén đặc biệt <strong>PTQ1_0 (Ternary 1-bit / 2-bit, mã tensor <code>143</code>)</strong> kết hợp thuật toán biến đổi Walsh-Hadamard.</p>
+    <div class="alert alert-warning">
+      <div>⚠️</div>
+      <div>
+        <strong>Lưu ý:</strong> Bản <code>llama.cpp</code> chính thức trên GitHub hiện chỉ hỗ trợ kiểu tensor từ 0 đến 42. Nếu mở model bằng bản chính thức, chương trình sẽ báo lỗi:
+        <br><code>gguf_init_from_reader: tensor 'output.weight' has invalid ggml type 143</code>.
+      </div>
+    </div>
+  </section>
+
+  <!-- BƯỚC 1: CÔNG CỤ -->
+  <section class="card">
+    <div class="card-title">
+      <span class="step-number">1</span> Chuẩn bị 4 công cụ bắt buộc
+    </div>
+    <p style="color: var(--text-muted); margin-bottom: 12px;">Đảm bảo máy tính đã cài đặt đầy đủ các phần mềm nền tảng sau:</p>
+    
+    <div class="grid-2">
+      <div class="tool-box">
+        <h4>Git for Windows <span>✓</span></h4>
+        <p>Công cụ tải mã nguồn từ kho lưu trữ GitHub.</p>
+        <a class="btn-link" href="https://git-scm.com/download/win" target="_blank">Tải Git</a>
+      </div>
+
+      <div class="tool-box">
+        <h4>CMake (v3.14+) <span>✓</span></h4>
+        <p>Bộ quản lý tạo file build cho C++ (nhớ tích chọn Add to PATH).</p>
+        <a class="btn-link" href="https://cmake.org/download/" target="_blank">Tải CMake</a>
+      </div>
+
+      <div class="tool-box">
+        <h4>Visual Studio 2022 <span>✓</span></h4>
+        <p>Cần tích chọn mục <strong>"Desktop development with C++"</strong>.</p>
+        <a class="btn-link" href="https://visualstudio.microsoft.com/vs/community/" target="_blank">Tải VS 2022</a>
+      </div>
+
+      <div class="tool-box" style="border-color: rgba(16, 185, 129, 0.4);">
+        <h4 style="color: #34d399;">NVIDIA CUDA Toolkit <span>🚀</span></h4>
+        <p>Bắt buộc để chạy tăng tốc bằng card đồ họa rời NVIDIA RTX.</p>
+        <a class="btn-link" style="background: rgba(16, 185, 129, 0.2); color: #34d399;" href="https://developer.nvidia.com/cuda-downloads" target="_blank">Tải CUDA 12.x</a>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <div>🔍</div>
+      <div>Kiểm tra CUDA Toolkit đã cài thành công chưa bằng cách mở PowerShell và gõ: <code>nvcc --version</code></div>
+    </div>
+  </section>
+
+  <!-- BƯỚC 2: CLONE MÃ NGUỒN -->
+  <section class="card">
+    <div class="card-title">
+      <span class="step-number">2</span> Tải mã nguồn Prism-ML Fork
+    </div>
+    <p>Mở PowerShell và di chuyển vào thư mục làm việc (ví dụ <code>D:\Llama.cpp</code>) rồi clone mã nguồn về:</p>
+
+    <div class="code-container">
+      <div class="code-header">
+        <span>PowerShell</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy lệnh</button>
+      </div>
+      <pre>cd D:\Llama.cpp
+git clone https://github.com/PrismML-Eng/llama.cpp.git llama-prism
+cd llama-prism</pre>
+    </div>
+  </section>
+
+  <!-- BƯỚC 3: BIÊN DỊCH -->
+  <section class="card">
+    <div class="card-title">
+      <span class="step-number">3</span> Biên dịch (Build) kích hoạt CUDA
+    </div>
+    <p>Chạy 2 lệnh dưới đây để bắt đầu build bản hỗ trợ CUDA và tránh lỗi treo mạng khi tải giao diện npm:</p>
+
+    <div class="code-container">
+      <div class="code-header">
+        <span>PowerShell</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy lệnh</button>
+      </div>
+      <pre># Cấu hình build: Kích hoạt CUDA và tắt tự động npm ci để build siêu nhanh
+cmake -B build -DGGML_CUDA=ON -DLLAMA_BUILD_UI=OFF
+
+# Bắt đầu biên dịch (tận dụng toàn bộ nhân CPU)
+cmake --build build --config Release -j</pre>
+    </div>
+
+    <div class="alert alert-tip">
+      <div>💡</div>
+      <div>Cờ <code>-DLLAMA_BUILD_UI=OFF</code> giúp bỏ qua bước <code>UI: running npm ci</code>, giúp thời gian build chỉ còn khoảng <strong>1 phút</strong> thay vì bị nghẽn mạng!</div>
+    </div>
+  </section>
+
+  <!-- BƯỚC 4: TẢI MODEL -->
+  <section class="card">
+    <div class="card-title">
+      <span class="step-number">4</span> Tải Model Ternary-Bonsai-2-27B (~5.95 GB)
+    </div>
+    <p>Di chuyển vào thư mục chứa file chạy vừa build xong và tải model trực tiếp từ Hugging Face:</p>
+
+    <div class="code-container">
+      <div class="code-header">
+        <span>PowerShell</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy lệnh</button>
+      </div>
+      <pre>cd D:\Llama.cpp\llama-prism\build\bin\Release
+
+curl.exe -L -o "Ternary-Bonsai-2-27B-PTQ1_0.gguf" "https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf/resolve/main/Ternary-Bonsai-2-27B-PTQ1_0.gguf"</pre>
+    </div>
+    <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 6px;"><em>(Nếu anh đã tải file này trước đó, chỉ cần Copy/Move file vào thư mục <code>build\bin\Release</code> là được).</em></p>
+  </section>
+
+  <!-- BƯỚC 5: KHỞI ĐỘNG -->
+  <section class="card">
+    <div class="card-title">
+      <span class="step-number">5</span> Khởi động Web Chat & Chạy với GPU
+    </div>
+    <p>Tại thư mục <code>build\bin\Release</code>, chạy lệnh sau:</p>
+
+    <div class="code-container">
+      <div class="code-header">
+        <span>PowerShell</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy lệnh</button>
+      </div>
+      <pre>.\llama-server.exe -m Ternary-Bonsai-2-27B-PTQ1_0.gguf --port 8080 -ngl 99 -c 4096 --host 127.0.0.1</pre>
+    </div>
+
+    <p style="margin-top: 10px;">Khi màn hình báo <code>HTTP server listening on http://127.0.0.1:8080</code>, mở trình duyệt vào:</p>
+    <div style="text-align: center; margin: 18px 0;">
+      <a href="http://localhost:8080" target="_blank" style="font-size: 1.2rem; font-weight: 700; color: #38bdf8; text-decoration: none; padding: 10px 24px; border: 1px solid rgba(6, 182, 212, 0.4); border-radius: 8px; background: rgba(6, 182, 212, 0.1);">👉 http://localhost:8080</a>
+    </div>
+  </section>
+
+  <!-- BƯỚC 6: FILE BAT TỰ ĐỘNG -->
+  <section class="card">
+    <div class="card-title">
+      <span class="step-number">⚡</span> Mẹo: File chạy tự động 1-Click (.BAT)
+    </div>
+    <p>Tạo file <code>chay_bonsai_gpu.bat</code> trong thư mục <code>build\bin\Release</code> với nội dung sau để lần sau chỉ cần click đúp là mở ngay:</p>
+
+    <div class="code-container">
+      <div class="code-header">
+        <span>chay_bonsai_gpu.bat</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy nội dung file</button>
+      </div>
+      <pre>@echo off
+title Khoi dong Ternary-Bonsai-2-27B (CUDA GPU)
+cd /d "%~dp0"
+echo =======================================================
+echo   DANG KHOI DONG SERVER BONSAI VOI GPU NVIDIA RTX...
+echo   Giao dien web se tu dong mo tai localhost:8080
+echo =======================================================
+start http://localhost:8080
+llama-server.exe -m Ternary-Bonsai-2-27B-PTQ1_0.gguf --port 8080 -ngl 99 -c 4096 --host 127.0.0.1
+pause</pre>
+    </div>
+  </section>
+
+  <!-- BẢNG KHẮC PHỤC LỖI -->
+  <section class="card">
+    <div class="card-title">
+      <span>🛠️</span> Bảng khắc phục sự cố thường gặp
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 32%;">Thông báo lỗi</th>
+          <th style="width: 30%;">Nguyên nhân</th>
+          <th>Cách xử lý</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>invalid ggml type 143</code></td>
+          <td>Dùng nhầm bản llama.cpp gốc</td>
+          <td>Dùng file <code>.exe</code> biên dịch từ repo <code>PrismML-Eng/llama.cpp</code>.</td>
+        </tr>
+        <tr>
+          <td><code>failed to open GGUF file</code></td>
+          <td>Sai đường dẫn model</td>
+          <td>Đảm bảo file <code>.gguf</code> nằm cùng thư mục với <code>llama-server.exe</code>.</td>
+        </tr>
+        <tr>
+          <td><code>UI: running npm ci</code> (đứng yên)</td>
+          <td>Mạng tải node_modules chậm</td>
+          <td>Thêm cờ <code>-DLLAMA_BUILD_UI=OFF</code> khi cấu hình CMake.</td>
+        </tr>
+        <tr>
+          <td><code>No CMAKE_CUDA_COMPILER</code></td>
+          <td>Chưa nhận diện CUDA</td>
+          <td>Cài đặt NVIDIA CUDA Toolkit 12.x rồi khởi động lại PowerShell.</td>
+        </tr>
+        <tr>
+          <td><code>CUDA out of memory</code></td>
+          <td>Tràn bộ nhớ VRAM</td>
+          <td>Hạ context <code>-c 4096</code> xuống <code>-c 2048</code> hoặc giảm <code>-ngl 99</code> xuống <code>-ngl 60</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    Tài liệu hướng dẫn kỹ thuật chạy mô hình ngôn ngữ lớn cục bộ (Local LLM) trên Windows với GPU CUDA.
+  </footer>
+
+</div>
+
+<script>
+  function copyCode(button) {
+    const container = button.closest('.code-container');
+    const pre = container.querySelector('pre');
+    const text = pre.innerText;
+
+    navigator.clipboard.writeText(text).then(() => {
+      const originalText = button.innerText;
+      button.innerText = 'Đã chép! ✓';
+      button.style.background = '#10b981';
+      button.style.color = '#000';
+
+      setTimeout(() => {
+        button.innerText = originalText;
+        button.style.background = '';
+        button.style.color = '';
+      }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>
