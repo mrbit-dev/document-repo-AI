@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEVKIT AI — Kaggle + Ollama + Cloudflare Tunnel</title>
+<style>
+:root{--bg:#0b1020;--card:#121a2d;--text:#e8edf7;--muted:#aab6ca;--accent:#65d6ff;--border:#263552;--code:#080d18;--warn:#332b12}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#0b1020,#10182b);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.7}
+.container{max-width:980px;margin:auto;padding:40px 22px 70px}
+header{padding:32px;border:1px solid var(--border);border-radius:20px;background:rgba(18,26,45,.9);margin-bottom:24px}
+h1{margin:0 0 10px;font-size:32px}h2{font-size:24px;margin-top:0;color:var(--accent)}h3{margin-top:28px;color:#dce8ff}
+p,li{color:#d3dced}.section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:26px;margin:18px 0;box-shadow:0 10px 30px rgba(0,0,0,.15)}
+pre{background:var(--code);border:1px solid #202c43;border-radius:10px;padding:16px;overflow:auto;color:#dce7f7;font-family:Consolas,Monaco,monospace;font-size:14px}
+code{font-family:Consolas,Monaco,monospace;background:#1b263b;padding:2px 6px;border-radius:5px;color:#bfeeff}
+pre code{background:transparent;padding:0;color:inherit}
+.warning,.note{padding:14px 16px;border-radius:10px;margin:16px 0}.warning{background:var(--warn);border-left:4px solid #f0c75e}.note{background:#12253a;border-left:4px solid var(--accent)}
+table{width:100%;border-collapse:collapse;margin:16px 0}th,td{border:1px solid var(--border);padding:12px;text-align:left}th{background:#18243b}
+.badge{display:inline-block;padding:5px 10px;border-radius:20px;background:#143247;color:var(--accent);font-size:13px}
+a{color:var(--accent)}footer{margin-top:30px;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body><main class="container">
+<header><span class="badge">Hướng dẫn tiếng Việt</span>
+<h1>DEVKIT AI — Kaggle + Ollama + Cloudflare Tunnel</h1>
+<p>Chạy model Ollama trên GPU tạm thời của Kaggle và kết nối với VS Code thông qua Cloudflare Tunnel.</p>
+</header>
+
+<section class="section"><h2>DEVKIT AI — Kaggle + Ollama + Cloudflare Tunnel</h2>Hướng dẫn chạy một model Ollama trên GPU tạm thời của Kaggle và kết nối model đó với VS Code thông qua Cloudflare Tunnel.</section>
+<section class="section"><h2>Trước khi bắt đầu</h2>
+<ul>
+<li>Tạo hoặc đăng nhập tài khoản Kaggle và hoàn tất xác minh số điện thoại nếu được yêu cầu.</li>
+<li>Chọn <b>Create → New Notebook</b>.</li>
+<li>Trong phần cài đặt Notebook bên phải, bật <b>Internet</b>.</li>
+<li>Đặt <b>Accelerator</b> thành <b>GPU</b>.</li>
+<li>Trong Kaggle, bấm <b>+ Code</b> để thêm một cell.</li>
+<li>Các lệnh bắt đầu bằng <code>!</code> là shell command; các Python cell không dùng <code>!</code>.</li>
+<li>Sử dụng chính xác tên model <code>qwen3.8:latest</code> trong toàn bộ quá trình thiết lập.</li>
+</ul></section>
+<section class="section"><h2>1. Kiểm tra GPU</h2>
+<p>Sau khi chọn GPU trong phần cài đặt Kaggle, chạy:</p>
+<pre><code>!nvidia-smi</code></pre>
+<p>Nếu bạn thấy thông tin về GPU NVIDIA thì GPU đã được kích hoạt.</p></section>
+<section class="section"><h2>2. Cài đặt Zstandard</h2>
+<p>Trình cài đặt Ollama có thể cần <code>zstd</code> để giải nén file tải xuống.</p>
+<pre><code>!sudo apt-get update -y
+!sudo apt-get install -y zstd</code></pre></section>
+<section class="section"><h2>3. Cài đặt Ollama</h2>
+<pre><code>!curl -fsSL https://ollama.com/install.sh | sh</code></pre></section>
+<section class="section"><h2>4. Xác nhận Ollama đã được cài đặt</h2>
+<pre><code>!ollama --version</code></pre>
+<p>Bạn sẽ thấy số phiên bản của Ollama.</p></section>
+<section class="section"><h2>5. Khởi động Ollama Server</h2>
+<p>Chạy đoạn code này trong một Python code cell:</p>
+<pre><code>import subprocess
+import time
+ollama_process = subprocess.Popen(
+    ["ollama", "serve"],
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL
+)
+
+time.sleep(5)
+print("Ollama started")</code></pre></section>
+<section class="section"><h2>6. Xác nhận Ollama đang chạy</h2>
+<pre><code>!curl http://127.0.0.1:11434</code></pre>
+<p>Kết quả mong đợi:</p>
+<pre><code>Ollama is running</code></pre></section>
+<section class="section"><h2>7. Tải model AI</h2>
+<pre><code>!ollama pull qwen3.8:latest</code></pre>
+<p>Chờ quá trình tải hoàn tất hoàn toàn.</p></section>
+<section class="section"><h2>8. Kiểm tra tên model đã cài</h2>
+<pre><code>!ollama list</code></pre>
+<p>Bạn sẽ thấy:</p>
+<pre><code>qwen3.8:latest</code></pre>
+<p>Hãy sử dụng chính xác tên này trong tất cả các lệnh tiếp theo và trong VS Code.</p></section>
+<section class="section"><h2>9. Kiểm tra model cục bộ</h2>
+<p>Chạy trong một Python code cell:</p>
+<pre><code>import requests
+response = requests.post(
+    "http://127.0.0.1:11434/api/generate",
+    json={
+        "model": "qwen3.8:latest",
+        "prompt": "Reply with exactly: DEVKIT AI model test successful.",
+        "stream": False
+    },
+    timeout=300
+)
+
+print("Status:", response.status_code)
+print(response.text)</code></pre>
+<p>Nếu thành công, kết quả sẽ hiển thị:</p>
+<pre><code>Status: 200
+DEVKIT AI model test successful.</code></pre></section>
+<section class="section"><h2>10. Cài đặt Cloudflared</h2>
+<pre><code>!wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+!sudo dpkg -i cloudflared-linux-amd64.deb</code></pre></section>
+<section class="section"><h2>11. Xác nhận Cloudflared đã được cài đặt</h2>
+<pre><code>!cloudflared --version</code></pre>
+<p>Bạn sẽ thấy số phiên bản của Cloudflared.</p></section>
+<section class="section"><h2>12. Tạo Cloudflare Tunnel</h2>
+<p>Chạy đoạn code này trong một Python code cell:</p>
+<pre><code>import subprocess
+import time
+
+cloudflared = subprocess.Popen(
+    [
+        "cloudflared",
+        "tunnel",
+        "--url", "http://127.0.0.1:11434",
+        "--http-host-header", "localhost:11434"
+    ],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT,
+    text=True
+)
+
+time.sleep(8)
+for _ in range(30):
+    line = cloudflared.stdout.readline()
+    if line:
+        print(line, end="")</code></pre>
+<p>Chờ xuất hiện một URL tạm thời tương tự:</p>
+<pre><code>https://something-random.trycloudflare.com</code></pre>
+<p>Hãy copy URL đó.</p>
+<div class="warning"><b>Quan trọng:</b> Hãy giữ cell này tiếp tục chạy. Nếu bạn dừng cell, public tunnel cũng sẽ ngừng hoạt động.</div></section>
+<section class="section"><h2>13. Kiểm tra Public Tunnel</h2>
+<p>Thay URL mẫu bằng URL tunnel thực tế của bạn:</p>
+<pre><code>import requests
+PUBLIC_URL = "https://your-tunnel.trycloudflare.com"
+response = requests.get(PUBLIC_URL + "/api/tags", timeout=60)
+print("Status:", response.status_code)
+print(response.text)</code></pre>
+<p>Nếu bạn nhận được <code>status 200</code> cùng danh sách model thì tunnel đang hoạt động.</p></section>
+<section class="section"><h2>14. Cấu hình Cline trong VS Code</h2>
+<p>Mở VS Code → mở/cài đặt <b>Cline</b> → chọn <b>OpenAI Compatible</b> làm API Provider.</p>
+<p>Nhập các thông tin sau:</p>
+<table>
+<tr><th>Thiết lập</th><th>Giá trị</th></tr>
+<tr><td>API Provider</td><td><code>OpenAI Compatible</code></td></tr>
+<tr><td>Base URL</td><td><code>https://your-tunnel.trycloudflare.com/v1</code></td></tr>
+<tr><td>API Key</td><td><code>ollama</code></td></tr>
+<tr><td>Model ID</td><td><code>qwen3.8:latest</code></td></tr>
+</table>
+<p>Thay <code>your-tunnel.trycloudflare.com</code> bằng Cloudflare URL hiện tại của bạn.</p>
+<div class="warning"><b>Quan trọng:</b> Base URL bắt buộc phải kết thúc bằng <code>/v1</code>.</div></section>
+<section class="section"><h2>15. Prompt kiểm tra Cline lần đầu</h2>
+<p>Gửi prompt sau:</p>
+<pre><code>Reply in one short sentence: confirm that you are connected and ready.</code></pre></section>
+<section class="section"><h2>Xử lý sự cố</h2>
+<h3>Không nhìn thấy GPU</h3>
+<ul>
+<li>Vào phần cài đặt Kaggle Notebook.</li>
+<li>Kiểm tra <b>Accelerator</b> đã được đặt thành <b>GPU</b>.</li>
+<li>Chạy lại:</li>
+</ul>
+<pre><code>!nvidia-smi</code></pre>
+
+<h3>Ollama không chạy</h3>
+<p>Chạy lại Python cell khởi động server, chờ vài giây rồi chạy:</p>
+<pre><code>!curl http://127.0.0.1:11434</code></pre>
+
+<h3>Không tìm thấy model</h3>
+<p>Chạy:</p>
+<pre><code>!ollama list</code></pre>
+<p>Copy chính xác tên model. Trong hướng dẫn này là:</p>
+<pre><code>qwen3.8:latest</code></pre>
+
+<h3>Tunnel không hoạt động</h3>
+<ul>
+<li>Đảm bảo Cloudflare tunnel cell vẫn đang chạy.</li>
+<li>Đảm bảo phiên Kaggle chưa bị dừng.</li>
+<li>Copy đầy đủ URL bắt đầu bằng <code>https://</code>.</li>
+</ul>
+
+<h3>VS Code/Cline không thể kết nối</h3>
+<p>Kiểm tra:</p>
+<ul>
+<li>Base URL kết thúc bằng <code>/v1</code>.</li>
+<li>API key là <code>ollama</code>.</li>
+<li>Model ID là <code>qwen3.8:latest</code>.</li>
+<li>Cloudflare tunnel vẫn đang chạy.</li>
+</ul></section>
+<section class="section"><h2>Dọn dẹp sau khi sử dụng</h2>
+<p>Khi hoàn tất:</p>
+<ol>
+<li>Dừng Cloudflare tunnel cell.</li>
+<li>Dừng phiên Kaggle Notebook.</li>
+<li>Xóa temporary endpoint khỏi Cline nếu bạn không còn cần sử dụng.</li>
+</ol>
+<div class="note">GPU của Kaggle phụ thuộc vào quota. Cloudflare Quick Tunnels được thiết kế cho mục đích kiểm thử/phát triển tạm thời, không phải để hosting lâu dài.</div></section>
+<footer>DEVKIT AI — Tài liệu AI</footer>
+</main></body></html>
