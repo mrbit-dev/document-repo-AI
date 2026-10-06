@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DEVKIT AI - Fix Lỗi Cloudflare Tunnel & Ollama 24/7 Trọn Gói</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0d14;
+      --bg-card: #111622;
+      --border-color: #232b3e;
+      --accent-cyan: #00f2fe;
+      --accent-blue: #4facfe;
+      --accent-green: #10b981;
+      --accent-yellow: #fbbf24;
+      --accent-orange: #f97316;
+      --text-main: #f3f4f6;
+      --text-muted: #94a3b8;
+      --code-bg: #07090e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 30px 20px;
+    }
+
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+      padding: 30px;
+      background: linear-gradient(180deg, rgba(79, 172, 254, 0.12) 0%, rgba(0, 242, 254, 0.02) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      position: relative;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 220px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: rgba(0, 242, 254, 0.12);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      color: var(--accent-cyan);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, var(--accent-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: border-color 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(79, 172, 254, 0.4);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .step-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      color: #000;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+    }
+
+    .code-wrapper {
+      position: relative;
+      background-color: var(--code-bg);
+      border: 1px solid #1a2234;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .code-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0d111a;
+      padding: 8px 14px;
+      border-bottom: 1px solid #1a2234;
+      font-size: 0.8rem;
+      color: #64748b;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .copy-btn {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent-blue);
+      color: #000;
+      border-color: var(--accent-blue);
+    }
+
+    .copy-btn.copied {
+      background: var(--accent-green) !important;
+      color: #000 !important;
+      border-color: var(--accent-green) !important;
+    }
+
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+    }
+
+    code {
+      font-family: 'Fira Code', monospace;
+    }
+
+    .highlight-comment { color: #64748b; font-style: italic; }
+
+    .note-box {
+      background: rgba(251, 191, 36, 0.08);
+      border-left: 4px solid var(--accent-yellow);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 14px;
+      font-size: 0.9rem;
+      color: #fef08a;
+    }
+
+    .info-box {
+      background: rgba(79, 172, 254, 0.08);
+      border-left: 4px solid var(--accent-blue);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 14px;
+      font-size: 0.9rem;
+      color: #bae6fd;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      color: #64748b;
+      font-size: 0.88rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge">DEVKIT AI • BỘ CẤU HÌNH THỰC CHIẾN 24/7</div>
+      <h1>Hướng Dẫn Fix Lỗi Cloudflare Tunnel & Ollama</h1>
+      <p>Trọn bộ giải pháp: Fix lỗi 403 Forbidden, Script Auto-Reconnect Quick Tunnel, Script Anti-Idle giữ phiên Kaggle và Named Tunnel có Token cố định.</p>
+    </header>
+
+    <!-- BƯỚC 1 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-number">1</div>
+        <div class="card-title">Cấu hình Ollama Host & Origins (Chống lỗi 403 Forbidden)</div>
+      </div>
+      <p>Trước khi chạy <code>ollama serve</code>, cần mở CORS và cho phép nhận kết nối từ bên ngoài:</p>
+      
+      <div class="code-wrapper">
+        <div class="code-bar">
+          <span>bash / terminal</span>
+          <button class="copy-btn" onclick="copyCode(this, 'code-step1')">Sao chép</button>
+        </div>
+        <pre><code id="code-step1"><span class="highlight-comment"># Bật cho phép mọi IP và mọi domain gửi request đến Ollama</span>
+export OLLAMA_HOST="0.0.0.0:11434"
+export OLLAMA_ORIGINS="*"
+
+<span class="highlight-comment"># Chạy Ollama ngầm</span>
+nohup ollama serve > /tmp/ollama.log 2>&1 &</code></pre>
+      </div>
+
+      <div class="note-box">
+        💡 <strong>Kiểm tra:</strong> Gõ lệnh <code>curl http://localhost:11434</code> nếu thấy trả về <code>Ollama is running</code> là hoàn tất!
+      </div>
+    </div>
+
+    <!-- BƯỚC 2: AUTO RECONNECT QUICK TUNNEL -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-number">2</div>
+        <div class="card-title">Script Auto-Reconnect Quick Tunnel (Kèm fix --http-host-header)</div>
+      </div>
+      <p>Dành cho anh em dùng Quick Tunnel miễn phí (không cần tên miền riêng). Script tự động kèm cờ <code>--http-host-header="localhost:11434"</code> để triệt tiêu lỗi 403, đồng thời tự động kết nối lại ngay lập tức nếu bị rớt mạng:</p>
+      
+      <div class="code-wrapper">
+        <div class="code-bar">
+          <span>python (jupyter / kaggle cell)</span>
+          <button class="copy-btn" onclick="copyCode(this, 'code-step2')">Sao chép</button>
+        </div>
+        <pre><code id="code-step2">import subprocess, time, re, os
+
+<span class="highlight-comment"># 1. Bật biến môi trường chống lỗi 403 Forbidden</span>
+os.environ["OLLAMA_HOST"] = "0.0.0.0:11434"
+os.environ["OLLAMA_ORIGINS"] = "*"
+
+<span class="highlight-comment"># 2. Khởi chạy Ollama ngầm nếu chưa chạy</span>
+subprocess.Popen(["nohup", "ollama", "serve"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+time.sleep(2)
+
+def start_tunnel():
+    print("[+] Đang khởi chạy Cloudflare Tunnel...")
+    <span class="highlight-comment"># Thêm --http-host-header localhost:11434 để fix lỗi 403 Forbidden</span>
+    cmd = [
+        "cloudflared", "tunnel",
+        "--url", "http://127.0.0.1:11434",
+        "--http-host-header", "localhost:11434",
+        "--metrics", "localhost:45678"
+    ]
+    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    
+    url = None
+    for line in proc.stdout:
+        match = re.search(r'https://[a-zA-Z0-9-]+\.trycloudflare\.com', line)
+        if match:
+            url = match.group(0)
+            print(f"\n[🔥 KẾT NỐI THÀNH CÔNG] Domain Ollama của bạn:")
+            print(f"👉 {url}\n")
+            break
+    return proc, url
+
+<span class="highlight-comment"># Vòng lặp giám sát: nếu tunnel chết sẽ tự động bật lại ngay lập tức</span>
+while True:
+    proc, url = start_tunnel()
+    proc.wait() <span class="highlight-comment"># Chờ tiến trình</span>
+    print("[!] Tunnel bị ngắt kết nối. Đang tự động kết nối lại sau 5 giây...")
+    time.sleep(5)</code></pre>
+      </div>
+    </div>
+
+    <!-- BƯỚC 3: SCRIPT CHỐNG KAGGLE NGẮT (ANTI-IDLE) -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-number">3</div>
+        <div class="card-title">Script Chống Kaggle / Colab Tự Ngắt (Anti-Idle Keep-Alive)</div>
+      </div>
+      <p>Kaggle thường tự động tắt phiên sau 40–60 phút nếu không có tương tác chuột. Chạy đoạn script này ở 1 cell riêng để giữ kernel luôn active suốt thời gian GPU được cấp:</p>
+
+      <div class="code-wrapper">
+        <div class="code-bar">
+          <span>python (jupyter / kaggle cell)</span>
+          <button class="copy-btn" onclick="copyCode(this, 'code-step3')">Sao chép</button>
+        </div>
+        <pre><code id="code-step3">import time
+from IPython.display import clear_output
+
+<span class="highlight-comment"># Script giữ kernel Kaggle luôn active chạy tối đa thời gian của GPU</span>
+print("[*] Đang kích hoạt chế độ Keep-Alive...")
+start_time = time.time()
+while True:
+    elapsed = int(time.time() - start_time)
+    hours, remainder = divmod(elapsed, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    clear_output(wait=True)
+    print(f"[🔥 VPS AI ONLINE] Thời gian đã chạy: {hours:02d}:{minutes:02d}:{seconds:02d} / 12:00:00")
+    time.sleep(30)</code></pre>
+      </div>
+    </div>
+
+    <!-- BƯỚC 4: NAMED TUNNEL CỐ ĐỊNH TÊN MIỀN -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-number">4</div>
+        <div class="card-title">Named Tunnel Có Token (Cố định tên miền riêng, không bao giờ đổi link)</div>
+      </div>
+      <p>Nếu có tên miền riêng thêm vào Cloudflare Zero Trust (one.dash.cloudflare.com), anh em tạo Tunnel và chạy bằng Token. Cloudflare sẽ tự động quản lý kết nối và giữ tên miền cố định vĩnh viễn:</p>
+
+      <div class="code-wrapper">
+        <div class="code-bar">
+          <span>bash / terminal</span>
+          <button class="copy-btn" onclick="copyCode(this, 'code-step4')">Sao chép</button>
+        </div>
+        <pre><code id="code-step4"><span class="highlight-comment"># 1. Cài đặt cloudflared phiên bản mới nhất</span>
+curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
+sudo apt-get update && sudo apt-get install -y cloudflared
+
+<span class="highlight-comment"># 2. Chạy tunnel bằng Token (chạy ngầm ổn định, tự động reconnect khi rớt mạng)</span>
+nohup cloudflared tunnel run --token &lt;ĐIỀN_TOKEN_CLOUDFLARE_VÀO_ĐÂY&gt; > /tmp/tunnel.log 2>&1 &</code></pre>
+      </div>
+
+      <div class="info-box">
+        📌 <strong>Lưu ý cấu hình Zero Trust:</strong> Khi tạo Public Hostname, chọn Service Type là <code>HTTP</code>, URL là <code>localhost:11434</code>. Trong mục <strong>Additional application settings</strong> &rarr; <strong>HTTP Settings</strong>, nhập HTTP Host Header là <code>localhost:11434</code>.
+      </div>
+    </div>
+
+    <!-- BƯỚC 5: KẾT NỐI VÀO CLAUDE CODE & CURSOR -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-number">5</div>
+        <div class="card-title">Kết nối Ollama VPS vào Cursor & Claude Code CLI</div>
+      </div>
+      <p>Sau khi có URL của Cloudflare Tunnel, tiến hành cấu hình vào các công cụ lập trình:</p>
+
+      <div class="code-wrapper">
+        <div class="code-bar">
+          <span>cấu hình cursor / claude code</span>
+          <button class="copy-btn" onclick="copyCode(this, 'code-step5')">Sao chép</button>
+        </div>
+        <pre><code id="code-step5"><span class="highlight-comment"># --- CẤU HÌNH VÀO CURSOR IDE ---</span>
+1. Mở Cursor Settings -> Models -> Add Model: qwen2.5-coder:14b (hoặc qwen2.5:32b)
+2. OpenAI Base URL: https://[domain-cua-ban].trycloudflare.com/v1
+3. API Key: ollama
+
+<span class="highlight-comment"># --- CẤU HÌNH VÀO CLAUDE CODE CLI ---</span>
+export ANTHROPIC_BASE_URL="https://[domain-cua-ban].trycloudflare.com/v1"
+export ANTHROPIC_API_KEY="ollama"</code></pre>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2026 DEVKIT AI • Hướng Dẫn Tối Ưu Hệ Thống AI & Lập Trình Thực Chiến</p>
+    </footer>
+  </div>
+
+  <script>
+    function copyCode(btn, elementId) {
+      const codeElement = document.getElementById(elementId);
+      const textToCopy = codeElement.innerText;
+
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalText = btn.innerText;
+        btn.innerText = "✓ Đã sao chép!";
+        btn.classList.add("copied");
+
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.classList.remove("copied");
+        }, 2000);
+      }).catch(err => {
+        console.error("Không thể sao chép: ", err);
+      });
+    }
+  </script>
+</body>
+</html>
