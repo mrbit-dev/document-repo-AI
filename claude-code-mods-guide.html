@@ -1,0 +1,3006 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cẩm Nang Toàn Diện: 8 Mods Đột Phá Cho Claude Code | DEVKIT AI</title>
+  <meta name="description" content="Hướng dẫn chi tiết toàn bộ 8 mods miễn phí cho Claude Code từ video DEVKIT AI: Token Weather, Blast Radius, Safety Net, Done Ping, Plain English, Replay Theater, Quick Buttons, /better kèm link tải và lệnh cài đặt chính xác.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #111827;
+      --bg-tertiary: #1f2937;
+      --bg-card: rgba(17, 24, 39, 0.78);
+      --bg-card-hover: rgba(31, 41, 55, 0.9);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(217, 119, 6, 0.35);
+      
+      --accent-orange: #f59e0b;
+      --accent-orange-bright: #fbbf24;
+      --accent-claude: #d97706;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+      --accent-blue: #3b82f6;
+
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+
+      --code-bg: #090d16;
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+      --font-display: 'Space Grotesk', sans-serif;
+
+      --shadow-glow: 0 0 25px rgba(217, 119, 6, 0.18);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.65;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(217, 119, 6, 0.16), transparent),
+        radial-gradient(circle at 85% 25%, rgba(6, 182, 212, 0.09), transparent 35%),
+        radial-gradient(circle at 15% 70%, rgba(168, 85, 247, 0.07), transparent 35%);
+      background-attachment: fixed;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-claude);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Navigation Bar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      background: rgba(10, 14, 23, 0.88);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 14px 0;
+      transition: all 0.3s ease;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #d97706, #fbbf24);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #000;
+      font-size: 19px;
+      box-shadow: 0 0 15px rgba(217, 119, 6, 0.4);
+    }
+    .brand-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+    .brand-title span {
+      color: var(--accent-orange-bright);
+    }
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-links a:hover {
+      color: var(--accent-orange-bright);
+    }
+    .nav-badge {
+      background: rgba(217, 119, 6, 0.2);
+      color: var(--accent-orange-bright);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid rgba(217, 119, 6, 0.4);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 65px 0 35px;
+      text-align: center;
+      position: relative;
+    }
+    .hero-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-accent);
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      color: var(--accent-orange-bright);
+      margin-bottom: 22px;
+      box-shadow: 0 0 20px rgba(217, 119, 6, 0.15);
+    }
+    .hero-badge-pill .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-emerald);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.1rem, 4.8vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      margin-bottom: 18px;
+      background: linear-gradient(180deg, #ffffff 30%, #d1d5db 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, #f59e0b, #fbbf24 60%, #fdba74);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+      max-width: 840px;
+      margin: 0 auto 30px;
+      font-size: 1.12rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: none;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #d97706, #f59e0b);
+      color: #0b0f19;
+      box-shadow: 0 4px 20px rgba(217, 119, 6, 0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(217, 119, 6, 0.5);
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      backdrop-filter: blur(10px);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* Video Banner */
+    .video-callout {
+      background: linear-gradient(145deg, rgba(31, 41, 55, 0.6), rgba(17, 24, 39, 0.8));
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 24px;
+      align-items: center;
+      text-align: left;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    @media (max-width: 860px) {
+      .video-callout {
+        grid-template-columns: 1fr;
+      }
+    }
+    .video-frame-wrap {
+      position: relative;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-subtle);
+      aspect-ratio: 16 / 9;
+      background: #000;
+    }
+    .video-frame-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .video-info h3 {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .video-info p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .video-meta-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .v-tag {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .v-tag.hot {
+      color: var(--accent-orange-bright);
+      border-color: rgba(217, 119, 6, 0.4);
+      background: rgba(217, 119, 6, 0.1);
+    }
+
+    /* ========================================================
+       HIGHLIGHTED USER OVERVIEW SECTION (Mục Tổng Quan Yêu Cầu)
+       ======================================================== */
+    .overview-highlight-card {
+      background: linear-gradient(135deg, rgba(217, 119, 6, 0.08), rgba(17, 24, 39, 0.92) 50%, rgba(6, 182, 212, 0.05));
+      border: 1px solid rgba(217, 119, 6, 0.4);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 60px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .overview-highlight-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: linear-gradient(180deg, #f59e0b, #06b6d4);
+    }
+    .overview-highlight-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .highlight-icon-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .highlight-icon-title h3 {
+      font-family: var(--font-display);
+      font-size: 1.55rem;
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .highlight-icon {
+      font-size: 1.8rem;
+    }
+    .overview-highlight-body {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .info-row {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 18px;
+      align-items: start;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 16px 20px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    @media (max-width: 768px) {
+      .info-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+    }
+    .info-label {
+      font-weight: 700;
+      color: var(--accent-orange-bright);
+      font-size: 0.98rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .info-value {
+      font-size: 0.98rem;
+      color: #e5e7eb;
+      line-height: 1.65;
+    }
+    .sub-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .sub-list li {
+      position: relative;
+      padding-left: 20px;
+    }
+    .sub-list li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--accent-orange);
+      font-weight: bold;
+    }
+    .four-places-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 6px;
+    }
+    .place-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 12px 14px;
+      border-radius: 8px;
+    }
+    .place-name {
+      display: block;
+      font-weight: 700;
+      color: #38bdf8;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    .place-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* Section Headers */
+    .section-title-wrap {
+      text-align: center;
+      margin-bottom: 38px;
+    }
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--accent-orange);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+    .section-desc {
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 10px auto 0;
+      font-size: 1rem;
+    }
+
+    /* Filter Bar */
+    .filter-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      backdrop-filter: blur(8px);
+    }
+    .filter-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .filter-pill:hover, .filter-pill.active {
+      background: var(--accent-claude);
+      color: #000;
+      border-color: var(--accent-orange-bright);
+      font-weight: 600;
+    }
+    .search-input-wrap {
+      position: relative;
+      min-width: 260px;
+    }
+    .search-input-wrap input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      padding: 8px 14px 8px 36px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border 0.2s ease;
+    }
+    .search-input-wrap input:focus {
+      border-color: var(--accent-orange);
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    /* 8 MODS DETAILED CARDS */
+    .mods-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+      margin-bottom: 70px;
+    }
+
+    .mod-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .mod-card:hover {
+      border-color: var(--border-accent);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    .mod-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+      background: var(--card-accent, var(--accent-orange));
+    }
+
+    .mod-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .mod-title-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .mod-number {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent-orange-bright);
+      background: rgba(217, 119, 6, 0.12);
+      border: 1px solid rgba(217, 119, 6, 0.3);
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mod-name-group h3 {
+      font-family: var(--font-display);
+      font-size: 1.45rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .mod-badges {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .badge-anthropic {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      font-size: 0.75rem;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .badge-custom {
+      background: rgba(6, 182, 212, 0.15);
+      color: #22d3ee;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      font-size: 0.75rem;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+    .badge-location {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.75rem;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+    }
+
+    .mod-body {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 26px;
+      align-items: stretch;
+      margin-bottom: 22px;
+    }
+    @media (max-width: 900px) {
+      .mod-body {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .mod-explanation {
+      font-size: 0.97rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .mod-explanation p {
+      margin-bottom: 12px;
+    }
+    .mod-feature-list {
+      list-style: none;
+      margin: 14px 0;
+    }
+    .mod-feature-list li {
+      position: relative;
+      padding-left: 24px;
+      margin-bottom: 8px;
+      font-size: 0.92rem;
+      color: #d1d5db;
+    }
+    .mod-feature-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--accent-emerald);
+      font-weight: bold;
+    }
+
+    /* Live Interactive Widget inside card */
+    .mod-interactive {
+      background: var(--code-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .interactive-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .interactive-title {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-orange-bright);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .interactive-status {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+
+    /* ========================================================
+       INSTALLATION COMMANDS & LINKS BOX (Hộp Lệnh Cài Đặt Từng Mod)
+       ======================================================== */
+    .mod-install-box {
+      background: rgba(10, 14, 23, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      border-left: 3px solid var(--card-accent, var(--accent-orange));
+    }
+    .install-box-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .install-box-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .install-source-link {
+      font-size: 0.82rem;
+      color: var(--accent-orange-bright);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      background: rgba(217, 119, 6, 0.12);
+      border: 1px solid rgba(217, 119, 6, 0.3);
+      padding: 4px 10px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+    .install-source-link:hover {
+      background: var(--accent-orange);
+      color: #000;
+    }
+    .install-cmd-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 800px) {
+      .install-cmd-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .cmd-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .cmd-item-full {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .cmd-label {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .code-block-sm {
+      background: #060910;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: #38bdf8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .code-block-sm code {
+      word-break: break-all;
+      overflow-x: auto;
+    }
+    .code-block-sm.prompt-style {
+      color: #fde047;
+      border-color: rgba(245, 158, 11, 0.25);
+      background: rgba(245, 158, 11, 0.03);
+    }
+    .btn-copy-sm {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .btn-copy-sm:hover {
+      background: var(--accent-orange);
+      color: #000;
+    }
+
+    /* Specific Widgets Styles */
+    .weather-meter {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 12px;
+    }
+    .weather-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .weather-state {
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .weather-bar-container {
+      height: 10px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .weather-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #10b981, #f59e0b);
+      transition: width 0.4s ease, background 0.4s ease;
+      border-radius: 999px;
+    }
+    .weather-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .w-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-mono);
+    }
+    .w-btn:hover {
+      background: rgba(217, 119, 6, 0.3);
+      border-color: var(--accent-orange);
+    }
+
+    .blast-box {
+      border: 1px dashed var(--accent-rose);
+      background: rgba(244, 63, 94, 0.06);
+      border-radius: 8px;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+    }
+    .blast-header {
+      color: #fb7185;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .blast-files-list {
+      max-height: 80px;
+      overflow-y: auto;
+      background: rgba(0,0,0,0.3);
+      padding: 6px 10px;
+      border-radius: 4px;
+      color: #fda4af;
+      margin: 8px 0;
+      font-size: 0.78rem;
+    }
+    .blast-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-blast-cancel {
+      background: var(--accent-emerald);
+      color: #000;
+      padding: 5px 12px;
+      font-weight: 700;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-blast-proceed {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-dim);
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      border: 1px solid var(--border-subtle);
+      cursor: not-allowed;
+    }
+
+    .safety-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+    .safety-tag-blocked {
+      background: rgba(244, 63, 94, 0.2);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.4);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.72rem;
+    }
+
+    .done-ping-demo {
+      text-align: center;
+      padding: 16px;
+    }
+    .chime-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+      transition: all 0.2s ease;
+    }
+    .chime-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    }
+    .ping-toast {
+      margin-top: 14px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #a7f3d0;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .ping-toast.show {
+      opacity: 1;
+    }
+
+    .replay-slider-box {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+    }
+    .diff-line {
+      padding: 3px 6px;
+      border-radius: 3px;
+      margin: 2px 0;
+    }
+    .diff-add {
+      background: rgba(16, 185, 129, 0.18);
+      color: #6ee7b7;
+      border-left: 3px solid #10b981;
+    }
+    .diff-del {
+      background: rgba(244, 63, 94, 0.18);
+      color: #fda4af;
+      border-left: 3px solid #f43f5e;
+    }
+
+    .buttons-matrix {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .quick-b-item {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: #e5e7eb;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .quick-b-item:hover {
+      background: rgba(217, 119, 6, 0.2);
+      border-color: var(--accent-orange);
+      color: #fff;
+    }
+    .quick-b-output {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--accent-orange-bright);
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+    }
+
+    .better-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .better-input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      outline: none;
+    }
+    .better-btn {
+      background: var(--accent-orange);
+      color: #000;
+      font-weight: 700;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .better-output-box {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 10px;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: #93c5fd;
+      max-height: 120px;
+      overflow-y: auto;
+      line-height: 1.45;
+    }
+
+    /* Terminal Simulator */
+    .terminal-section {
+      margin-bottom: 70px;
+    }
+    .terminal-window {
+      background: #070a10;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    }
+    .terminal-topbar {
+      background: #111724;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .terminal-dots {
+      display: flex;
+      gap: 8px;
+    }
+    .t-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .t-dot.red { background: #ef4444; }
+    .t-dot.yellow { background: #f59e0b; }
+    .t-dot.green { background: #10b981; }
+    .terminal-top-title {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+    .terminal-content {
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+    .t-line { margin-bottom: 6px; }
+    .t-prompt { color: var(--accent-orange-bright); font-weight: 600; }
+    .t-mod-strip {
+      background: rgba(217, 119, 6, 0.12);
+      border: 1px solid rgba(217, 119, 6, 0.25);
+      border-radius: 6px;
+      padding: 4px 10px;
+      display: inline-block;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+      color: #fbbf24;
+    }
+    .t-gate-alert {
+      background: rgba(244, 63, 94, 0.12);
+      border-left: 3px solid #f43f5e;
+      padding: 8px 12px;
+      margin: 8px 0;
+      color: #fda4af;
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* Guide & Security Checklist */
+    .guide-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      margin-bottom: 60px;
+      backdrop-filter: blur(10px);
+    }
+    .guide-box h3 {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: #fff;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 24px;
+    }
+    .step-item {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+    }
+    .step-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent-claude);
+      color: #000;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: var(--font-display);
+    }
+    .step-content {
+      flex: 1;
+    }
+    .step-content h4 {
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .step-content p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: #38bdf8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0;
+    }
+    .code-block code {
+      word-break: break-all;
+    }
+    .btn-copy {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-copy:hover {
+      background: var(--accent-orange);
+      color: #000;
+    }
+
+    .warning-callout {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-left: 4px solid var(--accent-orange);
+      padding: 18px 20px;
+      border-radius: var(--radius-sm);
+      margin: 24px 0;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .warning-icon {
+      font-size: 1.5rem;
+      color: var(--accent-orange-bright);
+    }
+    .warning-text h5 {
+      color: var(--accent-orange-bright);
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+    .warning-text p {
+      font-size: 0.92rem;
+      color: #e5e7eb;
+      line-height: 1.55;
+    }
+
+    /* Comparison Table */
+    .table-container {
+      overflow-x: auto;
+      margin: 30px 0 60px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+    th, td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    th {
+      background: rgba(255, 255, 255, 0.03);
+      color: #fff;
+      font-family: var(--font-display);
+      font-weight: 700;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* FAQ Section */
+    .faq-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 70px;
+    }
+    @media (max-width: 768px) {
+      .faq-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .faq-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 22px;
+    }
+    .faq-card h4 {
+      font-size: 1.05rem;
+      color: #fff;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .faq-card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 50px 0 40px;
+      background: rgba(10, 14, 23, 0.95);
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .footer-links a:hover {
+      color: var(--accent-orange);
+    }
+
+    /* Sticky Quick Nav Floating Pill */
+    .quick-dock {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 99;
+      background: rgba(17, 24, 39, 0.92);
+      border: 1px solid var(--border-accent);
+      backdrop-filter: blur(16px);
+      border-radius: 999px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    }
+    .dock-btn {
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s ease;
+    }
+    .dock-btn:hover {
+      color: var(--accent-orange-bright);
+    }
+    .dock-divider {
+      width: 1px;
+      height: 16px;
+      background: var(--border-subtle);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sticky Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a href="#top" class="brand">
+        <div class="brand-logo">C</div>
+        <div class="brand-title">Claude Code <span>Mods</span></div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#overview">Tổng Quan</a></li>
+        <li><a href="#mods-list">8 Mods &amp; Lệnh Cài</a></li>
+        <li><a href="#terminal-demo">Terminal Live</a></li>
+        <li><a href="#create-mod">Tự Tạo Mod</a></li>
+        <li><a href="#security">Bảo Mật</a></li>
+        <li><a href="#github-links">8 GitHub Mods</a></li>
+      </ul>
+      <span class="nav-badge">v2.1.289 Ready</span>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero container" id="top">
+    <div class="hero-badge-pill">
+      <span class="pulse-dot"></span>
+      <span>Cập nhật mới nhất từ ngày 01/10/2026 • Claude Code Mods Ecosystem</span>
+    </div>
+    <h1>Chấm Dứt "Ngồi Canh Terminal" Với <br><span class="highlight">8 Mods Đột Phá Cho Claude Code</span></h1>
+    <p class="hero-subtitle">
+      Hướng dẫn chi tiết toàn diện dựa trên video thực chiến từ <strong>DEVKIT AI</strong>. Khám phá 3 mod chính thức từ Anthropic và 5 mod tự xây dựng giúp biến Claude Code thành trợ lý AI an toàn tuyệt đối, thông minh và tiện dụng hơn.
+    </p>
+    <div class="hero-actions">
+      <a href="#mods-list" class="btn btn-primary">Khám Phá 8 Mods &amp; Lệnh Cài Đặt ⚡</a>
+      <a href="#create-mod" class="btn btn-secondary">Tự Tạo Mod Với 1 Câu Lệnh ✨</a>
+      <a href="#video-section" class="btn btn-secondary">Xem Video Gốc 📺</a>
+    </div>
+
+    <!-- Video Callout Box -->
+    <div class="video-callout" id="video-section">
+      <div class="video-frame-wrap">
+        <iframe 
+          src="https://www.youtube-nocookie.com/embed/etfxZAeDS00" 
+          title="Claude Code Mods: 8 You Should Install Today (Free)" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen>
+        </iframe>
+      </div>
+      <div class="video-info">
+        <div class="video-meta-tags">
+          <span class="v-tag hot">Video Phân Tích</span>
+          <span class="v-tag">DEVKIT AI</span>
+          <span class="v-tag">Thời lượng: 5:02</span>
+          <span class="v-tag">Claude Code 2.1.289</span>
+        </div>
+        <h3>Claude Code Mods: 8 You Should Install Today (Free)</h3>
+        <p>
+          Bạn yêu cầu Claude làm 1 việc, chuyển tab khác, 20 phút sau quay lại thì nó xong từ 19 phút trước? Hoặc tệ hơn là Claude tự chạy lệnh xoá file mật, làm tràn bộ nhớ và quên luôn yêu cầu ban đầu? Video này giải quyết triệt để vấn đề đó.
+        </p>
+        <div style="display:flex; gap: 10px; flex-wrap: wrap;">
+          <a href="https://youtu.be/etfxZAeDS00" target="_blank" class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.85rem;">Mở Trên YouTube ↗</a>
+          <a href="https://code.claude.com/docs/en/plugins/mods/overview" target="_blank" class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.85rem;">Tài Liệu Anthropic ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         HIGHLIGHTED USER OVERVIEW SECTION (Mục Tổng Quan Yêu Cầu)
+         ======================================================== -->
+    <div class="overview-highlight-card" id="overview">
+      <div class="overview-highlight-header">
+        <div class="highlight-icon-title">
+          <span class="highlight-icon">🌟</span>
+          <h3>Tổng Quan Nội Dung Video &amp; Tính Năng "Mods" Mới</h3>
+        </div>
+        <span class="v-tag hot">Bản Cập Nhật 10/2026</span>
+      </div>
+      <div class="overview-highlight-body">
+        
+        <div class="info-row">
+          <div class="info-label">⏱️ Thời điểm ra mắt:</div>
+          <div class="info-value">
+            Tính năng <strong>Mods</strong> chính thức có mặt trên Claude Code từ ngày <strong>01/10/2026</strong> (áp dụng từ phiên bản <code>v2.1.287</code> trở lên, video thực nghiệm trên bản <code>v2.1.289</code>).
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-label">🎯 Vấn đề cốt lõi giải quyết:</div>
+          <div class="info-value">
+            Chấm dứt tình trạng <strong>"Babysitting a terminal"</strong> (ngồi canh máy) — bạn giao việc rồi chuyển tab, 20 phút sau quay lại thì Claude đã xong từ 19 phút trước; hoặc tệ hơn là Claude tự chạy lệnh xóa file, đọc nhầm khóa bí mật <code>.env</code>, hoặc bị đầy context bộ nhớ làm mất chi tiết yêu cầu ban đầu.
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-label">⚖️ Phân biệt Mod vs Skill:</div>
+          <div class="info-value">
+            <ul class="sub-list">
+              <li><strong>Skill:</strong> Thay đổi những gì Claude <em>biết</em> (kiến thức domain, workflow tác vụ).</li>
+              <li><strong>Mod:</strong> Can thiệp trực tiếp thay đổi <em>chính giao diện và hành vi thực thi của Claude Code</em> (thanh thông tin, phím tắt nhanh, chuông báo âm thanh, và các cổng bảo mật chặn lệnh nguy hiểm).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-row">
+          <div class="info-label">📍 4 vị trí Mod có thể hoạt động:</div>
+          <div class="info-value">
+            <div class="four-places-grid">
+              <div class="place-item">
+                <span class="place-name">1. Top Strip:</span>
+                <span class="place-desc">Thanh trạng thái ghim phía trên ô gõ prompt.</span>
+              </div>
+              <div class="place-item">
+                <span class="place-name">2. Side Panel:</span>
+                <span class="place-desc">Bảng điều khiển tác vụ hiển thị bên hông.</span>
+              </div>
+              <div class="place-item">
+                <span class="place-name">3. Pop-up / Chime:</span>
+                <span class="place-desc">Thông báo nổi kèm âm thanh khi hoàn thành.</span>
+              </div>
+              <div class="place-item">
+                <span class="place-name">4. Gatekeeper (Execution Gate):</span>
+                <span class="place-desc">"Cổng gác" kiểm duyệt mọi câu lệnh trước khi chạy trên máy tính.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Interactive Filter & Search -->
+  <section class="container" id="mods-list">
+    <div class="section-title-wrap">
+      <span class="section-tag">Danh Sách &amp; Lệnh Cài Đặt Chi Tiết</span>
+      <h2 class="section-title">8 Mods Bạn Nên Cài Đặt Ngay Hôm Nay</h2>
+      <p class="section-desc">Gồm 3 mod mẫu chính thức từ Anthropic và 5 mod độc quyền xây dựng bởi DEVKIT AI kèm link và câu lệnh cài đặt chính xác.</p>
+    </div>
+
+    <div class="filter-wrapper">
+      <div class="filter-pills">
+        <button class="filter-pill active" onclick="filterMods('all')">Tất Cả (8)</button>
+        <button class="filter-pill" onclick="filterMods('anthropic')">Anthropic Official (3)</button>
+        <button class="filter-pill" onclick="filterMods('custom')">Custom Mods (5)</button>
+        <button class="filter-pill" onclick="filterMods('security')">Bảo Mật &amp; An Toàn</button>
+        <button class="filter-pill" onclick="filterMods('productivity')">Năng Suất &amp; UI</button>
+      </div>
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="modSearchInput" placeholder="Tìm tên mod, tính năng, lệnh..." onkeyup="searchMods()">
+      </div>
+    </div>
+
+    <!-- 8 MODS CONTAINER -->
+    <div class="mods-grid" id="modsContainer">
+
+      <!-- MOD 1: Token Weather -->
+      <article class="mod-card" data-category="anthropic productivity" style="--card-accent: #f59e0b;">
+        <div class="mod-header">
+          <div class="mod-title-box">
+            <div class="mod-number">01</div>
+            <div class="mod-name-group">
+              <h3>Token Weather</h3>
+              <div class="mod-badges">
+                <span class="badge-anthropic">Anthropic Official</span>
+                <span class="badge-location">Vị trí: Top Strip</span>
+              </div>
+            </div>
+          </div>
+          <span class="v-tag hot">⏱ Video 1:01</span>
+        </div>
+        <div class="mod-body">
+          <div class="mod-explanation">
+            <p>
+              Claude có một bộ nhớ làm việc (working memory / context window). Khi bộ nhớ này bị lấp đầy, Claude sẽ tự động ép chặt các tin nhắn cũ và bắt đầu <strong>quên mất các chi tiết quan trọng</strong> mà bạn đã yêu cầu lúc đầu.
+            </p>
+            <p>
+              <strong>Token Weather</strong> đặt một bản báo cáo thời tiết trực quan cho bộ nhớ này ngay phía trên ô nhập câu lệnh:
+            </p>
+            <ul class="mod-feature-list">
+              <li><strong>Clear (0% - 30%):</strong> Bầu trời trong xanh, bộ nhớ thông thoáng, Claude nhớ toàn bộ chi tiết.</li>
+              <li><strong>Cloudy (30% - 70%):</strong> Nhiều mây, đã nạp tài liệu lớn (ví dụ đọc kho lưu trữ lớn nhảy lên 37%).</li>
+              <li><strong>Storm (70%+):</strong> Cơn bão ập đến! Cảnh báo đỏ: Hãy gõ lệnh <code>/compact</code> hoặc mở phiên chat mới để tránh mất dữ liệu.</li>
+              <li>Các vạch phân đoạn nhỏ cho biết chính xác từng câu hỏi của bạn tiêu tốn thêm bao nhiêu token (+21.7k...).</li>
+            </ul>
+          </div>
+          <div class="mod-interactive">
+            <div class="interactive-header">
+              <span class="interactive-title">⛅ Thử Nghiệm: Token Weather</span>
+              <span class="interactive-status" id="weatherTokenCount">0 / 200k tokens</span>
+            </div>
+            <div class="weather-meter">
+              <div class="weather-header">
+                <span class="weather-state" id="weatherStateText">☀️ Clear (Trời quang)</span>
+                <span style="font-family: var(--font-mono); font-weight:700;" id="weatherPercent">0%</span>
+              </div>
+              <div class="weather-bar-container">
+                <div class="weather-bar-fill" id="weatherBarFill"></div>
+              </div>
+              <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;" id="weatherTip">
+                Bộ nhớ hoàn toàn sạch. Sẵn sàng nhận dự án lớn!
+              </p>
+            </div>
+            <div class="weather-controls">
+              <button class="w-btn" onclick="addTokens(0)">Reset (0%)</button>
+              <button class="w-btn" onclick="addTokens(37)">Đọc File Code (+37%)</button>
+              <button class="w-btn" onclick="addTokens(20)">Hỏi Thêm (+20%)</button>
+              <button class="w-btn" onclick="addTokens(85)">Quá Tải Bão (+85%)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Install Commands & Links -->
+        <div class="mod-install-box">
+          <div class="install-box-header">
+            <span class="install-box-title">📦 Link &amp; Câu Lệnh Cài Đặt: Token Weather</span>
+            <a href="https://github.com/anthropics/claude-code-playground/tree/main/claude-code/mods" target="_blank" class="install-source-link">GitHub Anthropic Sample Mods ↗</a>
+          </div>
+          <div class="install-cmd-grid">
+            <div class="cmd-item">
+              <span class="cmd-label">1. Clone &amp; Thẩm định an toàn (Local Validate):</span>
+              <div class="code-block-sm">
+                <code>claude plugin validate ./claude-code-playground/claude-code/mods/token-weather</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+            <div class="cmd-item">
+              <span class="cmd-label">2. Khởi chạy kèm Mod (hoặc chép vào ~/.claude/mods/):</span>
+              <div class="code-block-sm">
+                <code>claude --plugin-dir ./claude-code-playground/claude-code/mods/token-weather</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="cmd-item-full">
+            <span class="cmd-label">⚡ Hoặc tự tạo nhanh bằng 1 câu Prompt trong Claude Code:</span>
+            <div class="code-block-sm prompt-style">
+              <code>"Make me a mod that displays a working memory token weather report (Clear, Cloudy, Storm) above the prompt box."</code>
+              <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- MOD 2: Blast Radius -->
+      <article class="mod-card" data-category="anthropic security" style="--card-accent: #f43f5e;">
+        <div class="mod-header">
+          <div class="mod-title-box">
+            <div class="mod-number">02</div>
+            <div class="mod-name-group">
+              <h3>Blast Radius</h3>
+              <div class="mod-badges">
+                <span class="badge-anthropic">Anthropic Official</span>
+                <span class="badge-location">Vị trí: Gatekeeper Hook</span>
+              </div>
+            </div>
+          </div>
+          <span class="v-tag hot">⏱ Video 1:32</span>
+        </div>
+        <div class="mod-body">
+          <div class="mod-explanation">
+            <p>
+              Khi bạn yêu cầu Claude: <em>"Hãy dọn dẹp dự án của tôi"</em>, Claude có thể quyết định xóa toàn bộ một thư mục chứa hàng chục tệp tin mà bạn không hề hay biết.
+            </p>
+            <p>
+              <strong>Blast Radius</strong> đóng vai trò như một chiếc phanh khẩn cấp: Giữ lại câu lệnh và tính toán chính xác <strong>bán kính tàn phá</strong> trước khi có bất kỳ tệp tin nào bị chạm vào:
+            </p>
+            <ul class="mod-feature-list">
+              <li>Liệt kê chi tiết số lượng file bị ảnh hưởng (ví dụ: 84 files, dung lượng ~604 KB).</li>
+              <li>Hiển thị danh sách tên từng tệp tin sẽ bị xoá vĩnh viễn.</li>
+              <li>Chặn cả các lệnh git phá huỷ như <code>git push --force</code> hay <code>git reset --hard</code> làm mất code chưa lưu.</li>
+              <li>Bạn có toàn quyền bấm <strong>Cancel</strong> để huỷ bỏ lệnh ngay lập tức mà không mất dù chỉ 1 byte!</li>
+            </ul>
+          </div>
+          <div class="mod-interactive">
+            <div class="interactive-header">
+              <span class="interactive-title">🛑 Thử Nghiệm: Cổng Chặn Blast Radius</span>
+              <span class="interactive-status">ACTIVE</span>
+            </div>
+            <div class="blast-box">
+              <div class="blast-header">⚠️ CẢNH BÁO: PHÁT HIỆN LỆNH XOÁ NGUY HIỂM</div>
+              <div style="font-size:0.75rem; color:#cbd5e1;">Lệnh: <code>rm -rf ./build/dist_archives/</code></div>
+              <div class="blast-files-list">
+                • 84 files chuẩn bị bị xoá (~604.2 KB)<br>
+                - dist/bundle.v1.min.js (182 KB)<br>
+                - dist/assets/vendor-icons.svg (94 KB)<br>
+                - dist/cache/compiled_views.bin (328 KB)...
+              </div>
+              <div class="blast-actions">
+                <button class="btn-blast-cancel" onclick="alert('Đã huỷ lệnh an toàn! Không có file nào bị xóa.')">Huỷ Bỏ (Cancel - An Toàn)</button>
+                <button class="btn-blast-proceed" onclick="alert('Cảnh báo: Hành động này có nguy cơ làm mất dữ liệu!')">Tiếp tục (Proceed)</button>
+              </div>
+            </div>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">
+              * Trong video thực tế, tác giả bấm Cancel và Claude Code xác nhận không có file nào bị thay đổi.
+            </p>
+          </div>
+        </div>
+
+        <!-- Install Commands & Links -->
+        <div class="mod-install-box">
+          <div class="install-box-header">
+            <span class="install-box-title">📦 Link &amp; Câu Lệnh Cài Đặt: Blast Radius</span>
+            <a href="https://github.com/anthropics/claude-code-playground/tree/main/claude-code/mods" target="_blank" class="install-source-link">GitHub Anthropic Sample Mods ↗</a>
+          </div>
+          <div class="install-cmd-grid">
+            <div class="cmd-item">
+              <span class="cmd-label">1. Clone &amp; Thẩm định an toàn (Local Validate):</span>
+              <div class="code-block-sm">
+                <code>claude plugin validate ./claude-code-playground/claude-code/mods/blast-radius</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+            <div class="cmd-item">
+              <span class="cmd-label">2. Khởi chạy kèm Mod (hoặc chép vào ~/.claude/mods/):</span>
+              <div class="code-block-sm">
+                <code>claude --plugin-dir ./claude-code-playground/claude-code/mods/blast-radius</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="cmd-item-full">
+            <span class="cmd-label">⚡ Hoặc tự tạo nhanh bằng 1 câu Prompt trong Claude Code:</span>
+            <div class="code-block-sm prompt-style">
+              <code>"Make me a mod that intercepts delete, force push, and destructive commands, displaying exact file count, size, and asking confirmation."</code>
+              <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- MOD 3: Safety Net -->
+      <article class="mod-card" data-category="custom security" style="--card-accent: #06b6d4;">
+        <div class="mod-header">
+          <div class="mod-title-box">
+            <div class="mod-number">03</div>
+            <div class="mod-name-group">
+              <h3>Safety Net</h3>
+              <div class="mod-badges">
+                <span class="badge-custom">Tự Xây Dựng (Custom)</span>
+                <span class="badge-location">Vị trí: Security Gate</span>
+              </div>
+            </div>
+          </div>
+          <span class="v-tag hot">⏱ Video 1:59</span>
+        </div>
+        <div class="mod-body">
+          <div class="mod-explanation">
+            <p>
+              Claude Code nguyên bản đã từ chối xoá toàn bộ thư mục gốc dự án, nhưng vẫn còn nhiều kẽ hở nghiêm trọng. <strong>Safety Net</strong> được tạo ra để lấp đầy toàn bộ những khoảng trống đó chỉ trong một cơ chế bảo vệ.
+            </p>
+            <p>
+              Trong thử nghiệm thực tế, khi tác giả cố tình yêu cầu Claude thực hiện 3 hành động nguy hiểm cùng một lúc:
+            </p>
+            <ul class="mod-feature-list">
+              <li><strong>Đọc file <code>.env</code>:</strong> Nơi lưu trữ API keys, mật khẩu database -> Bị Safety Net chặn tức thì, bảo vệ khóa bí mật tuyệt đối.</li>
+              <li><strong>Lệnh xóa bảng cơ sở dữ liệu:</strong> Phát hiện câu lệnh <code>DROP TABLE users;</code> -> Lập tức huỷ lệnh, bảng dữ liệu vẫn nguyên vẹn.</li>
+              <li><strong>Chạy script internet không rõ nguồn gốc:</strong> Chặn đứng các câu lệnh <code>curl | sh</code> hoặc <code>wget | bash</code>.</li>
+            </ul>
+          </div>
+          <div class="mod-interactive">
+            <div class="interactive-header">
+              <span class="interactive-title">🛡️ Nhật Ký Bảo Vệ Của Safety Net</span>
+              <span class="interactive-status">3 BLOCKS</span>
+            </div>
+            <div>
+              <div class="safety-item">
+                <span>📄 Đọc tệp <code>.env</code> / secrets</span>
+                <span class="safety-tag-blocked">BỊ CHẶN (BLOCKED)</span>
+              </div>
+              <div class="safety-item">
+                <span>🗄️ SQL: <code>DROP TABLE customers;</code></span>
+                <span class="safety-tag-blocked">BỊ CHẶN (BLOCKED)</span>
+              </div>
+              <div class="safety-item">
+                <span>🌐 Shell: <code>curl https://... | sh</code></span>
+                <span class="safety-tag-blocked">BỊ CHẶN (BLOCKED)</span>
+              </div>
+            </div>
+            <p style="font-size:0.76rem; color:#67e8f9; margin-top:10px;">
+              ✓ Kết quả: Claude hoàn toàn không đọc được API key và database không hề suy suyển.
+            </p>
+          </div>
+        </div>
+
+        <!-- Install Commands & Links -->
+        <div class="mod-install-box">
+          <div class="install-box-header">
+            <span class="install-box-title">📦 Cách Cài Đặt Chuẩn: Safety Net</span>
+            <span class="install-source-link" style="color: var(--accent-orange); font-size: 0.8rem;">✨ Mod Tự Tạo (Custom Prompt Mod)</span>
+          </div>
+          <div class="install-cmd-grid">
+            <div class="cmd-item">
+              <span class="cmd-label">1. Tạo trực tiếp bằng Prompt trong Claude Code (Khuyên dùng):</span>
+              <div class="code-block-sm prompt-style">
+                <code>"Make me a security mod that blocks reading .env secret files, prevents DROP TABLE queries, and blocks running curl piped to sh."</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+            <div class="cmd-item">
+              <span class="cmd-label">2. Hoặc khởi tạo khung plugin cục bộ trong dự án:</span>
+              <div class="code-block-sm">
+                <code>claude plugin init safety-net</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="cmd-item-full">
+            <span class="cmd-label">🛡️ Lệnh thẩm định mã sau khi mod được lưu vào ~/.claude/mods/:</span>
+            <div class="code-block-sm">
+              <code>claude plugin validate ~/.claude/mods/safety-net</code>
+              <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- MOD 4: Done Ping -->
+      <article class="mod-card" data-category="custom productivity" style="--card-accent: #10b981;">
+        <div class="mod-header">
+          <div class="mod-title-box">
+            <div class="mod-number">04</div>
+            <div class="mod-name-group">
+              <h3>Done Ping</h3>
+              <div class="mod-badges">
+                <span class="badge-custom">Tự Xây Dựng (Custom)</span>
+                <span class="badge-location">Vị trí: Audio &amp; Notification</span>
+              </div>
+            </div>
+          </div>
+          <span class="v-tag hot">⏱ Video 2:28</span>
+        </div>
+        <div class="mod-body">
+          <div class="mod-explanation">
+            <p>
+              Đây chính là mod <strong>chấm dứt hoàn toàn tình trạng phải ngồi canh máy ("babysitting a terminal")</strong>!
+            </p>
+            <p>
+              Khi bạn giao cho Claude Code một công việc lớn (ví dụ tạo toàn bộ trang thanh toán order, viết unit tests):
+            </p>
+            <ul class="mod-feature-list">
+              <li>Nếu tác vụ kéo dài hơn <strong>30 giây</strong>, bạn hoàn toàn có thể yên tâm đứng dậy pha cà phê hoặc làm việc khác.</li>
+              <li>Khi Claude hoàn thành, Done Ping sẽ phát một tiếng chuông êm dịu ("soft chime") vào loa máy tính.</li>
+              <li>Kèm theo dòng tóm tắt thông số rõ ràng: <em>"took 43s · 2 file edits"</em> (hoàn thành sau 43 giây, sửa 2 tệp).</li>
+            </ul>
+          </div>
+          <div class="mod-interactive">
+            <div class="interactive-header">
+              <span class="interactive-title">🔔 Nghe Thử Chuông Done Ping</span>
+              <span class="interactive-status">WEB AUDIO API</span>
+            </div>
+            <div class="done-ping-demo">
+              <button class="chime-btn" onclick="playDonePingChime()">
+                <span>🔊 Bấm Để Phát Chuông (Chime)</span>
+              </button>
+              <div class="ping-toast" id="pingToast">
+                🔔 <strong>Xong rồi!</strong> took 43s · 2 file edits
+              </div>
+            </div>
+            <p style="font-size:0.75rem; color:var(--text-muted); text-align:center;">
+              * Chuông sử dụng bộ dao động âm thanh chuẩn phòng thu, không làm bạn giật mình khi đeo tai nghe.
+            </p>
+          </div>
+        </div>
+
+        <!-- Install Commands & Links -->
+        <div class="mod-install-box">
+          <div class="install-box-header">
+            <span class="install-box-title">📦 Cách Cài Đặt Chuẩn: Done Ping</span>
+            <span class="install-source-link" style="color: var(--accent-orange); font-size: 0.8rem;">✨ Mod Tự Tạo (Custom Prompt Mod)</span>
+          </div>
+          <div class="install-cmd-grid">
+            <div class="cmd-item">
+              <span class="cmd-label">1. Tạo trực tiếp bằng Prompt trong Claude Code (Khuyên dùng):</span>
+              <div class="code-block-sm prompt-style">
+                <code>"Make me a mod that plays a soft chime audio and displays 'took Xs · Y file edits' whenever a task runs over 30s."</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+            <div class="cmd-item">
+              <span class="cmd-label">2. Hoặc khởi tạo khung plugin cục bộ trong dự án:</span>
+              <div class="code-block-sm">
+                <code>claude plugin init done-ping</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="cmd-item-full">
+            <span class="cmd-label">🔔 Lệnh thẩm định mã sau khi mod được lưu vào ~/.claude/mods/:</span>
+            <div class="code-block-sm">
+              <code>claude plugin validate ~/.claude/mods/done-ping</code>
+              <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- MOD 5: Plain English -->
+      <article class="mod-card" data-category="custom productivity" style="--card-accent: #a855f7;">
+        <div class="mod-header">
+          <div class="mod-title-box">
+            <div class="mod-number">05</div>
+            <div class="mod-name-group">
+              <h3>Plain English</h3>
+              <div class="mod-badges">
+                <span class="badge-custom">Tự Xây Dựng (Custom)</span>
+                <span class="badge-location">Vị trí: Output Hook</span>
+              </div>
+            </div>
+          </div>
+          <span class="v-tag hot">⏱ Video 2:47</span>
+        </div>
+        <div class="mod-body">
+          <div class="mod-explanation">
+            <p>
+              Dành riêng cho những ai nhìn vào câu trả lời dài dòng chứa hàng trăm dòng log kỹ thuật của Claude và thắc mắc: <em>"Ủa rồi rốt cuộc Claude đã thực sự làm được gì?"</em>
+            </p>
+            <p>
+              <strong>Plain English</strong> tự động thêm <strong>đúng 1 câu giải thích bình dân</strong> bên dưới mỗi phản hồi có thay đổi code thực tế:
+            </p>
+            <ul class="mod-feature-list">
+              <li>Được viết bằng ngôn từ giản dị nhất, dành riêng cho người không biết code hoặc người quản lý dự án.</li>
+              <li>Ví dụ thực tế: <em>"You've built a complete ordering system. Open it in a browser and test it."</em> (Bạn đã hoàn thiện hệ thống đặt hàng. Hãy mở trình duyệt và thử nghiệm nhé).</li>
+              <li><strong>Siêu tốc:</strong> Chạy ngầm bằng model <em>Claude 3.5 Haiku</em> siêu nhẹ, tóm tắt chỉ trong vòng ~1 giây mà không làm gián đoạn dòng suy nghĩ của bạn.</li>
+            </ul>
+          </div>
+          <div class="mod-interactive">
+            <div class="interactive-header">
+              <span class="interactive-title">💬 So Sánh Đầu Ra Của Claude</span>
+              <span class="interactive-status">HAIKU POWERED</span>
+            </div>
+            <div style="font-size:0.8rem; margin-bottom:10px;">
+              <div style="color:var(--text-dim); margin-bottom:4px;">Log kỹ thuật gốc:</div>
+              <div style="background:rgba(0,0,0,0.3); padding:6px; border-radius:4px; font-family:var(--font-mono); color:#94a3b8; font-size:0.75rem;">
+                Updated OrderController.php: added store() method with CSRF validation and Stripe webhook handler...
+              </div>
+            </div>
+            <div>
+              <div style="color:#c084fc; font-weight:600; font-size:0.8rem; margin-bottom:4px;">✨ Tóm tắt Plain English (Bình dân):</div>
+              <div style="background:rgba(168, 85, 247, 0.12); border-left:3px solid #a855f7; padding:8px 10px; border-radius:0 6px 6px 0; color:#e9d5ff; font-size:0.82rem;">
+                "Bạn đã có trang đặt hàng hoàn chỉnh có cổng thanh toán. Hãy mở trình duyệt lên để bấm thử nhé!"
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Install Commands & Links -->
+        <div class="mod-install-box">
+          <div class="install-box-header">
+            <span class="install-box-title">📦 Cách Cài Đặt Chuẩn: Plain English</span>
+            <span class="install-source-link" style="color: var(--accent-orange); font-size: 0.8rem;">✨ Mod Tự Tạo (Custom Prompt Mod)</span>
+          </div>
+          <div class="install-cmd-grid">
+            <div class="cmd-item">
+              <span class="cmd-label">1. Tạo trực tiếp bằng Prompt trong Claude Code (Khuyên dùng):</span>
+              <div class="code-block-sm prompt-style">
+                <code>"Make me a mod that uses Claude Haiku to add a one-sentence non-technical Plain English summary under every answer where code was modified."</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+            <div class="cmd-item">
+              <span class="cmd-label">2. Hoặc khởi tạo khung plugin cục bộ trong dự án:</span>
+              <div class="code-block-sm">
+                <code>claude plugin init plain-english</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="cmd-item-full">
+            <span class="cmd-label">📝 Lệnh thẩm định mã sau khi mod được lưu vào ~/.claude/mods/:</span>
+            <div class="code-block-sm">
+              <code>claude plugin validate ~/.claude/mods/plain-english</code>
+              <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- MOD 6: Replay Theater -->
+      <article class="mod-card" data-category="anthropic productivity" style="--card-accent: #10b981;">
+        <div class="mod-header">
+          <div class="mod-title-box">
+            <div class="mod-number">06</div>
+            <div class="mod-name-group">
+              <h3>Replay Theater</h3>
+              <div class="mod-badges">
+                <span class="badge-anthropic">Anthropic Official</span>
+                <span class="badge-location">Lệnh: /replay</span>
+              </div>
+            </div>
+          </div>
+          <span class="v-tag hot">⏱ Video 3:08</span>
+        </div>
+        <div class="mod-body">
+          <div class="mod-explanation">
+            <p>
+              Sau khi Claude thực hiện hàng loạt chỉnh sửa trên nhiều file cùng lúc, làm sao để bạn kiểm soát và hiểu được Claude đã sửa những gì mà không cần mở Git diff thủ công?
+            </p>
+            <p>
+              Chỉ cần gõ lệnh <code>/replay</code>, Replay Theater sẽ mở ra một "rạp chiếu phim" tua lại từng dòng code:
+            </p>
+            <ul class="mod-feature-list">
+              <li>Cho phép bạn bấm duyệt qua từng bước sửa đổi một cách tuần tự (step-by-step).</li>
+              <li>Màu <strong style="color: #6ee7b7;">Xanh lá</strong> biểu thị các dòng mã mới được thêm vào.</li>
+              <li>Màu <strong style="color: #fda4af;">Đỏ</strong> biểu thị các dòng mã cũ đã bị lược bỏ hoặc sửa đổi.</li>
+              <li>Cảm giác trực quan hệt như đang bấm tua lại một cuốn băng video ghi lại từng thao tác của Claude.</li>
+            </ul>
+          </div>
+          <div class="mod-interactive">
+            <div class="interactive-header">
+              <span class="interactive-title">🎞️ Trình Diễn /replay Diff Viewer</span>
+              <span class="interactive-status">STEP 2 / 2</span>
+            </div>
+            <div class="replay-slider-box">
+              <div style="color:var(--text-dim); margin-bottom:6px; font-size:0.75rem;">File: <code>routes/web.php</code></div>
+              <div class="diff-line diff-del">- Route::get('/checkout', [OldOrder::class, 'index']);</div>
+              <div class="diff-line diff-add">+ Route::post('/checkout/v2', [NewOrderController::class, 'store']);</div>
+              <div class="diff-line diff-add">+ Route::get('/order/success', [NewOrderController::class, 'success']);</div>
+            </div>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-top:10px;">
+              * Giúp code review nhanh chóng ngay trong màn hình dòng lệnh trước khi commit.
+            </p>
+          </div>
+        </div>
+
+        <!-- Install Commands & Links -->
+        <div class="mod-install-box">
+          <div class="install-box-header">
+            <span class="install-box-title">📦 Link &amp; Câu Lệnh Cài Đặt: Replay Theater</span>
+            <a href="https://github.com/anthropics/claude-code-playground/tree/main/claude-code/mods" target="_blank" class="install-source-link">GitHub Anthropic Sample Mods ↗</a>
+          </div>
+          <div class="install-cmd-grid">
+            <div class="cmd-item">
+              <span class="cmd-label">1. Clone &amp; Thẩm định an toàn (Local Validate):</span>
+              <div class="code-block-sm">
+                <code>claude plugin validate ./claude-code-playground/claude-code/mods/replay-theater</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+            <div class="cmd-item">
+              <span class="cmd-label">2. Khởi chạy kèm Mod (hoặc chép vào ~/.claude/mods/):</span>
+              <div class="code-block-sm">
+                <code>claude --plugin-dir ./claude-code-playground/claude-code/mods/replay-theater</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="cmd-item-full">
+            <span class="cmd-label">⚡ Hoặc tự tạo nhanh bằng 1 câu Prompt trong Claude Code:</span>
+            <div class="code-block-sm prompt-style">
+              <code>"Make me a mod providing /replay command to step through file diffs interactively with green additions and red deletions."</code>
+              <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- MOD 7: Quick Buttons -->
+      <article class="mod-card" data-category="custom productivity" style="--card-accent: #f59e0b;">
+        <div class="mod-header">
+          <div class="mod-title-box">
+            <div class="mod-number">07</div>
+            <div class="mod-name-group">
+              <h3>Quick Buttons</h3>
+              <div class="mod-badges">
+                <span class="badge-custom">Tự Xây Dựng (Custom)</span>
+                <span class="badge-location">Lệnh: /buttons</span>
+              </div>
+            </div>
+          </div>
+          <span class="v-tag hot">⏱ Video 3:24</span>
+        </div>
+        <div class="mod-body">
+          <div class="mod-explanation">
+            <p>
+              Bạn chán ngấy việc mỗi ngày phải lặp đi lặp lại những câu prompt quen thuộc? Gõ lệnh <code>/buttons</code> và một menu gồm <strong>6 nút bấm một chạm</strong> sẽ hiện ra ngay lập tức:
+            </p>
+            <ul class="mod-feature-list">
+              <li><strong>1. Explain it simply:</strong> Giải thích đoạn code/logic này thật đơn giản.</li>
+              <li><strong>2. Test it &amp; fix it:</strong> Chạy thử nghiệm và tự động sửa các lỗi phát sinh.</li>
+              <li><strong>3. Save a checkpoint:</strong> Lưu lại điểm mốc commit git an toàn.</li>
+              <li><strong>4. What changed?:</strong> Liệt kê tất cả file thay đổi bằng đúng 1 dòng tóm tắt mỗi file.</li>
+              <li><strong>5. Find my bugs:</strong> Quét tìm lỗ hổng tiềm ẩn trong toàn bộ code vừa viết.</li>
+              <li><strong>6. What next?:</strong> Đề xuất bước tiếp theo hợp lý nhất cần làm.</li>
+              <li><strong>Tùy biến 100%:</strong> Bạn có thể dễ dàng thay thế 6 nút này bằng những câu prompt riêng của dự án bạn!</li>
+            </ul>
+          </div>
+          <div class="mod-interactive">
+            <div class="interactive-header">
+              <span class="interactive-title">🕹️ Bấm Thử 6 Nút Quick Buttons</span>
+              <span class="interactive-status">CLICK TO RUN</span>
+            </div>
+            <div class="buttons-matrix">
+              <button class="quick-b-item" onclick="simulateButton('Explain it simply', '💡 Đang giải thích logic theo phong cách dễ hiểu cho người mới...')">
+                <span>💡 Explain it simply</span>
+              </button>
+              <button class="quick-b-item" onclick="simulateButton('Test it & fix it', '🧪 Đang chạy test suite và tự vá 2 lỗi assertions...')">
+                <span>🧪 Test it & fix it</span>
+              </button>
+              <button class="quick-b-item" onclick="simulateButton('Save a checkpoint', '💾 Đã tạo git checkpoint: commit [a8f91] sạch sẽ!')">
+                <span>💾 Save a checkpoint</span>
+              </button>
+              <button class="quick-b-item" onclick="simulateButton('What changed?', '📝 2 files đổi: order.html (giao diện mới), api.js (kết nối stripe)')">
+                <span>📝 What changed?</span>
+              </button>
+              <button class="quick-b-item" onclick="simulateButton('Find my bugs', '🔍 Quét xong: Không phát hiện memory leak, đã thêm sanitize input!')">
+                <span>🔍 Find my bugs</span>
+              </button>
+              <button class="quick-b-item" onclick="simulateButton('What next?', '🚀 Gợi ý bước tới: Viết automated integration test cho luồng checkout.')">
+                <span>🚀 What next?</span>
+              </button>
+            </div>
+            <div class="quick-b-output" id="buttonsOutput">
+              👈 Hãy bấm thử 1 nút ở trên để xem phản hồi tức thì
+            </div>
+          </div>
+        </div>
+
+        <!-- Install Commands & Links -->
+        <div class="mod-install-box">
+          <div class="install-box-header">
+            <span class="install-box-title">📦 Cách Cài Đặt Chuẩn: Quick Buttons</span>
+            <span class="install-source-link" style="color: var(--accent-orange); font-size: 0.8rem;">✨ Mod Tự Tạo (Custom Prompt Mod)</span>
+          </div>
+          <div class="install-cmd-grid">
+            <div class="cmd-item">
+              <span class="cmd-label">1. Tạo trực tiếp bằng Prompt trong Claude Code (Khuyên dùng):</span>
+              <div class="code-block-sm prompt-style">
+                <code>"Make me a mod providing /buttons panel with 6 one-click prompts: Explain simply, Test and fix, Save checkpoint, What changed, Find bugs, What next."</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+            <div class="cmd-item">
+              <span class="cmd-label">2. Hoặc khởi tạo khung plugin cục bộ trong dự án:</span>
+              <div class="code-block-sm">
+                <code>claude plugin init quick-buttons</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="cmd-item-full">
+            <span class="cmd-label">🕹️ Lệnh thẩm định mã sau khi mod được lưu vào ~/.claude/mods/:</span>
+            <div class="code-block-sm">
+              <code>claude plugin validate ~/.claude/mods/quick-buttons</code>
+              <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- MOD 8: /better -->
+      <article class="mod-card" data-category="custom productivity" style="--card-accent: #38bdf8;">
+        <div class="mod-header">
+          <div class="mod-title-box">
+            <div class="mod-number">08</div>
+            <div class="mod-name-group">
+              <h3>/better (Prompt Enhancer)</h3>
+              <div class="mod-badges">
+                <span class="badge-custom">Tự Xây Dựng (Custom)</span>
+                <span class="badge-location">Lệnh: /better</span>
+              </div>
+            </div>
+          </div>
+          <span class="v-tag hot">⏱ Video 3:45</span>
+        </div>
+        <div class="mod-body">
+          <div class="mod-explanation">
+            <p>
+              Chúng ta thường gõ những câu prompt rất sơ sài như: <em>"make the order page nicer"</em> (làm trang đặt hàng đẹp hơn). Điều này khiến AI đoán mò và thường cho ra kết quả không như ý muốn.
+            </p>
+            <p>
+              Chỉ cần gõ <code>/better &lt;ý tưởng thô&gt;</code>, mod sẽ tự động tái cấu trúc câu nói thô thiển của bạn thành một <strong>bản đặc tả kỹ thuật chuẩn chỉnh gồm 4 phần</strong>:
+            </p>
+            <ul class="mod-feature-list">
+              <li><strong>Goal (Mục tiêu):</strong> Xác định chính xác kết quả đầu ra cần đạt được.</li>
+              <li><strong>Details (Chi tiết):</strong> Danh sách các yêu cầu UI/UX, bảng màu, hiệu ứng, responsive.</li>
+              <li><strong>Done-when (Tiêu chuẩn xong):</strong> Tiêu chí nghiệm thu rõ ràng (không lỗi console, pass test).</li>
+              <li><strong>Plan first (Lập kế hoạch trước):</strong> Bắt buộc Claude phải trình bày dàn ý kế hoạch trước khi bắt tay viết code.</li>
+              <li>Đặc biệt: Kết quả rơi thẳng vào ô gõ prompt để bạn xem lại và chỉnh sửa trước khi gửi!</li>
+            </ul>
+          </div>
+          <div class="mod-interactive">
+            <div class="interactive-header">
+              <span class="interactive-title">🪄 Trải Nghiệm Lệnh /better</span>
+              <span class="interactive-status">PROMPT GENERATOR</span>
+            </div>
+            <div class="better-input-row">
+              <input type="text" class="better-input" id="betterInput" value="make the order page nicer">
+              <button class="better-btn" onclick="runBetterMod()">Nâng Cấp</button>
+            </div>
+            <div class="better-output-box" id="betterOutput">
+🎯 GOAL: Hiện đại hóa giao diện trang đặt hàng (Order Page).<br>
+📋 DETAILS: Bổ sung card sản phẩm bo tròn, giỏ hàng cố định bên phải, micro-animations khi chọn số lượng và dark mode.<br>
+✅ DONE-WHEN: Mọi tương tác mượt mà ở mobile & desktop, không có lỗi JS console.<br>
+📝 PLAN FIRST: Hãy liệt kê các thành phần giao diện cần sửa trước khi chỉnh code.
+            </div>
+          </div>
+        </div>
+
+        <!-- Install Commands & Links -->
+        <div class="mod-install-box">
+          <div class="install-box-header">
+            <span class="install-box-title">📦 Cách Cài Đặt Chuẩn: /better</span>
+            <span class="install-source-link" style="color: var(--accent-orange); font-size: 0.8rem;">✨ Mod Tự Tạo (Custom Prompt Mod)</span>
+          </div>
+          <div class="install-cmd-grid">
+            <div class="cmd-item">
+              <span class="cmd-label">1. Tạo trực tiếp bằng Prompt trong Claude Code (Khuyên dùng):</span>
+              <div class="code-block-sm prompt-style">
+                <code>"Make me a mod providing /better command that rewrites rough prompt into structured Goal, Details, Done-when, and Plan first, inserting into input box."</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+            <div class="cmd-item">
+              <span class="cmd-label">2. Hoặc khởi tạo khung plugin cục bộ trong dự án:</span>
+              <div class="code-block-sm">
+                <code>claude plugin init better-prompt</code>
+                <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="cmd-item-full">
+            <span class="cmd-label">🪄 Lệnh thẩm định mã sau khi mod được lưu vào ~/.claude/mods/:</span>
+            <div class="code-block-sm">
+              <code>claude plugin validate ~/.claude/mods/better-prompt</code>
+              <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- Interactive Terminal Simulator -->
+  <section class="container terminal-section" id="terminal-demo">
+    <div class="section-title-wrap">
+      <span class="section-tag">Trải Nghiệm Trực Quan</span>
+      <h2 class="section-title">Giao Diện Claude Code Khi Có Mods Sẽ Như Thế Nào?</h2>
+      <p class="section-desc">Mô phỏng chân thực màn hình dòng lệnh của bạn khi được trang bị đầy đủ các mods hỗ trợ.</p>
+    </div>
+
+    <div class="terminal-window">
+      <div class="terminal-topbar">
+        <div class="terminal-dots">
+          <div class="t-dot red"></div>
+          <div class="t-dot yellow"></div>
+          <div class="t-dot green"></div>
+        </div>
+        <div class="terminal-top-title">brian@hyperlab: ~/projects/demo-models (claude v2.1.289)</div>
+        <div style="font-family: var(--font-mono); font-size:0.75rem; color:#10b981;">● MODS ACTIVE (8)</div>
+      </div>
+      <div class="terminal-content">
+        <div class="t-line">
+          <div class="t-mod-strip">
+            ☁️ <strong>Token Weather:</strong> Cloudy 37% [■■■■□□□□□□] (74k/200k) | ⏱️ <strong>Working Today:</strong> 42m
+          </div>
+        </div>
+        <div class="t-line">
+          <span class="t-prompt">&gt; claude:</span> Hãy dọn dẹp các tệp build tạm thời và chuẩn bị deploy
+        </div>
+        <div class="t-line" style="color: #94a3b8;">
+          Claude đang quét các thư mục trong workspace...
+        </div>
+        <div class="t-line">
+          <div class="t-gate-alert">
+            🛑 <strong>[Blast Radius Intercepted]:</strong> Lệnh <code>rm -rf ./temp_storage/</code> định xoá <strong>42 files (~120 KB)</strong>.<br>
+            Bạn có muốn tiếp tục? (Y/n) &gt; <span style="color:#6ee7b7; font-weight:bold;">n (Đã huỷ an toàn)</span>
+          </div>
+        </div>
+        <div class="t-line" style="color: #cbd5e1;">
+          Claude: Đã bỏ qua thư mục temp_storage theo yêu cầu của bạn. Tiếp tục tối ưu hóa CSS và minify JavaScript...
+        </div>
+        <div class="t-line" style="color: #94a3b8;">
+          ... Chỉnh sửa 2 tệp: <code>app.css</code> và <code>main.js</code> ...
+        </div>
+        <div class="t-line" style="color: #38bdf8;">
+          🔔 <strong>[Done Ping]:</strong> *chime* Tác vụ hoàn thành trong <strong>38s · 2 file edits</strong>
+        </div>
+        <div class="t-line" style="background: rgba(168,85,247,0.1); padding: 4px 8px; border-radius: 4px; color: #d8b4fe; margin-top: 6px;">
+          💬 <strong>[Plain English]:</strong> "Tất cả file giao diện đã được nén gọn gàng và sẵn sàng tải lên hosting."
+        </div>
+        <div class="t-line" style="margin-top: 14px;">
+          <div class="t-mod-strip">
+            ☁️ <strong>Token Weather:</strong> Cloudy 45% (+16k) | ⏱️ <strong>Working Today:</strong> 43m
+          </div>
+        </div>
+        <div class="t-line">
+          <span class="t-prompt">&gt;</span> <span style="animation: pulse 1.2s infinite;">█</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How to create your own mod with 1 sentence -->
+  <section class="container" id="create-mod">
+    <div class="guide-box">
+      <div class="section-tag">Không Cần Viết Code</div>
+      <h3>Tự Tạo Mod Riêng Của Bạn Chỉ Bằng 1 Câu Lệnh!</h3>
+      <p style="color: var(--text-muted); font-size: 1.05rem;">
+        Điều kỳ diệu nhất ở tính năng Mods của Claude Code: <strong>Bạn không cần phải là một lập trình viên phần mềm chuyên sâu để tự chế tạo mod</strong>. Chỉ cần mở Claude Code lên và mô tả mong muốn của bạn bằng ngôn ngữ tự nhiên.
+      </p>
+
+      <div class="steps-container">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>Mô tả ý tưởng cho Claude Code</h4>
+            <p>Mở phiên làm việc Claude Code và gõ một câu lệnh tự nhiên mô tả mod bạn muốn tạo:</p>
+            <div class="code-block">
+              <code>"Make me a mod that shows how long I've been working today above the prompt."</code>
+              <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <p style="font-size:0.88rem; color: var(--text-dim);">
+              (Tạo cho tôi một mod hiển thị thời gian tôi đã làm việc hôm nay nằm ở thanh phía trên ô prompt).
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>Claude Code tự sinh mã trong 15-20 giây</h4>
+            <p>
+              Claude sẽ tự động viết toàn bộ cấu trúc file plugin/mod, đăng ký hooks tương ứng và thông báo hoàn tất, sau đó hỏi: <em>"Reload to apply changes?"</em>.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>Xác nhận Reload và Sử dụng ngay!</h4>
+            <p>
+              Bạn chọn <strong>Yes</strong> (hoặc gõ reload). Ngay lập tức, trên ô prompt xuất hiện đồng hồ đếm giờ làm việc: <code>working today: 0 minutes</code>. Đồng hồ bắt đầu chạy ngay lập tức!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10 Great Prompt Ideas Table -->
+      <h4 style="color: #fff; margin: 34px 0 16px; font-size: 1.2rem;">💡 10 Ý Tưởng Câu Lệnh Để Bạn Tự Tạo Mods Độc Đáo:</h4>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Ý Tưởng Mod</th>
+              <th>Câu Lệnh 1 Dòng (Prompt) Để Tạo</th>
+              <th>Vị Trí Phù Hợp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><strong>Git Branch Watcher</strong></td>
+              <td><code>Make me a mod that displays the current git branch and uncommitted changes above the prompt.</code></td>
+              <td>Top Strip</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><strong>Cost / API Tracker</strong></td>
+              <td><code>Make me a mod that estimates the dollar cost of the current session next to my token meter.</code></td>
+              <td>Top Strip</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><strong>Pomodoro Coffee Break</strong></td>
+              <td><code>Make me a mod that plays a gentle chime every 25 minutes reminding me to stand up and drink water.</code></td>
+              <td>Audio &amp; Toast</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td><strong>Auto-Git-Commit on Green</strong></td>
+              <td><code>Make me a mod that auto-commits with a clean message whenever all tests pass.</code></td>
+              <td>Execution Gate</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td><strong>Block Hardcoded Secrets</strong></td>
+              <td><code>Make me a mod that blocks any file write containing API keys or hardcoded passwords.</code></td>
+              <td>Security Gate</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td><strong>Vietnamese Explainer</strong></td>
+              <td><code>Make me a mod that appends a 1-sentence Vietnamese summary under every major code change.</code></td>
+              <td>Output Hook</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td><strong>Linter Auto-Runner</strong></td>
+              <td><code>Make me a mod that silently runs ESLint/Prettier after Claude edits any frontend file.</code></td>
+              <td>Post-Edit Hook</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td><strong>Project Health Score</strong></td>
+              <td><code>Make me a mod showing a mini status pill with test coverage and open TODO count.</code></td>
+              <td>Side Panel</td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td><strong>No-Friday-Deploy Gate</strong></td>
+              <td><code>Make me a mod that blocks deploy commands and production pushes on Friday afternoons.</code></td>
+              <td>Gatekeeper</td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td><strong>Snapshot Restore Button</strong></td>
+              <td><code>Make me a mod providing /undo-last command to instantly revert Claude's last batch of file edits.</code></td>
+              <td>Slash Command</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Security & Installation Section -->
+  <section class="container" id="security">
+    <div class="section-title-wrap">
+      <span class="section-tag">An Toàn Là Trên Hết</span>
+      <h2 class="section-title">Hướng Dẫn Cài Đặt &amp; Cảnh Báo Bảo Mật</h2>
+      <p class="section-desc">Những lưu ý sinh tử bạn nhất định phải biết trước khi tải và cài đặt bất kỳ Mod nào từ cộng đồng.</p>
+    </div>
+
+    <!-- Red Alert Box -->
+    <div class="warning-callout">
+      <div class="warning-icon">⚠️</div>
+      <div class="warning-text">
+        <h5>CẢNH BÁO BẢO MẬT TỐI QUAN TRỌNG TỪ TÁC GIẢ</h5>
+        <p>
+          Một Mod trong Claude Code chạy với <strong>toàn bộ quyền hạn hệ thống của chính tài khoản máy tính của bạn (Full User Permissions)</strong>! Nếu bạn cài đặt một Mod độc hại từ nguồn không rõ ràng, nó hoàn toàn có thể đọc trộm khóa SSH, mật khẩu trình duyệt, mã nguồn cá nhân hoặc gửi dữ liệu ra bên ngoài máy tính của bạn.
+        </p>
+      </div>
+    </div>
+
+    <!-- Technical Note on CLI Syntax -->
+    <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-md); padding: 20px 24px; margin-bottom: 30px;">
+      <h4 style="color: var(--accent-orange-bright); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+        <span>💡</span> Lưu Ý Kỹ Thuật: Vì Sao Không Thể Gõ Lệnh Dạng <code>github:...</code>?
+      </h4>
+      <p style="font-size: 0.92rem; color: #cbd5e1; margin-bottom: 10px; line-height: 1.6;">
+        Nếu bạn thử chạy lệnh <code>claude plugin validate github:...</code> hoặc <code>claude plugin install github:...</code> thì Claude Code sẽ báo lỗi ngay lập tức vì 2 nguyên nhân cốt lõi:
+      </p>
+      <ul style="font-size: 0.88rem; color: #cbd5e1; padding-left: 20px; line-height: 1.8;">
+        <li><strong>Lệnh <code>claude plugin validate &lt;path&gt;</code>:</strong> Chỉ nhận <em>đường dẫn thư mục/tệp tin cục bộ trên máy tính</em> (local path như <code>./mods/ten-mod</code> hoặc <code>~/.claude/mods/ten-mod</code>), hoàn toàn <strong>không</strong> nhận đường dẫn từ xa dạng URI <code>github:...</code>. Nếu truyền <code>github:...</code>, CLI hiểu đó là một tên file nội bộ và báo lỗi <code>File not found</code>.</li>
+        <li><strong>Lệnh <code>claude plugin install &lt;plugin&gt;</code>:</strong> Chỉ tìm plugin từ <em>Marketplace đã được đăng ký</em> (mặc định chỉ có <code>anthropic-plugin-directory</code>). Để cài từ kho ngoài, quy trình chuẩn là: <code>claude plugin marketplace add &lt;repo&gt;</code> rồi mới <code>claude plugin install &lt;name&gt;@&lt;marketplace&gt;</code>.</li>
+        <li><strong>Về các Custom Mods của video:</strong> Kênh DEVKIT AI không duy trì một GitHub repo công khai dạng <code>devkit-ai/claude-mods</code>. Trong video thực tế, tác giả tận dụng khả năng tự tạo mod trực tiếp của Claude Code bằng câu Prompt: <code>"Make me a mod that..."</code> để Claude Code tự sinh code và nạp thẳng vào hệ thống!</li>
+      </ul>
+    </div>
+
+    <div class="concept-grid" style="margin-bottom: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+      <div class="concept-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 24px;">
+        <div style="font-size: 24px; margin-bottom: 12px;">🔍</div>
+        <h4 style="color:#fff; margin-bottom:8px;">1. Luôn Chạy Lệnh Thẩm Định (Validate)</h4>
+        <p style="margin-bottom: 10px; font-size:0.92rem; color:var(--text-muted);">Trước khi cài đặt bất kỳ mod nào, hãy chạy lệnh thẩm định sau để quét tĩnh mã nguồn:</p>
+        <div class="code-block" style="padding: 8px 12px; font-size: 0.8rem;">
+          <code>claude plugin validate &lt;path-hoặc-tên-mod&gt;</code>
+          <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:8px;">
+          Lệnh này sẽ liệt kê tất cả các file, tài nguyên và quyền hệ thống mà mod sẽ chạm vào mà <strong>KHÔNG</strong> thực thi mod đó.
+        </p>
+      </div>
+
+      <div class="concept-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 24px;">
+        <div style="font-size: 24px; margin-bottom: 12px;">🤝</div>
+        <h4 style="color:#fff; margin-bottom:8px;">2. Chỉ Cài Đặt Từ Nguồn Đáng Tin Cậy</h4>
+        <p style="font-size:0.92rem; color:var(--text-muted);">
+          Ưu tiên các mod chính thức từ Anthropic Playground hoặc các tác giả có độ uy tín cao trong cộng đồng. Đừng bao giờ chạy các lệnh cài đặt mod được chia sẻ từ tin nhắn ẩn danh trên mạng xã hội.
+        </p>
+      </div>
+
+      <div class="concept-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 24px;">
+        <div style="font-size: 24px; margin-bottom: 12px;">📂</div>
+        <h4 style="color:#fff; margin-bottom:8px;">3. Kiểm Tra Thư Mục Lưu Trữ</h4>
+        <p style="font-size:0.92rem; color:var(--text-muted);">
+          Các Mod thường nằm trong thư mục <code>~/.claude/mods/</code> (toàn cục) hoặc <code>.claude/mods/</code> (riêng từng dự án). Bạn luôn có thể mở thư mục này ra để tự đọc mã nguồn trước khi bật lên.
+        </p>
+      </div>
+    </div>
+
+    <!-- Official Links & Pack Resource -->
+    <div class="guide-box" style="text-align: center;">
+      <h3 style="justify-content: center;">📦 Kho Tài Nguyên Miễn Phí (Official &amp; Pack Links)</h3>
+      <p style="max-width: 750px; margin: 0 auto 24px; color: var(--text-muted);">
+        Bạn có thể tải về các mod mẫu của Anthropic và theo dõi tài liệu chính thức theo các đường dẫn dưới đây:
+      </p>
+      <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+        <a href="https://github.com/anthropics/claude-code-playground/tree/main/claude-code/mods" target="_blank" class="btn btn-primary">
+          Anthropic Sample Mods (GitHub) ↗
+        </a>
+        <a href="https://code.claude.com/docs/en/plugins/mods/overview" target="_blank" class="btn btn-secondary">
+          Claude Code Mods Documentation ↗
+        </a>
+        <a href="https://youtu.be/etfxZAeDS00" target="_blank" class="btn btn-secondary">
+          Xem Lại Video DEVKIT AI ↗
+        </a>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 18px;">
+        * Để nhận bộ cài đặt đầy đủ 5 mods của tác giả video (Safety Net, Done Ping, Plain English, Quick Buttons, /better) kèm 10 prompts mẫu: Hãy bình luận chữ <strong>MODS</strong> dưới video YouTube gốc!
+      </p>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="container">
+    <div class="section-title-wrap">
+      <span class="section-tag">Hỏi Đáp</span>
+      <h2 class="section-title">Các Câu Hỏi Thường Gặp (FAQ)</h2>
+    </div>
+
+    <div class="faq-grid">
+      <div class="faq-card">
+        <h4>⚡ Mod có làm chậm Claude Code không?</h4>
+        <p>Hầu hết các Mod được tối ưu siêu nhẹ (như Plain English sử dụng model Claude 3.5 Haiku chỉ tốn khoảng 1 giây để phản hồi, còn các gatekeeper như Blast Radius chạy code kiểm tra cục bộ tức thì trong vài mili-giây) nên không ảnh hưởng đến tốc độ làm việc.</p>
+      </div>
+      <div class="faq-card">
+        <h4>🔄 Tôi cần phiên bản nào để dùng Mods?</h4>
+        <p>Bạn cần Claude Code phiên bản <strong>2.1.287 trở lên</strong> (phiên bản tác giả thử nghiệm trong video là 2.1.289). Tính năng Mods được bật sẵn mặc định mà không cần thêm cờ cấu hình phức tạp nào.</p>
+      </div>
+      <div class="faq-card">
+        <h4>👥 Tôi có thể chia sẻ Mod cho đồng đội trong team không?</h4>
+        <p>Có! Bạn có thể lưu các file mod vào thư mục <code>.claude/mods/</code> ngay trong git repository của dự án. Khi đồng đội clone dự án về, Claude Code sẽ tự động nhận diện và áp dụng các mod này cho cả nhóm.</p>
+      </div>
+      <div class="faq-card">
+        <h4>🛑 Làm sao để tắt hoặc gỡ bỏ một Mod khi không dùng?</h4>
+        <p>Bạn chỉ cần xóa file hoặc thư mục của mod đó trong <code>.claude/mods/</code> hoặc dùng lệnh <code>claude plugin remove &lt;mod-name&gt;</code> rồi khởi động lại Claude Code.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 GitHub Mods & Local Paths Section -->
+  <section class="container" id="github-links" style="margin-top: 50px; margin-bottom: 70px;">
+    <div class="section-title-wrap">
+      <span class="section-tag" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);">🐙 Kho Mã Nguồn GitHub &amp; Local Paths</span>
+      <h2 class="section-title">Tổng Hợp 8 Đường Dẫn GitHub &amp; Lệnh Nạp Cục Bộ Của 8 Mods</h2>
+      <p class="section-desc">Để khắc phục triệt để lỗi không nhận diện cú pháp <code>github:...</code>, dưới đây là đầy đủ 8 liên kết GitHub trực tiếp và đường dẫn thư mục nội bộ (Local Path) chuẩn xác để bạn kiểm tra (validate) và nạp vào Claude Code.</p>
+    </div>
+
+    <!-- Quick Git Clone Box -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-accent); border-radius: var(--radius-md); padding: 24px; margin-bottom: 30px; box-shadow: var(--shadow-glow);">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+        <span style="font-weight: 700; color: var(--accent-orange-bright); font-size: 1.05rem;">⚡ 1 Lệnh Tải Toàn Bộ Repo Về Máy Để Lấy Local Path:</span>
+        <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Bash / Terminal / PowerShell</span>
+      </div>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">
+        Chạy 2 lệnh git clone sau trong terminal để tải mã nguồn chính thức từ Anthropic và các bộ thư viện mod cộng đồng:
+      </p>
+      <div class="code-block-sm" style="margin-bottom: 10px;">
+        <code>git clone https://github.com/anthropics/claude-code-playground.git</code>
+        <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+      </div>
+      <div class="code-block-sm">
+        <code>git clone https://github.com/whyashthakker/awesome-claude-code-mods.git</code>
+        <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+
+    <!-- 8 Mods Grid List -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px;">
+      
+      <!-- Mod 1: Token Weather -->
+      <div class="concept-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div>
+            <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-orange); font-weight: 700;">MOD 01</span>
+            <h4 style="color: #fff; font-size: 1.15rem; margin-top: 2px;">Token Weather</h4>
+          </div>
+          <span class="badge-anthropic">Anthropic Official</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">Thước đo dự báo thời tiết bộ nhớ ngữ cảnh tokens (Clear, Cloudy, Storm) theo thời gian thực.</p>
+        <div style="margin-bottom: 10px;">
+          <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 600;">🔗 Direct GitHub Link:</span>
+          <div style="margin-top: 4px;">
+            <a href="https://github.com/anthropics/claude-code-playground/tree/main/claude-code/mods/token-weather" target="_blank" style="color: #38bdf8; font-size: 0.82rem; word-break: break-all; text-decoration: underline;">anthropics/.../mods/token-weather ↗</a>
+          </div>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <span style="font-size: 0.75rem; color: var(--text-dim);">📁 Đường dẫn nội bộ (Local Path):</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>./claude-code-playground/claude-code/mods/token-weather</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+        <div>
+          <span style="font-size: 0.75rem; color: var(--text-dim);">⚙️ Lệnh validate &amp; chạy:</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>claude plugin validate ./claude-code-playground/claude-code/mods/token-weather</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mod 2: Blast Radius -->
+      <div class="concept-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div>
+            <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-orange); font-weight: 700;">MOD 02</span>
+            <h4 style="color: #fff; font-size: 1.15rem; margin-top: 2px;">Blast Radius</h4>
+          </div>
+          <span class="badge-anthropic">Anthropic Official</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">Phanh khẩn cấp chặn lệnh xóa nguy hiểm, tính toán dung lượng và số lượng file bị ảnh hưởng.</p>
+        <div style="margin-bottom: 10px;">
+          <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 600;">🔗 Direct GitHub Link:</span>
+          <div style="margin-top: 4px;">
+            <a href="https://github.com/anthropics/claude-code-playground/tree/main/claude-code/mods/blast-radius" target="_blank" style="color: #38bdf8; font-size: 0.82rem; word-break: break-all; text-decoration: underline;">anthropics/.../mods/blast-radius ↗</a>
+          </div>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <span style="font-size: 0.75rem; color: var(--text-dim);">📁 Đường dẫn nội bộ (Local Path):</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>./claude-code-playground/claude-code/mods/blast-radius</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+        <div>
+          <span style="font-size: 0.75rem; color: var(--text-dim);">⚙️ Lệnh validate &amp; chạy:</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>claude plugin validate ./claude-code-playground/claude-code/mods/blast-radius</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mod 3: Safety Net -->
+      <div class="concept-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div>
+            <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-orange); font-weight: 700;">MOD 03</span>
+            <h4 style="color: #fff; font-size: 1.15rem; margin-top: 2px;">Safety Net</h4>
+          </div>
+          <span class="badge-custom">Security Gate</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">Bảo vệ file .env/secrets, phát hiện và chặn lệnh SQL DROP TABLE, chặn script curl | sh độc hại.</p>
+        <div style="margin-bottom: 10px;">
+          <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 600;">🔗 GitHub Reference (Guards):</span>
+          <div style="margin-top: 4px;">
+            <a href="https://github.com/whyashthakker/awesome-claude-code-mods" target="_blank" style="color: #38bdf8; font-size: 0.82rem; word-break: break-all; text-decoration: underline;">whyashthakker/awesome-claude-code-mods ↗</a>
+          </div>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <span style="font-size: 0.75rem; color: var(--text-dim);">📁 Đường dẫn nội bộ đề xuất:</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>~/.claude/mods/safety-net</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+        <div>
+          <span style="font-size: 0.75rem; color: var(--text-dim);">⚙️ Khởi tạo / Validate nội bộ:</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>claude plugin init safety-net</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mod 4: Done Ping -->
+      <div class="concept-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div>
+            <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-orange); font-weight: 700;">MOD 04</span>
+            <h4 style="color: #fff; font-size: 1.15rem; margin-top: 2px;">Done Ping</h4>
+          </div>
+          <span class="badge-custom">Audio Notification</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">Phát chuông âm thanh chime tinh tế và hiển thị thống kê thời gian khi lệnh chạy xong > 30s.</p>
+        <div style="margin-bottom: 10px;">
+          <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 600;">🔗 GitHub Reference (Audio/Hooks):</span>
+          <div style="margin-top: 4px;">
+            <a href="https://github.com/hamzafer/claude-code-mods" target="_blank" style="color: #38bdf8; font-size: 0.82rem; word-break: break-all; text-decoration: underline;">hamzafer/claude-code-mods (Audio Hooks) ↗</a>
+          </div>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <span style="font-size: 0.75rem; color: var(--text-dim);">📁 Đường dẫn nội bộ đề xuất:</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>~/.claude/mods/done-ping</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+        <div>
+          <span style="font-size: 0.75rem; color: var(--text-dim);">⚙️ Khởi tạo / Validate nội bộ:</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>claude plugin init done-ping</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mod 5: Plain English -->
+      <div class="concept-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div>
+            <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-orange); font-weight: 700;">MOD 05</span>
+            <h4 style="color: #fff; font-size: 1.15rem; margin-top: 2px;">Plain English</h4>
+          </div>
+          <span class="badge-custom">Haiku Summary</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">Tự động phân tích các sửa đổi mã nguồn và thêm 1 câu tóm tắt bằng ngôn ngữ đời thường ngắn gọn.</p>
+        <div style="margin-bottom: 10px;">
+          <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 600;">🔗 GitHub Reference (Formatters):</span>
+          <div style="margin-top: 4px;">
+            <a href="https://github.com/whyashthakker/awesome-claude-code-mods" target="_blank" style="color: #38bdf8; font-size: 0.82rem; word-break: break-all; text-decoration: underline;">whyashthakker/awesome-claude-code-mods (Formatters) ↗</a>
+          </div>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <span style="font-size: 0.75rem; color: var(--text-dim);">📁 Đường dẫn nội bộ đề xuất:</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>~/.claude/mods/plain-english</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+        <div>
+          <span style="font-size: 0.75rem; color: var(--text-dim);">⚙️ Khởi tạo / Validate nội bộ:</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>claude plugin init plain-english</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mod 6: Replay Theater -->
+      <div class="concept-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div>
+            <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-orange); font-weight: 700;">MOD 06</span>
+            <h4 style="color: #fff; font-size: 1.15rem; margin-top: 2px;">Replay Theater</h4>
+          </div>
+          <span class="badge-anthropic">Anthropic Official</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">Lệnh <code>/replay</code> xem lại từng bước sửa file dưới dạng thước phim trực quan xanh thêm / đỏ bớt.</p>
+        <div style="margin-bottom: 10px;">
+          <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 600;">🔗 Direct GitHub Link:</span>
+          <div style="margin-top: 4px;">
+            <a href="https://github.com/anthropics/claude-code-playground/tree/main/claude-code/mods/replay-theater" target="_blank" style="color: #38bdf8; font-size: 0.82rem; word-break: break-all; text-decoration: underline;">anthropics/.../mods/replay-theater ↗</a>
+          </div>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <span style="font-size: 0.75rem; color: var(--text-dim);">📁 Đường dẫn nội bộ (Local Path):</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>./claude-code-playground/claude-code/mods/replay-theater</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+        <div>
+          <span style="font-size: 0.75rem; color: var(--text-dim);">⚙️ Lệnh validate &amp; chạy:</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>claude plugin validate ./claude-code-playground/claude-code/mods/replay-theater</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mod 7: Quick Buttons -->
+      <div class="concept-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div>
+            <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-orange); font-weight: 700;">MOD 07</span>
+            <h4 style="color: #fff; font-size: 1.15rem; margin-top: 2px;">Quick Buttons</h4>
+          </div>
+          <span class="badge-custom">UI Toolbar</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">Lệnh <code>/buttons</code> gọi bảng menu 6 nút bấm một chạm thực thi nhanh các tác vụ prompt thường ngày.</p>
+        <div style="margin-bottom: 10px;">
+          <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 600;">🔗 GitHub Reference (Interactive Panes):</span>
+          <div style="margin-top: 4px;">
+            <a href="https://github.com/OneWave-AI/claude-code-mods" target="_blank" style="color: #38bdf8; font-size: 0.82rem; word-break: break-all; text-decoration: underline;">OneWave-AI/claude-code-mods ↗</a>
+          </div>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <span style="font-size: 0.75rem; color: var(--text-dim);">📁 Đường dẫn nội bộ đề xuất:</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>~/.claude/mods/quick-buttons</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+        <div>
+          <span style="font-size: 0.75rem; color: var(--text-dim);">⚙️ Khởi tạo / Validate nội bộ:</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>claude plugin init quick-buttons</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mod 8: /better (Better Prompt) -->
+      <div class="concept-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div>
+            <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-orange); font-weight: 700;">MOD 08</span>
+            <h4 style="color: #fff; font-size: 1.15rem; margin-top: 2px;">/better (Better Prompt)</h4>
+          </div>
+          <span class="badge-custom">Prompt Architecture</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">Tái cấu trúc câu prompt sơ khai thành bộ khung 4 tiêu chuẩn: Goal, Details, Done-when, Plan first.</p>
+        <div style="margin-bottom: 10px;">
+          <span style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 600;">🔗 GitHub Reference (Prompts):</span>
+          <div style="margin-top: 4px;">
+            <a href="https://github.com/Piebald-AI/claude-code-system-prompts" target="_blank" style="color: #38bdf8; font-size: 0.82rem; word-break: break-all; text-decoration: underline;">Piebald-AI/claude-code-system-prompts ↗</a>
+          </div>
+        </div>
+        <div style="margin-bottom: 8px;">
+          <span style="font-size: 0.75rem; color: var(--text-dim);">📁 Đường dẫn nội bộ đề xuất:</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>~/.claude/mods/better-prompt</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+        <div>
+          <span style="font-size: 0.75rem; color: var(--text-dim);">⚙️ Khởi tạo / Validate nội bộ:</span>
+          <div class="code-block-sm" style="margin-top: 4px;">
+            <code>claude plugin init better-prompt</code>
+            <button class="btn-copy-sm" onclick="copyCode(this)">Copy</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Quick Floating Dock -->
+  <div class="quick-dock">
+    <a href="#top" class="dock-btn">▲ Đầu Trang</a>
+    <div class="dock-divider"></div>
+    <a href="#overview" class="dock-btn">🌟 Tổng Quan</a>
+    <div class="dock-divider"></div>
+    <a href="#mods-list" class="dock-btn">8 Mods &amp; Lệnh Cài</a>
+    <div class="dock-divider"></div>
+    <a href="#github-links" class="dock-btn">🐙 8 GitHub Mods</a>
+    <div class="dock-divider"></div>
+    <button onclick="playDonePingChime()" class="dock-btn" style="background:none; border:none; cursor:pointer;">🔔 Test Chuông</button>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p style="font-weight: 600; color: #fff;">Cẩm Nang Hướng Dẫn Claude Code Mods</p>
+      <p style="margin-top: 6px;">Tổng hợp và thiết kế chi tiết từ video phân tích của kênh <strong>DEVKIT AI</strong>.</p>
+      <div class="footer-links">
+        <a href="https://youtu.be/etfxZAeDS00" target="_blank">YouTube Video</a>
+        <a href="https://code.claude.com/docs/en/plugins/mods/overview" target="_blank">Anthropic Docs</a>
+        <a href="https://github.com/anthropics/claude-code-playground" target="_blank">Anthropic Playground</a>
+        <a href="https://github.com/whyashthakker/awesome-claude-code-mods" target="_blank">Awesome Mods GitHub</a>
+        <a href="https://github.com/topics/claude-mods" target="_blank">GitHub #claude-mods Topic</a>
+      </div>
+      <p style="font-size: 0.8rem; color: var(--text-dim);">
+        Lưu ý: Mod chạy với quyền hạn của người dùng hệ thống. Luôn kiểm tra mã nguồn bằng <code>claude plugin validate</code> trước khi chạy.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Interactive JavaScript Logic -->
+  <script>
+    // 1. Audio Synthesizer for Done Ping Chime (Web Audio API)
+    function playDonePingChime() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioContext();
+
+        // High pleasant chime notes: E6 then B6
+        const playTone = (freq, delay, duration) => {
+          setTimeout(() => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+            gain.gain.setValueAtTime(0, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 0.04);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start();
+            osc.stop(ctx.currentTime + duration);
+          }, delay);
+        };
+
+        // Arpeggio chime
+        playTone(1318.51, 0, 0.8);   // E6
+        playTone(1975.53, 140, 1.2); // B6
+
+        // Show Toast Notification
+        const toast = document.getElementById('pingToast');
+        if (toast) {
+          toast.classList.add('show');
+          setTimeout(() => {
+            toast.classList.remove('show');
+          }, 3500);
+        }
+      } catch (e) {
+        console.error("Audio playback error:", e);
+      }
+    }
+
+    // 2. Token Weather Interactive Simulation
+    function addTokens(percent) {
+      const fill = document.getElementById('weatherBarFill');
+      const text = document.getElementById('weatherPercent');
+      const state = document.getElementById('weatherStateText');
+      const count = document.getElementById('weatherTokenCount');
+      const tip = document.getElementById('weatherTip');
+
+      fill.style.width = percent + '%';
+      text.innerText = percent + '%';
+      const tokens = Math.round((percent / 100) * 200);
+      count.innerText = tokens + 'k / 200k tokens';
+
+      if (percent === 0) {
+        fill.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
+        state.innerHTML = '☀️ Clear (Trời quang)';
+        state.style.color = '#34d399';
+        tip.innerText = 'Bộ nhớ hoàn toàn sạch. Sẵn sàng nhận dự án lớn!';
+      } else if (percent < 40) {
+        fill.style.background = 'linear-gradient(90deg, #10b981, #38bdf8)';
+        state.innerHTML = '⛅ Partly Cloudy (Hơi nhiều mây)';
+        state.style.color = '#38bdf8';
+        tip.innerText = 'Đã đọc một số tệp mã nguồn. Claude vẫn ghi nhớ chi tiết rất tốt.';
+      } else if (percent < 70) {
+        fill.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+        state.innerHTML = '☁️ Cloudy (Nhiều mây - Cảnh báo)';
+        state.style.color = '#fbbf24';
+        tip.innerText = 'Bộ nhớ bắt đầu đầy. Claude có thể sẽ nén bớt các tin nhắn ban đầu.';
+      } else {
+        fill.style.background = 'linear-gradient(90deg, #ef4444, #f43f5e)';
+        state.innerHTML = '⛈️ Storm (Cơn bão - Quá tải!)';
+        state.style.color = '#fb7185';
+        tip.innerText = 'Bão rồi! Hãy gõ /compact hoặc bắt đầu cuộc trò chuyện mới để tránh mất ngữ cảnh!';
+      }
+    }
+
+    // 3. Quick Buttons Interactive Simulator
+    function simulateButton(btnName, responseText) {
+      const output = document.getElementById('buttonsOutput');
+      output.style.opacity = 0.5;
+      output.innerText = `Đang chạy lệnh: [${btnName}]...`;
+      setTimeout(() => {
+        output.style.opacity = 1;
+        output.innerText = responseText;
+      }, 300);
+    }
+
+    // 4. /better Prompt Enhancer Simulator
+    function runBetterMod() {
+      const input = document.getElementById('betterInput').value.trim();
+      const output = document.getElementById('betterOutput');
+      if (!input) return;
+
+      output.innerHTML = `<span style="color:#fbbf24;">Đang cấu trúc lại prompt...</span>`;
+      setTimeout(() => {
+        output.innerHTML = `
+🎯 <strong>GOAL:</strong> Xây dựng nâng cấp toàn diện cho yêu cầu: "${input}".<br>
+📋 <strong>DETAILS:</strong> Phân tích kiến trúc hiện tại, tối ưu trải nghiệm tương tác, bổ sung xử lý lỗi biên và kiểm thử tự động.<br>
+✅ <strong>DONE-WHEN:</strong> Code sạch không lint errors, unit tests pass 100%, có tài liệu ngắn gọn.<br>
+📝 <strong>PLAN FIRST:</strong> Vui lòng trình bày dàn ý các bước tiếp cận trước khi tiến hành chỉnh sửa mã.
+        `;
+      }, 350);
+    }
+
+    // 5. Filter & Search Mods
+    function filterMods(category) {
+      const pills = document.querySelectorAll('.filter-pill');
+      pills.forEach(p => p.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const cards = document.querySelectorAll('.mod-card');
+      cards.forEach(card => {
+        if (category === 'all') {
+          card.style.display = 'block';
+        } else {
+          const cardCat = card.getAttribute('data-category') || '';
+          if (cardCat.includes(category)) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        }
+      });
+    }
+
+    function searchMods() {
+      const query = document.getElementById('modSearchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('.mod-card');
+      cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        if (text.includes(query)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // 6. Copy Code Snippet
+    function copyCode(btn) {
+      const code = btn.previousElementSibling.innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const originalText = btn.innerText;
+        btn.innerText = 'Đã Chép!';
+        btn.style.background = '#10b981';
+        btn.style.color = '#000';
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.style.background = '';
+          btn.style.color = '';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
