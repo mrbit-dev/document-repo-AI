@@ -1,0 +1,2328 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Hướng dẫn toàn diện về ComfyUI (comfy.org): Khái niệm, so sánh chi tiết với Stable Diffusion WebUI, phân tích bản v0.41.0 và cẩm nang cài đặt chi tiết trên Windows.">
+  <meta name="keywords" content="ComfyUI, Stable Diffusion, comfy.org, ComfyUI v0.41.0, AI art, node-based, cài đặt ComfyUI Windows, so sánh ComfyUI và WebUI">
+  <title>ComfyUI Toàn Tập: Khám Phá, So Sánh & Hướng Dẫn Cài Đặt Chi Tiết Trên Windows</title>
+
+  <style>
+    /* ==========================================================================
+       HỆ THỐNG BIẾN & THEME (SỬ DỤNG FONT TAHOMA SẮC NÉT TRÊN WINDOWS)
+       ========================================================================== */
+    :root {
+      /* Font chính thức: Tahoma */
+      --font-main: Tahoma, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      --font-mono: Consolas, "Courier New", Monaco, monospace;
+
+      /* Dark Theme (Mặc định - Giao diện tối hiện đại, dịu mắt) */
+      --bg-base: #0b0f19;
+      --bg-surface: #111827;
+      --bg-card: #151d30;
+      --bg-card-hover: #1c263d;
+      --bg-glass: rgba(11, 15, 25, 0.92);
+      --bg-code: #070a12;
+      --border: rgba(148, 163, 184, 0.16);
+      --border-accent: rgba(99, 102, 241, 0.45);
+
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --text-link: #38bdf8;
+
+      /* Màu nhấn Brand */
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-light: #818cf8;
+      --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+      --emerald: #10b981;
+      --emerald-light: #34d399;
+      --cyan: #06b6d4;
+      --amber: #f59e0b;
+      --rose: #ef4444;
+      --blue: #3b82f6;
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+
+      --transition-fast: 0.15s ease;
+      --transition-normal: 0.22s ease-in-out;
+    }
+
+    [data-theme="light"] {
+      --bg-base: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f1f5f9;
+      --bg-glass: rgba(255, 255, 255, 0.94);
+      --bg-code: #0f172a;
+      --border: rgba(100, 116, 139, 0.2);
+      --border-accent: rgba(99, 102, 241, 0.4);
+
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --text-link: #0284c7;
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    /* ==========================================================================
+       RESET & TYPOGRAPHY
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 15px;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background-color var(--transition-normal), color var(--transition-normal);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Đèn nền ambient nhẹ */
+    .ambient-glow {
+      position: fixed;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.14) 0%, rgba(139, 92, 246, 0.06) 50%, transparent 75%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(60px);
+    }
+
+    /* Thanh tiến trình đọc */
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: var(--primary-gradient);
+      z-index: 9999;
+      transition: width 0.1s ease-out;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ==========================================================================
+       HEADER & THANH MENU (CHỐNG XUỐNG DÒNG 100%)
+       ========================================================================== */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: var(--bg-glass);
+      border-bottom: 1px solid var(--border);
+      height: 62px;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      flex-wrap: nowrap; /* Tuyệt đối không xuống dòng */
+    }
+
+    /* Brand Logo */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+    }
+
+    .brand-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+
+    .brand-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      background: rgba(99, 102, 241, 0.16);
+      color: var(--primary-light);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+
+    /* Navigation Menu - Hàng ngang duy nhất, cuộn mượt khi màn hình nhỏ */
+    nav.nav-bar {
+      flex: 1 1 auto;
+      min-width: 0; /* Quan trọng để flex child không tràn */
+      display: flex;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none; /* Ẩn thanh cuộn Firefox */
+      -ms-overflow-style: none; /* IE */
+      padding: 2px 4px;
+    }
+
+    .nav-links::-webkit-scrollbar {
+      display: none; /* Ẩn thanh cuộn Chrome/Safari */
+    }
+
+    .nav-link {
+      display: inline-block;
+      padding: 6px 11px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: #fff;
+      background: var(--primary);
+    }
+
+    [data-theme="light"] .nav-link:hover, [data-theme="light"] .nav-link.active {
+      color: #fff;
+      background: var(--primary);
+    }
+
+    /* Action Buttons bên phải */
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .theme-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-github {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid var(--border-accent);
+      color: var(--text-primary);
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-github:hover {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+    }
+
+    /* ==========================================================================
+       HERO BANNER
+       ========================================================================== */
+    .hero {
+      padding: 56px 0 40px;
+      text-align: center;
+      position: relative;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--primary-light);
+      margin-bottom: 20px;
+    }
+
+    .badge-pill .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+    }
+
+    .hero-title {
+      font-size: clamp(1.8rem, 4.2vw, 2.7rem);
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .hero-title .gradient-text {
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    .hero-desc {
+      font-size: 1.02rem;
+      color: var(--text-secondary);
+      max-width: 820px;
+      margin: 0 auto 30px;
+      line-height: 1.65;
+    }
+
+    .hero-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 22px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: 1px solid transparent;
+      font-family: var(--font-main);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 3px 14px rgba(99, 102, 241, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 5px 18px rgba(99, 102, 241, 0.5);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      border-color: var(--border);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-accent);
+      transform: translateY(-1px);
+    }
+
+    /* Stats Grid */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: center;
+      transition: transform var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-accent);
+    }
+
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--primary-light);
+      margin-bottom: 2px;
+    }
+
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* ==========================================================================
+       SECTIONS & BỐ CỤC
+       ========================================================================== */
+    .main-content {
+      padding: 24px 0 60px;
+    }
+
+    .section-wrapper {
+      margin-bottom: 56px;
+      scroll-margin-top: 80px;
+    }
+
+    .section-header {
+      margin-bottom: 22px;
+    }
+
+    .section-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+      display: inline-block;
+    }
+
+    .section-title {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title svg {
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .section-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      max-width: 820px;
+      line-height: 1.6;
+    }
+
+    /* Cards & Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+
+    .card:hover {
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: rgba(99, 102, 241, 0.14);
+      color: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .card-text {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .card-list {
+      margin-top: 12px;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .card-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    .card-list li svg {
+      color: var(--emerald);
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    /* ==========================================================================
+       BẢNG SO SÁNH (COMFYUI VS STABLE DIFFUSION WEBUI)
+       ========================================================================== */
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+      min-width: 680px;
+    }
+
+    .comp-table th {
+      background: rgba(15, 23, 42, 0.5);
+      padding: 14px 18px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comp-table th.col-highlight {
+      color: var(--primary-light);
+      background: rgba(99, 102, 241, 0.12);
+      border-bottom: 2px solid var(--primary);
+    }
+
+    .comp-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .comp-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .comp-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .comp-table td.col-highlight {
+      background: rgba(99, 102, 241, 0.04);
+      color: var(--text-primary);
+    }
+
+    .table-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .badge-win {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald-light);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-neutral {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .badge-warning {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--rose);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    /* Verdict Box */
+    .verdict-box {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .verdict-box {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .verdict-item {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+    }
+
+    .verdict-item.comfy {
+      border-color: rgba(99, 102, 241, 0.35);
+      background: linear-gradient(180deg, rgba(99, 102, 241, 0.08) 0%, rgba(15, 23, 42, 0.4) 100%);
+    }
+
+    .verdict-item.webui {
+      border-color: rgba(245, 158, 11, 0.35);
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, rgba(15, 23, 42, 0.4) 100%);
+    }
+
+    .verdict-item h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ==========================================================================
+       RELEASE v0.41.0 SECTION
+       ========================================================================== */
+    .release-hero-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .release-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .tag-pill {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .release-date {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    .assets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .asset-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      transition: all var(--transition-fast);
+      gap: 10px;
+    }
+
+    .asset-item:hover {
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .asset-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .asset-name {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .asset-target {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       INSTALLATION TABS & TIMELINE
+       ========================================================================== */
+    .install-tabs {
+      display: flex;
+      gap: 6px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      white-space: nowrap;
+    }
+
+    .install-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .install-tab-btn {
+      padding: 10px 18px;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      position: relative;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-main);
+    }
+
+    .install-tab-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .install-tab-btn.active {
+      color: var(--primary-light);
+      background: rgba(99, 102, 241, 0.12);
+    }
+
+    .install-tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--primary);
+    }
+
+    .install-tab-content {
+      display: none;
+    }
+
+    .install-tab-content.active {
+      display: block;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Step Timeline */
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .step-card {
+      display: flex;
+      gap: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      transition: border-color var(--transition-fast);
+    }
+
+    .step-card:hover {
+      border-color: var(--border-accent);
+    }
+
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .step-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .step-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .step-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--primary-light);
+    }
+
+    .step-desc {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    /* ==========================================================================
+       CODE BLOCKS & SAO CHÉP LỆNH
+       ========================================================================== */
+    .code-block {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .code-copy-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-main);
+      transition: all var(--transition-fast);
+    }
+
+    .code-copy-btn:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .code-content {
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      overflow-x: auto;
+      line-height: 1.55;
+    }
+
+    .code-comment { color: #64748b; }
+    .code-cmd { color: #38bdf8; font-weight: 600; }
+    .code-path { color: #34d399; }
+    .code-param { color: #fbbf24; }
+
+    /* Callout Alerts */
+    .callout {
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      margin: 16px 0;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 0.88rem;
+      line-height: 1.55;
+    }
+
+    .callout svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .callout-info {
+      background: rgba(6, 182, 212, 0.08);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      color: #a5f3fc;
+    }
+    .callout-info svg { color: var(--cyan); }
+
+    .callout-tip {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #a7f3d0;
+    }
+    .callout-tip svg { color: var(--emerald); }
+
+    .callout-warning {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      color: #fde68a;
+    }
+    .callout-warning svg { color: var(--amber); }
+
+    .callout-danger {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #fca5a5;
+    }
+    .callout-danger svg { color: var(--rose); }
+
+    [data-theme="light"] .callout-info { color: #0e7490; }
+    [data-theme="light"] .callout-tip { color: #047857; }
+    [data-theme="light"] .callout-warning { color: #b45309; }
+    [data-theme="light"] .callout-danger { color: #b91c1c; }
+
+    /* Directory Tree */
+    .dir-tree {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      line-height: 1.7;
+      color: #cbd5e1;
+    }
+
+    .dir-folder { color: #38bdf8; font-weight: 700; }
+    .dir-file { color: #cbd5e1; }
+    .dir-note { color: #94a3b8; font-size: 0.78rem; font-style: italic; }
+
+    /* Shortcut Table */
+    .shortcut-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .shortcut-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .kbd {
+      display: inline-block;
+      padding: 2px 7px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      box-shadow: 0 1px 0 var(--border);
+    }
+
+    /* FAQ Accordion */
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      transition: border-color var(--transition-fast);
+    }
+
+    .faq-item:hover {
+      border-color: var(--border-accent);
+    }
+
+    .faq-question {
+      width: 100%;
+      text-align: left;
+      padding: 16px 20px;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-family: var(--font-main);
+    }
+
+    .faq-icon {
+      transition: transform var(--transition-normal);
+      flex-shrink: 0;
+      color: var(--primary-light);
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(180deg);
+    }
+
+    .faq-answer {
+      display: none;
+      padding: 0 20px 18px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      background: var(--bg-surface);
+      padding: 36px 0;
+      margin-top: 60px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      list-style: none;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color var(--transition-fast);
+    }
+
+    .footer-links a:hover {
+      color: var(--primary-light);
+    }
+
+    /* Scroll To Top */
+    .scroll-top {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 40px;
+      height: 40px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-md);
+      z-index: 900;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition-normal);
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .scroll-top:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* Responsive Queries */
+    @media (max-width: 900px) {
+      .hero {
+        padding: 36px 0 24px;
+      }
+      .step-card {
+        flex-direction: column;
+        gap: 12px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .btn-github span {
+        display: none; /* Chỉ hiện icon trên điện thoại */
+      }
+      .brand-title {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Thanh tiến trình đọc trên đỉnh -->
+  <div id="progress-bar"></div>
+
+  <!-- Vùng sáng ambient -->
+  <div class="ambient-glow"></div>
+
+  <!-- ====================================================================
+       HEADER & NAVIGATION BAR (KHÔNG BAO GIỜ BỊ XUỐNG DÒNG)
+       ==================================================================== -->
+  <header class="site-header">
+    <div class="container nav-inner">
+
+      <!-- Logo & Tên Website -->
+      <a href="#hero" class="brand" title="ComfyUI Guide Windows">
+        <div class="brand-icon">C</div>
+        <span class="brand-title">ComfyUI Guide</span>
+        <span class="brand-tag">v0.41.0</span>
+      </a>
+
+      <!-- Thanh Menu Ngang (Scrollable, không wrap) -->
+      <nav class="nav-bar">
+        <ul class="nav-links">
+          <li><a href="#about" class="nav-link">Giới thiệu</a></li>
+          <li><a href="#comparison" class="nav-link">So sánh WebUI</a></li>
+          <li><a href="#release" class="nav-link">Bản v0.41.0</a></li>
+          <li><a href="#installation" class="nav-link">Cài đặt Windows</a></li>
+          <li><a href="#models" class="nav-link">Quản lý Model</a></li>
+          <li><a href="#post-install" class="nav-link">Tiện ích</a></li>
+          <li><a href="#troubleshooting" class="nav-link">Sửa lỗi</a></li>
+        </ul>
+      </nav>
+
+      <!-- Nút thao tác nhanh bên phải -->
+      <div class="nav-actions">
+        <button id="theme-btn" class="theme-toggle" title="Đổi giao diện sáng/tối" aria-label="Toggle theme">
+          <svg id="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          <svg id="sun-icon" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+
+        <a href="https://github.com/Comfy-Org/ComfyUI/releases/tag/v0.41.0" target="_blank" rel="noopener noreferrer" class="btn-github">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>GitHub v0.41.0</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ====================================================================
+       HERO BANNER
+       ==================================================================== -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <div class="badge-pill">
+        <span class="pulse-dot"></span>
+        <span>ComfyUI Release v0.41.0 &bull; Cập nhật chính thức</span>
+      </div>
+
+      <h1 class="hero-title">
+        Làm Chủ <span class="gradient-text">ComfyUI</span> Trên Windows<br>
+        Từ Số 0 Đến Chuyên Nghiệp
+      </h1>
+
+      <p class="hero-desc">
+        Hướng dẫn toàn diện về <strong>ComfyUI</strong> (comfy.org) — công cụ sinh ảnh và video AI đồ họa dạng nốt (node-based) mạnh mẽ, tối ưu VRAM hàng đầu thế giới. So sánh chuyên sâu với Stable Diffusion WebUI (A1111/Forge) và hướng dẫn chi tiết tải, cài đặt trọn gói bản Standalone Portable v0.41.0 cho Windows.
+      </p>
+
+      <div class="hero-cta">
+        <a href="#installation" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Cài Đặt Windows Ngay
+        </a>
+        <a href="#comparison" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          So Sánh Với WebUI
+        </a>
+        <a href="https://comfy.org/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          Trang Chủ Comfy.org
+        </a>
+      </div>
+
+      <!-- Quick Metrics Bar -->
+      <div class="hero-stats">
+        <div class="stat-card">
+          <div class="stat-value">Node-Based</div>
+          <div class="stat-label">Kiến trúc đồ thị luồng xử lý tùy biến 100%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">Tiết Kiệm VRAM</div>
+          <div class="stat-label">Chạy mượt FLUX.1 & SDXL trên GPU từ 6GB-8GB</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">v0.41.0</div>
+          <div class="stat-label">Bản Portable Standalone mới nhất có sẵn cho Windows</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">1-Click Drag</div>
+          <div class="stat-label">Kéo ảnh PNG vào là khôi phục toàn bộ Workflow</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================================
+       MAIN CONTENT BODY
+       ==================================================================== -->
+  <main class="container main-content">
+
+    <!-- PHẦN 1: GIỚI THIỆU COMFYUI -->
+    <section class="section-wrapper" id="about">
+      <div class="section-header">
+        <span class="section-tag">Khái niệm cốt lõi</span>
+        <h2 class="section-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+          ComfyUI Là Gì? Vì Sao Trở Thành Tiêu Chuẩn Công Nghiệp?
+        </h2>
+        <p class="section-subtitle">
+          Khám phá sức mạnh của hệ sinh thái <strong>ComfyUI</strong> do Comfy Org phát triển (<a href="https://comfy.org/" target="_blank" rel="noopener noreferrer" style="color:var(--text-link);">comfy.org</a>), từ một đồ án mã nguồn mở bùng nổ thành hạ tầng AI tạo sinh (Generative AI) hàng đầu thế giới.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          </div>
+          <h3 class="card-title">Giao Diện Nốt Đồ Thị (Node-Based Graph)</h3>
+          <p class="card-text">
+            Khác với các WebUI thông thường chỉ có các ô nhập chữ và thanh trượt cố định, ComfyUI chia nhỏ toàn bộ quá trình sinh ảnh/video thành từng <strong>Nốt (Node)</strong> độc lập: Nạp model, mã hóa văn bản (CLIP Text Encode), bộ lấy mẫu (KSampler), giải mã không gian tiềm ẩn (VAE Decode), ControlNet, LoRA, Upscale...
+          </p>
+          <ul class="card-list">
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Hiểu tường tận cách các khối mô hình AI phối hợp với nhau.</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Ghép nối các chuỗi xử lý phức tạp (Chaining, Loopback, Inpainting nâng cao) mà không bị giới hạn.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          </div>
+          <h3 class="card-title">Tối Ưu VRAM &amp; Caching Thông Minh</h3>
+          <p class="card-text">
+            ComfyUI được viết với cơ chế <strong>Execution Graph</strong> cực kỳ thông minh:
+          </p>
+          <ul class="card-list">
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg><strong>Smart Caching:</strong> Khi bạn thay đổi prompt hoặc seed, ComfyUI chỉ tính toán lại đúng node thay đổi, không nạp lại model từ đầu, giúp sinh ảnh liên tục với tốc độ bàn thờ.</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg><strong>Quản lý bộ nhớ VRAM xuất sắc:</strong> Tự động giải phóng các tầng trọng số không dùng, cho phép card đồ họa tầm trung 6GB - 8GB VRAM chạy được mô hình nặng như SDXL, FLUX.1.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          </div>
+          <h3 class="card-title">Lưu Workflow Trong Ảnh (Metadata Sharing)</h3>
+          <p class="card-text">
+            Mỗi bức ảnh PNG được sinh ra từ ComfyUI đều được nhúng trực tiếp toàn bộ dữ liệu luồng nốt (JSON Workflow) vào phần metadata.
+          </p>
+          <ul class="card-list">
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Chỉ cần <strong>kéo và thả (drag &amp; drop)</strong> file ảnh vào giao diện ComfyUI là khôi phục 100% workflow gồm toàn bộ nốt, thông số, prompt và model đã dùng.</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Chia sẻ kinh nghiệm và quy trình làm việc giữa các nhà sáng tạo nội dung chỉ qua 1 tấm ảnh.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+          </div>
+          <h3 class="card-title">Hỗ Trợ Mọi Mô Hình AI Mới Nhất</h3>
+          <p class="card-text">
+            ComfyUI luôn là nền tảng đầu tiên đón đầu các kiến trúc mô hình tạo sinh đột phá trên thế giới:
+          </p>
+          <ul class="card-list">
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg><strong>Mô hình hình ảnh:</strong> Stable Diffusion 1.5, SD 2.1, SDXL, SD 3 / SD 3.5, Black Forest Labs FLUX.1 (schnell, dev), Kolors, PixArt...</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg><strong>Mô hình Video &amp; 3D:</strong> AnimateDiff, SVD (Stable Video Diffusion), Wan 2.1, HunyuanVideo, CogVideoX, LTX-Video.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHẦN 2: SO SÁNH COMFYUI VÀ STABLE DIFFUSION WEBUI -->
+    <section class="section-wrapper" id="comparison">
+      <div class="section-header">
+        <span class="section-tag">Bảng đối chiếu chuyên sâu</span>
+        <h2 class="section-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"></path><path d="M18 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4"></path><circle cx="8" cy="12" r="2"></circle><circle cx="20" cy="14" r="1"></circle></svg>
+          So Sánh ComfyUI Với Stable Diffusion WebUI (A1111 / WebUI Forge)
+        </h2>
+        <p class="section-subtitle">
+          Người dùng thường gọi "Stable Diffusion WebUI" (của AUTOMATIC1111 hay WebUI Forge) là "Table Diffusion" hoặc "Stable Diffusion". Cả hai đều chạy các mô hình Diffusion, nhưng triết lý thiết kế và hiệu năng thì hoàn toàn khác biệt.
+        </p>
+      </div>
+
+      <!-- Bảng so sánh -->
+      <div class="table-container">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th style="width: 22%;">Tiêu chí so sánh</th>
+              <th style="width: 39%;" class="col-highlight">ComfyUI (comfy.org)</th>
+              <th style="width: 39%;">Stable Diffusion WebUI (A1111 / Forge)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Kiến trúc &amp; Giao diện</strong></td>
+              <td class="col-highlight">
+                <span class="table-badge badge-win">Node-Based Graph</span><br>
+                Giao diện đồ thị trực quan, kéo thả liên kết giữa các nốt chức năng. Tự do sắp xếp và tạo ra bất kỳ quy trình xử lý tùy biến nào.
+              </td>
+              <td>
+                <span class="table-badge badge-neutral">Form Cố Định (Tab-Based)</span><br>
+                Giao diện dạng bảng biểu truyền thống với các tab <em>txt2img</em>, <em>img2img</em>, <em>Inpaint</em>, <em>Extras</em>. Ít tùy biến sâu được luồng chạy.
+              </td>
+            </tr>
+
+            <tr>
+              <td><strong>Hiệu năng &amp; Tiết kiệm VRAM</strong></td>
+              <td class="col-highlight">
+                <span class="table-badge badge-win">Xuất sắc vượt trội</span><br>
+                Tối ưu hóa quản lý bộ nhớ cực tốt. Card 6GB - 8GB VRAM có thể chạy mượt SDXL và FLUX.1 quantize (fp8/gguf). Ít khi gặp lỗi tràn RAM (CUDA Out of Memory).
+              </td>
+              <td>
+                <span class="table-badge badge-warning">Nặng hơn nhiều (A1111)</span><br>
+                Chiếm nhiều VRAM hơn, dễ bị crash khi tăng độ phân giải hoặc chạy đa mô hình. Forge cải thiện được VRAM nhưng vẫn thua độ linh hoạt của ComfyUI.
+              </td>
+            </tr>
+
+            <tr>
+              <td><strong>Tốc độ sinh ảnh (Inference Speed)</strong></td>
+              <td class="col-highlight">
+                <span class="table-badge badge-win">Rất nhanh (Smart Caching)</span><br>
+                Chỉ thực thi nốt bị thay đổi. Tích hợp sẵn hỗ trợ PyTorch 2.x, FP8, và cơ chế chuyển đổi tensor siêu tốc.
+              </td>
+              <td>
+                <span class="table-badge badge-neutral">Khá chậm (Khởi động lại bước)</span><br>
+                Mỗi lần đổi thông số thường phải duyệt lại nhiều bước trung gian, thời gian chờ sinh ảnh trung bình lâu hơn từ 15% - 40%.
+              </td>
+            </tr>
+
+            <tr>
+              <td><strong>Khả năng kiểm soát &amp; Tự động hóa</strong></td>
+              <td class="col-highlight">
+                <span class="table-badge badge-win">Vô hạn</span><br>
+                Có thể kết hợp nhiều checkpoint, nhiều LoRA ở các bước khác nhau, chạy 2-3 ControlNet, Upscale 2 lần, Face Detailer trong cùng một lần click Queue.
+              </td>
+              <td>
+                <span class="table-badge badge-neutral">Giới hạn trong Extension</span><br>
+                Phải cài nhiều plugin mở rộng (ControlNet, Adetailer...) và phụ thuộc vào sự tương thích giữa các plugin này với phiên bản WebUI.
+              </td>
+            </tr>
+
+            <tr>
+              <td><strong>Tốc độ hỗ trợ Model mới</strong></td>
+              <td class="col-highlight">
+                <span class="table-badge badge-win">Ngày đầu ra mắt (Day 1)</span><br>
+                FLUX.1, SD3.5, Wan 2.1, HunyuanVideo đều được hỗ trợ nạp và chạy ngay trên ComfyUI trước các nền tảng khác từ vài tuần đến vài tháng.
+              </td>
+              <td>
+                <span class="table-badge badge-warning">Chậm hơn</span><br>
+                Cần cộng đồng viết extension hoặc chờ tác giả cập nhật core codebase để hỗ trợ kiến trúc mô hình mới.
+              </td>
+            </tr>
+
+            <tr>
+              <td><strong>Chia sẻ quy trình (Workflow Sharing)</strong></td>
+              <td class="col-highlight">
+                <span class="table-badge badge-win">Kéo thả ảnh PNG</span><br>
+                Mọi người chỉ cần gửi cho nhau 1 file ảnh PNG hoặc JSON. Kéo ảnh vào cửa sổ ComfyUI là sẵn sàng bấm chạy.
+              </td>
+              <td>
+                <span class="table-badge badge-neutral">Sao chép Prompt &amp; Cài đặt</span><br>
+                Phải copy thủ công từng đoạn prompt, negative prompt, seed, sampler và nhớ xem người tạo đã bật extension nào.
+              </td>
+            </tr>
+
+            <tr>
+              <td><strong>Đường cong học tập (Learning Curve)</strong></td>
+              <td class="col-highlight">
+                <span class="table-badge badge-warning">Cần làm quen nốt</span><br>
+                Cần hiểu nguyên lý: Latent Space, VAE, CLIP, Sampler để nối dây. Tuy nhiên học xong sẽ làm chủ hoàn toàn quá trình tạo ảnh AI.
+              </td>
+              <td>
+                <span class="table-badge badge-win">Dễ tiếp cận ban đầu</span><br>
+                Chỉ cần điền chữ vào ô prompt, chọn kích thước, bấm nút Generate là có ảnh ngay. Phù hợp cho người chỉ muốn trải nghiệm cơ bản.
+              </td>
+            </tr>
+
+            <tr>
+              <td><strong>Tích hợp Lập trình &amp; API</strong></td>
+              <td class="col-highlight">
+                <span class="table-badge badge-win">Backend chuẩn REST / WebSocket</span><br>
+                ComfyUI bản chất là một API engine cực mạnh. Dễ dàng biến ComfyUI thành server sinh ảnh ngầm cho ứng dụng Web, Discord Bot hay Game.
+              </td>
+              <td>
+                <span class="table-badge badge-neutral">API cơ bản</span><br>
+                Có WebUI API nhưng cấu trúc JSON cồng kềnh, khó quản lý trạng thái luồng xử lý phức tạp.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Đánh giá tóm tắt -->
+      <div class="verdict-box">
+        <div class="verdict-item comfy">
+          <h4>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Nên chọn ComfyUI khi nào?
+          </h4>
+          <p style="font-size:0.88rem; color:var(--text-secondary); line-height: 1.6;">
+            &bull; Bạn muốn làm việc chuyên nghiệp, kiểm soát chất lượng ảnh và video ở mức cao nhất.<br>
+            &bull; Cấu hình máy tính có VRAM vừa phải (6GB - 12GB) nhưng muốn chạy mô hình khủng như FLUX.1, SDXL, Wan 2.1.<br>
+            &bull; Muốn tự động hóa chuỗi quy trình: Phục dựng khuôn mặt (Face Detailer), Upscale 4K, đổi nền, ghép trang phục.<br>
+            &bull; Muốn tích hợp AI vào sản phẩm phần mềm thông qua API.
+          </p>
+        </div>
+
+        <div class="verdict-item webui">
+          <h4>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            Khi nào nên chọn A1111 / WebUI Forge?
+          </h4>
+          <p style="font-size:0.88rem; color:var(--text-secondary); line-height: 1.6;">
+            &bull; Bạn là người mới bắt đầu làm quen với Stable Diffusion và ngại nhìn giao diện nối dây nốt phức tạp.<br>
+            &bull; Chỉ cần gõ prompt đơn giản để tạo avatar hoặc tranh minh họa nhanh mà không cần tùy chỉnh can thiệp sâu.<br>
+            &bull; Đã quen thuộc với các phím tắt và extension lâu năm của Automatic1111.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHẦN 3: PHÂN TÍCH RELEASE v0.41.0 TRÊN GITHUB -->
+    <section class="section-wrapper" id="release">
+      <div class="section-header">
+        <span class="section-tag">Phiên bản mới nhất</span>
+        <h2 class="section-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          ComfyUI v0.41.0: Những Cải Tiến Đột Phá &amp; Các Bản Tải Về
+        </h2>
+        <p class="section-subtitle">
+          Repository chính thức: <a href="https://github.com/Comfy-Org/ComfyUI" target="_blank" rel="noopener noreferrer" style="color:var(--text-link);">Comfy-Org/ComfyUI</a> &bull; Release Tag: <a href="https://github.com/Comfy-Org/ComfyUI/releases/tag/v0.41.0" target="_blank" rel="noopener noreferrer" style="color:var(--text-link);">v0.41.0</a>
+        </p>
+      </div>
+
+      <div class="release-hero-card">
+        <div class="release-meta">
+          <span class="tag-pill">Release v0.41.0</span>
+          <span class="release-date">Cập nhật bởi Comfy-Org team</span>
+          <span class="table-badge badge-win">Official Standalone Portable Ready</span>
+        </div>
+
+        <h3 style="font-size: 1.15rem; font-weight:700; margin-bottom: 10px; color: var(--text-primary);">
+          Điểm Nổi Bật Chính Của Phiên Bản v0.41.0
+        </h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 14px;">
+          Bản phát hành v0.41.0 tập trung mạnh mẽ vào việc tối ưu hóa hiệu năng, cập nhật hỗ trợ các mô hình khuếch tán thế hệ mới và hoàn thiện hệ thống quản lý tài nguyên:
+        </p>
+
+        <ul class="card-list" style="margin-bottom: 20px;">
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <strong>Hệ thống quản lý tài nguyên Asset System:</strong> Được kích hoạt mặc định trong bản Windows Standalone thông qua cờ <code style="color:var(--emerald-light); font-family:var(--font-mono);">--enable-assets</code>, hỗ trợ định tuyến và tải file tự động.
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <strong>Hỗ trợ mô hình FLUX.3 Image Klein:</strong> Nạp native cả bản Base và Step-distilled checkpoints cùng bộ mã hóa văn bản Qwen3-VL-4B text encoder.
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <strong>Tích hợp MiniMax-H3 LightVAE:</strong> Nâng cao tốc độ giải mã tiềm ẩn và chất lượng màu sắc hình ảnh/video.
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <strong>Bổ sung các Nốt mới:</strong> <code style="color:var(--cyan); font-family:var(--font-mono);">ImageSDRToHDR</code> (chuyển đổi dải màu động), <code style="color:var(--cyan); font-family:var(--font-mono);">ReferenceMultiLatent</code> và các nốt hỗ trợ hình học không gian tiềm ẩn.
+          </li>
+        </ul>
+
+        <h4 style="font-size: 0.95rem; font-weight:700; margin-bottom: 10px; color: var(--text-primary);">
+          Danh Sách File Standalone Portable Cho Windows (Tải trực tiếp từ GitHub Assets):
+        </h4>
+
+        <div class="assets-grid">
+          <div class="asset-item">
+            <div class="asset-info">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--emerald); flex-shrink:0;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+              <div>
+                <div class="asset-name">ComfyUI_windows_portable_nvidia.7z</div>
+                <div class="asset-target">Khuyên dùng: Card NVIDIA (GTX/RTX)</div>
+              </div>
+            </div>
+            <a href="https://github.com/Comfy-Org/ComfyUI/releases/download/v0.41.0/ComfyUI_windows_portable_nvidia.7z" class="btn btn-secondary" style="padding:5px 10px; font-size:0.78rem;" target="_blank">Tải .7z</a>
+          </div>
+
+          <div class="asset-item">
+            <div class="asset-info">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--cyan); flex-shrink:0;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+              <div>
+                <div class="asset-name">ComfyUI_windows_portable_nvidia_cu126.7z</div>
+                <div class="asset-target">Dành cho RTX 30/40/50 (CUDA 12.6)</div>
+              </div>
+            </div>
+            <a href="https://github.com/Comfy-Org/ComfyUI/releases/download/v0.41.0/ComfyUI_windows_portable_nvidia_cu126.7z" class="btn btn-secondary" style="padding:5px 10px; font-size:0.78rem;" target="_blank">Tải .7z</a>
+          </div>
+
+          <div class="asset-item">
+            <div class="asset-info">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--rose); flex-shrink:0;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+              <div>
+                <div class="asset-name">ComfyUI_windows_portable_amd.7z</div>
+                <div class="asset-target">Dành cho Card AMD Radeon (DirectML)</div>
+              </div>
+            </div>
+            <a href="https://github.com/Comfy-Org/ComfyUI/releases/download/v0.41.0/ComfyUI_windows_portable_amd.7z" class="btn btn-secondary" style="padding:5px 10px; font-size:0.78rem;" target="_blank">Tải .7z</a>
+          </div>
+
+          <div class="asset-item">
+            <div class="asset-info">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--blue); flex-shrink:0;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+              <div>
+                <div class="asset-name">ComfyUI_windows_portable_intel.7z</div>
+                <div class="asset-target">Dành cho GPU Intel Arc &amp; Core Ultra</div>
+              </div>
+            </div>
+            <a href="https://github.com/Comfy-Org/ComfyUI/releases/download/v0.41.0/ComfyUI_windows_portable_intel.7z" class="btn btn-secondary" style="padding:5px 10px; font-size:0.78rem;" target="_blank">Tải .7z</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHẦN 4: HƯỚNG DẪN CÀI ĐẶT CHO MÁY TÍNH WINDOWS -->
+    <section class="section-wrapper" id="installation">
+      <div class="section-header">
+        <span class="section-tag">Hướng dẫn thực hành</span>
+        <h2 class="section-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          Hướng Dẫn Cài Đặt ComfyUI Trên Windows Từng Bước
+        </h2>
+        <p class="section-subtitle">
+          Chọn phương thức cài đặt phù hợp với bạn. Với đa số người dùng, <strong>Cách 1 (Portable Standalone)</strong> là giải pháp tối ưu nhất vì đã tích hợp sẵn Python và PyTorch CUDA, không lo lỗi môi trường.
+        </p>
+      </div>
+
+      <!-- Installation Tabs Selector -->
+      <div class="install-tabs">
+        <button class="install-tab-btn active" onclick="switchTab('tab-portable')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+          Cách 1: Bản Portable Standalone v0.41.0 (Khuyên dùng)
+        </button>
+        <button class="install-tab-btn" onclick="switchTab('tab-desktop')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="12" cy="12" r="3"></circle></svg>
+          Cách 2: Ứng Dụng Comfy Desktop (comfy.org)
+        </button>
+        <button class="install-tab-btn" onclick="switchTab('tab-git')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+          Cách 3: Cài Bằng Git &amp; Python (Dành cho Dev)
+        </button>
+      </div>
+
+      <!-- ==================== TAB 1: PORTABLE ==================== -->
+      <div id="tab-portable" class="install-tab-content active">
+
+        <div class="callout callout-tip">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <div>
+            <strong>Tại sao nên dùng bản Portable Standalone?</strong><br>
+            Bản này chứa sẵn môi trường Python nhúng và toàn bộ thư viện PyTorch CUDA phù hợp. Bạn <strong>không cần</strong> cài Python vào Windows, <strong>không sợ</strong> lỗi phiên bản, và khi không thích có thể xóa thẳng thư mục mà không để lại rác trong máy.
+          </div>
+        </div>
+
+        <div class="steps-container">
+
+          <!-- Step 1 -->
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-body">
+              <div class="step-header">
+                <h3 class="step-title">Kiểm Tra Cấu Hình Máy Tính Windows</h3>
+                <span class="step-badge">Yêu cầu hệ thống</span>
+              </div>
+              <p class="step-desc">
+                Trước khi bắt đầu, đảm bảo máy tính Windows của bạn đáp ứng các tiêu chuẩn phần cứng để ComfyUI chạy ổn định:
+              </p>
+              <div class="grid-3" style="margin-bottom: 10px;">
+                <div style="background:var(--bg-surface); padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border);">
+                  <div style="color:var(--text-muted); font-size:0.75rem;">Hệ điều hành</div>
+                  <div style="font-weight:700; color:var(--text-primary);">Windows 10 / 11 64-bit</div>
+                </div>
+                <div style="background:var(--bg-surface); padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border);">
+                  <div style="color:var(--text-muted); font-size:0.75rem;">Card đồ họa (GPU)</div>
+                  <div style="font-weight:700; color:var(--primary-light);">NVIDIA RTX/GTX từ 6GB VRAM trở lên</div>
+                </div>
+                <div style="background:var(--bg-surface); padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border);">
+                  <div style="color:var(--text-muted); font-size:0.75rem;">Bộ nhớ &amp; Ổ cứng</div>
+                  <div style="font-weight:700; color:var(--emerald-light);">16GB RAM + Ổ SSD trống từ 30GB</div>
+                </div>
+              </div>
+              <div class="callout callout-warning" style="margin:0;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <div><strong>Lưu ý:</strong> Luôn cài đặt ComfyUI trên ổ cứng thể rắn <strong>SSD (NVMe hoặc SATA)</strong> để tốc độ nạp model nặng (4GB - 16GB) diễn ra trong vài giây thay vì vài phút trên ổ HDD.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-body">
+              <div class="step-header">
+                <h3 class="step-title">Tải Gói Standalone Portable v0.41.0</h3>
+                <span class="step-badge">Download .7z</span>
+              </div>
+              <p class="step-desc">
+                Truy cập trực tiếp đường link release GitHub chính thức và chọn gói tương ứng với GPU của máy:
+              </p>
+
+              <div class="code-block">
+                <div class="code-header">
+                  <span>Link tải GitHub chính thức (Release v0.41.0)</span>
+                  <button class="code-copy-btn" onclick="copyToClipboard('https://github.com/Comfy-Org/ComfyUI/releases/tag/v0.41.0')">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    Copy Link
+                  </button>
+                </div>
+                <div class="code-content">
+                  <span class="code-comment"># Bản khuyên dùng cho card NVIDIA (GTX 1660, RTX 2060, RTX 3060...):</span><br>
+                  <span class="code-cmd">https://github.com/Comfy-Org/ComfyUI/releases/download/v0.41.0/ComfyUI_windows_portable_nvidia.7z</span><br><br>
+                  <span class="code-comment"># Hoặc bản hỗ trợ CUDA 12.6 mới nhất:</span><br>
+                  <span class="code-cmd">https://github.com/Comfy-Org/ComfyUI/releases/download/v0.41.0/ComfyUI_windows_portable_nvidia_cu126.7z</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-body">
+              <div class="step-header">
+                <h3 class="step-title">Giải Nén File .7z Bằng 7-Zip</h3>
+                <span class="step-badge">Extract File</span>
+              </div>
+              <p class="step-desc">
+                File tải về có đuôi mở rộng là <code style="color:var(--primary-light); font-family:var(--font-mono);">.7z</code>. Bạn dùng phần mềm <a href="https://www.7-zip.org/" target="_blank" rel="noopener noreferrer" style="color:var(--text-link);">7-Zip</a> hoặc WinRAR để giải nén.
+              </p>
+
+              <div class="callout callout-danger">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <div>
+                  <strong>QUY TẮC ĐẶT TÊN THƯ MỤC CẦN NHỚ:</strong><br>
+                  Giải nén vào thư mục có đường dẫn <strong>ngắn gọn, KHÔNG DẤU TIẾNG VIỆT, KHÔNG KÍ TỰ ĐẶC BIỆT HOẶC KHOẢNG TRẮNG DÀI</strong>.<br>
+                  &check; <em>ĐÚNG:</em> <code style="color:var(--emerald-light); font-family:var(--font-mono);">D:\AI\ComfyUI_windows_portable</code> hoặc <code style="color:var(--emerald-light); font-family:var(--font-mono);">C:\ComfyUI</code><br>
+                  &cross; <em>SAI:</em> <code style="color:var(--rose); font-family:var(--font-mono);">C:\Users\Tên Người Dùng Có Dấu\Mục Tải Về\ComfyUI</code> (Chắc chắn sẽ bị lỗi <code style="font-family:var(--font-mono);">UnicodeDecodeError</code>).
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="step-card">
+            <div class="step-number">4</div>
+            <div class="step-body">
+              <div class="step-header">
+                <h3 class="step-title">Khám Phá Cấu Trúc Thư Mục &amp; Các File Thực Thi</h3>
+                <span class="step-badge">Cấu trúc Folder</span>
+              </div>
+              <p class="step-desc">
+                Sau khi giải nén, bên trong thư mục <code style="font-family:var(--font-mono);">ComfyUI_windows_portable</code> bạn sẽ thấy cấu trúc chuẩn:
+              </p>
+
+              <div class="dir-tree">
+                <div>📁 <span class="dir-folder">ComfyUI_windows_portable/</span></div>
+                <div>&nbsp;&nbsp;├── 📁 <span class="dir-folder">ComfyUI/</span> <span class="dir-note">(Mã nguồn chính, chứa thư mục models, custom_nodes, input, output)</span></div>
+                <div>&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;├── 📁 <span class="dir-folder">custom_nodes/</span> <span class="dir-note">(Nơi chứa plugin mở rộng như ComfyUI-Manager)</span></div>
+                <div>&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;├── 📁 <span class="dir-folder">models/</span> <span class="dir-note">(Nơi lưu Checkpoints, LoRAs, VAE, ControlNet...)</span></div>
+                <div>&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;├── 📁 <span class="dir-folder">input/</span> <span class="dir-note">(Chứa ảnh nguồn đưa vào)</span></div>
+                <div>&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;└── 📁 <span class="dir-folder">output/</span> <span class="dir-note">(Chứa ảnh &amp; video đã sinh ra)</span></div>
+                <div>&nbsp;&nbsp;├── 📁 <span class="dir-folder">python_embeded/</span> <span class="dir-note">(Môi trường Python 3.12/3.11 độc lập tích hợp sẵn PyTorch)</span></div>
+                <div>&nbsp;&nbsp;├── 📁 <span class="dir-folder">update/</span> <span class="dir-note">(Thư mục chứa script cập nhật)</span></div>
+                <div>&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;├── 📄 <span class="dir-file">update_comfyui.bat</span> <span class="dir-note">(Cập nhật ComfyUI lên bản mới nhất)</span></div>
+                <div>&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;└── 📄 <span class="dir-file">update_comfyui_and_python_dependencies.bat</span> <span class="dir-note">(Cập nhật cả thư viện)</span></div>
+                <div>&nbsp;&nbsp;├── 🚀 <span class="dir-file" style="color:var(--emerald-light); font-weight:700;">run_nvidia_gpu.bat</span> <span class="dir-note">&larr; <strong>FILE CHẠY CHÍNH VỚI CARD ĐỒ HỌA NVIDIA</strong></span></div>
+                <div>&nbsp;&nbsp;└── 📄 <span class="dir-file">run_cpu.bat</span> <span class="dir-note">(Chạy bằng CPU nếu máy không có GPU rời - rất chậm)</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="step-card">
+            <div class="step-number">5</div>
+            <div class="step-body">
+              <div class="step-header">
+                <h3 class="step-title">Khởi Động ComfyUI Lần Đầu Tiên</h3>
+                <span class="step-badge">Launch</span>
+              </div>
+              <p class="step-desc">
+                Nhấp đúp chuột vào file <code style="color:var(--emerald-light); font-weight:700; font-family:var(--font-mono);">run_nvidia_gpu.bat</code>.
+              </p>
+              <ul class="card-list" style="margin-bottom: 12px;">
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Một cửa sổ dòng lệnh màu đen (CMD) sẽ xuất hiện, tự kiểm tra card đồ họa và khởi chạy server local.</li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Trình duyệt web mặc định sẽ tự động mở địa chỉ: <a href="http://127.0.0.1:8188" target="_blank" style="color:var(--text-link); font-family:var(--font-mono); font-weight:700;">http://127.0.0.1:8188</a></li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Giao diện nốt mặc định sẽ hiện ra ngay lập tức!</li>
+              </ul>
+
+              <div class="callout callout-info" style="margin:0;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <div><strong>Lưu ý:</strong> Đừng tắt cửa sổ dòng lệnh màu đen khi đang sử dụng ComfyUI. Khi muốn dừng phần mềm, bạn chỉ việc đóng cửa sổ dòng lệnh đó lại.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ==================== TAB 2: COMFY DESKTOP ==================== -->
+      <div id="tab-desktop" class="install-tab-content">
+        <div class="callout callout-info">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <div>
+            <strong>Comfy Desktop là gì?</strong><br>
+            Đây là phần mềm ứng dụng cài đặt hoàn chỉnh (Native Installer) được nhóm <strong>Comfy Org</strong> phát triển chính thức từ trang <a href="https://comfy.org/" target="_blank" style="color:var(--text-link);">comfy.org</a>. Phần mềm đóng gói sẵn giao diện desktop độc lập, quản lý đa phiên bản, tự động tải model còn thiếu và hỗ trợ tạo bản sao lưu (Snapshot) rollback khi gặp sự cố.
+          </div>
+        </div>
+
+        <div class="steps-container">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-body">
+              <h3 class="step-title">Tải File Cài Đặt Comfy Desktop</h3>
+              <p class="step-desc">Truy cập website chính thức <a href="https://comfy.org/download" target="_blank" style="color:var(--text-link); font-weight:700;">comfy.org/download</a> và tải file cài đặt cho Windows: <code style="font-family:var(--font-mono); color:var(--primary-light);">ComfyUI-Setup.exe</code>.</p>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-body">
+              <h3 class="step-title">Chạy Bộ Cài Đặt Windows</h3>
+              <p class="step-desc">
+                Chạy file <code style="font-family:var(--font-mono);">ComfyUI-Setup.exe</code>. Trình cài đặt sẽ tự động:
+              </p>
+              <ul class="card-list">
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Phát hiện phần cứng GPU máy tính của bạn (NVIDIA, AMD, CPU).</li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Tải sẵn gói PyTorch và GPU Wheel thích hợp mà bạn không cần gõ dòng lệnh nào.</li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Tạo biểu tượng ComfyUI trên Desktop màn hình máy tính.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-body">
+              <h3 class="step-title">Trải Nghiệm Tính Năng Cao Cấp Của Comfy Desktop</h3>
+              <ul class="card-list">
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg><strong>Multi-Instance Management:</strong> Khởi tạo và chạy song song nhiều môi trường ComfyUI khác nhau.</li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg><strong>Tích hợp Model Downloader:</strong> Khi bạn mở một workflow mà thiếu file checkpoint, Comfy Desktop sẽ tự động hiển thị thanh tải xuống và lưu đúng thư mục.</li>
+                <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg><strong>Snapshots Rollback:</strong> Lưu trạng thái hiện tại trước khi cập nhật. Nếu cập nhật plugin bị lỗi, có thể rollback lại chỉ với 1 cú click.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 3: GIT CLONE ==================== -->
+      <div id="tab-git" class="install-tab-content">
+        <div class="callout callout-warning">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <div>
+            <strong>Dành cho nhà phát triển &amp; Kỹ sư phần mềm:</strong><br>
+            Phương pháp này yêu cầu máy tính của bạn đã cài đặt <strong>Git</strong> và <strong>Python 3.10, 3.11 hoặc 3.12</strong> cùng card đồ họa NVIDIA có CUDA Toolkit.
+          </div>
+        </div>
+
+        <div class="steps-container">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-body">
+              <h3 class="step-title">Clone Repository Về Máy</h3>
+              <p class="step-desc">Mở Windows Terminal (PowerShell hoặc CMD) và gõ lệnh:</p>
+
+              <div class="code-block">
+                <div class="code-header">
+                  <span>Terminal / PowerShell</span>
+                  <button class="code-copy-btn" onclick="copyToClipboard('git clone https://github.com/Comfy-Org/ComfyUI.git\ncd ComfyUI')">Copy</button>
+                </div>
+                <div class="code-content">
+                  <span class="code-cmd">git clone</span> https://github.com/Comfy-Org/ComfyUI.git<br>
+                  <span class="code-cmd">cd</span> ComfyUI
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-body">
+              <h3 class="step-title">Tạo Môi Trường Ảo Virtualenv &amp; Cài Đặt PyTorch CUDA</h3>
+              <div class="code-block">
+                <div class="code-header">
+                  <span>PowerShell</span>
+                  <button class="code-copy-btn" onclick="copyToClipboard('python -m venv venv\n.\\venv\\Scripts\\activate\npip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124\npip install -r requirements.txt')">Copy</button>
+                </div>
+                <div class="code-content">
+                  <span class="code-comment"># Tạo môi trường ảo</span><br>
+                  <span class="code-cmd">python</span> -m venv venv<br>
+                  <span class="code-cmd">.\venv\Scripts\activate</span><br><br>
+                  <span class="code-comment"># Cài đặt PyTorch hỗ trợ CUDA (ví dụ CUDA 12.4):</span><br>
+                  <span class="code-cmd">pip install</span> torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124<br><br>
+                  <span class="code-comment"># Cài đặt các thư viện phụ thuộc:</span><br>
+                  <span class="code-cmd">pip install</span> -r requirements.txt
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-body">
+              <h3 class="step-title">Khởi Chạy ComfyUI</h3>
+              <div class="code-block">
+                <div class="code-header">
+                  <span>PowerShell</span>
+                  <button class="code-copy-btn" onclick="copyToClipboard('python main.py --auto-launch')">Copy</button>
+                </div>
+                <div class="code-content">
+                  <span class="code-cmd">python</span> main.py <span class="code-param">--auto-launch</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- PHẦN 5: QUẢN LÝ MODEL & CHIA SẺ VỚI WEBUI -->
+    <section class="section-wrapper" id="models">
+      <div class="section-header">
+        <span class="section-tag">Tài nguyên mô hình</span>
+        <h2 class="section-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline><polyline points="7.5 19.79 7.5 14.6 3 12"></polyline><polyline points="21 12 16.5 14.6 16.5 19.79"></polyline><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          Vị Trí Đặt Model &amp; Chia Sẻ Thư Mục Dùng Chung Với WebUI
+        </h2>
+        <p class="section-subtitle">
+          Bộ cài ComfyUI mới tải về chưa có sẵn các mô hình AI lớn. Dưới đây là quy tắc đặt model vào đúng thư mục và mẹo vàng không làm tốn dung lượng ổ đĩa.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3 class="card-title">Vị Trí Lưu Model Trong ComfyUI</h3>
+          <p class="card-text" style="margin-bottom:12px;">
+            Mọi model được đặt trong thư mục: <code style="font-family:var(--font-mono); color:var(--text-link);">ComfyUI/models/</code>
+          </p>
+
+          <div class="dir-tree" style="padding:12px; font-size:0.8rem;">
+            <div>📁 <strong>models/</strong></div>
+            <div>&nbsp;&nbsp;├── 📁 <span class="dir-folder">checkpoints/</span> &rarr; Model chính (.safetensors: SD1.5, SDXL, Pony, Illustrious...)</div>
+            <div>&nbsp;&nbsp;├── 📁 <span class="dir-folder">loras/</span> &rarr; File LoRA tinh chỉnh phong cách, nhân vật</div>
+            <div>&nbsp;&nbsp;├── 📁 <span class="dir-folder">vae/</span> &rarr; File VAE giải mã màu sắc (sdxl_vae.safetensors, vae-ft-mse...)</div>
+            <div>&nbsp;&nbsp;├── 📁 <span class="dir-folder">controlnet/</span> &rarr; Model điều khiển dáng điệu, đường nét (OpenPose, Canny, Depth)</div>
+            <div>&nbsp;&nbsp;├── 📁 <span class="dir-folder">upscale_models/</span> &rarr; Model nâng cấp nét ảnh 4K (4x-UltraSharp, RealESRGAN...)</div>
+            <div>&nbsp;&nbsp;├── 📁 <span class="dir-folder">clip/</span> &rarr; Bộ mã hóa văn bản (CLIP-L, T5-XXL cho FLUX/SD3)</div>
+            <div>&nbsp;&nbsp;└── 📁 <span class="dir-folder">unet/</span> &rarr; UNet weights rời (flux1-dev.safetensors...)</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Mẹo Vàng: Dùng Chung Model Với WebUI (Tiết Kiệm 50GB - 200GB)</h3>
+          <p class="card-text">
+            Nếu bạn đã có sẵn thư mục model của <strong>Stable Diffusion WebUI (A1111 hoặc WebUI Forge)</strong> trên máy, bạn <strong>KHÔNG CẦN</strong> copy hay tải lại sang ComfyUI!
+          </p>
+          <ul class="card-list">
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Tìm file <code style="font-family:var(--font-mono); color:var(--amber);">extra_model_paths.yaml.example</code> trong thư mục <code style="font-family:var(--font-mono);">ComfyUI/</code>.</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Đổi tên file thành <code style="font-family:var(--font-mono); color:var(--emerald-light); font-weight:700;">extra_model_paths.yaml</code> (bỏ đuôi .example).</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>Mở file bằng Notepad và sửa đường dẫn <code style="font-family:var(--font-mono);">base_path</code> trỏ đến thư mục WebUI của bạn:</li>
+          </ul>
+
+          <div class="code-block" style="margin-top:10px;">
+            <div class="code-header"><span>extra_model_paths.yaml</span></div>
+            <div class="code-content">
+              a111:<br>
+              &nbsp;&nbsp;<span class="code-cmd">base_path:</span> <span class="code-path">D:/stable-diffusion-webui/</span><br>
+              &nbsp;&nbsp;<span class="code-cmd">checkpoints:</span> models/Stable-diffusion<br>
+              &nbsp;&nbsp;<span class="code-cmd">loras:</span> models/Lora<br>
+              &nbsp;&nbsp;<span class="code-cmd">vae:</span> models/VAE<br>
+              &nbsp;&nbsp;<span class="code-cmd">controlnet:</span> models/ControlNet
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHẦN 6: TIỆN ÍCH PHẢI CÓ & PHÍM TẮT THẦN THÁNH -->
+    <section class="section-wrapper" id="post-install">
+      <div class="section-header">
+        <span class="section-tag">Tăng tốc hiệu suất</span>
+        <h2 class="section-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          ComfyUI-Manager &amp; Các Phím Tắt Thần Thánh
+        </h2>
+        <p class="section-subtitle">
+          Cài đặt <strong>ComfyUI-Manager</strong> là việc đầu tiên bạn PHẢI LÀM sau khi tải ComfyUI. Đây là công cụ giúp bạn tìm kiếm, cài đặt node mở rộng và tự động sửa các node bị đỏ (Missing Nodes) chỉ với một cú click.
+        </p>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:24px;">
+        <!-- ComfyUI Manager -->
+        <div class="card">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          </div>
+          <h3 class="card-title">1. Cài Đặt ComfyUI-Manager</h3>
+          <p class="card-text">
+            Mở cửa sổ dòng lệnh (CMD hoặc PowerShell) ngay tại thư mục:
+            <code style="font-family:var(--font-mono); color:var(--text-link);">ComfyUI_windows_portable/ComfyUI/custom_nodes/</code>
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>custom_nodes/</span>
+              <button class="code-copy-btn" onclick="copyToClipboard('git clone https://github.com/ltdrdata/ComfyUI-Manager.git')">Copy</button>
+            </div>
+            <div class="code-content">
+              <span class="code-cmd">git clone</span> https://github.com/ltdrdata/ComfyUI-Manager.git
+            </div>
+          </div>
+
+          <p style="font-size:0.88rem; color:var(--text-secondary); line-height: 1.6;">
+            <em>Khởi động lại ComfyUI:</em> Bạn sẽ thấy xuất hiện nút <strong>"Manager"</strong> ở góc dưới menu bên phải. Bấm vào đó để:<br>
+            &bull; <strong>Install Missing Custom Nodes:</strong> Tự động tải nốt còn thiếu khi kéo ảnh workflow của người khác vào.<br>
+            &bull; <strong>Install Custom Nodes:</strong> Tìm kiếm hơn 2.000 plugin đồ họa AI.<br>
+            &bull; <strong>Update All:</strong> Cập nhật tất cả các node lên bản mới nhất.
+          </p>
+        </div>
+
+        <!-- Essential Custom Nodes -->
+        <div class="card">
+          <div class="card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          </div>
+          <h3 class="card-title">2. Top Custom Nodes Khuyên Dùng</h3>
+          <ul class="card-list" style="margin-top:8px;">
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg><strong>ComfyUI-Impact-Pack:</strong> Bộ công cụ tối tân tự động nhận diện và làm nét khuôn mặt (Face Detailer), mắt, bàn tay.</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg><strong>ComfyUI-Crystools:</strong> Hiển thị % sử dụng GPU, VRAM, RAM và nhiệt độ phần cứng real-time ngay trên thanh header.</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg><strong>rgthree-comfy:</strong> Tối ưu gom nhóm dây nốt (Reroute, Mute Switch, Power Lora Loader) giúp workflow gọn gàng, đẹp mắt.</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg><strong>ComfyUI_IPAdapter_plus:</strong> Giữ nguyên khuôn mặt, phong cách và bố cục ảnh nguồn mà không cần train LoRA.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Shortcuts Table -->
+      <div class="card">
+        <h3 class="card-title" style="margin-bottom:12px;">Bảng Phím Tắt Thần Thánh Giúp Bạn Thao Tác Nhanh</h3>
+        <table class="shortcut-table">
+          <thead>
+            <tr>
+              <th style="padding:8px 14px; color:var(--text-muted); font-size:0.8rem; text-align:left;">Phím tắt</th>
+              <th style="padding:8px 14px; color:var(--text-muted); font-size:0.8rem; text-align:left;">Chức năng tương ứng</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> (hoặc <span class="kbd">Space</span>)</td>
+              <td><strong>Queue Prompt</strong> (Chạy quá trình sinh ảnh ngay lập tức)</td>
+            </tr>
+            <tr>
+              <td><span class="kbd">Double Click</span> vào nền trống</td>
+              <td>Mở thanh tìm kiếm nốt (Search Node) nhanh chóng</td>
+            </tr>
+            <tr>
+              <td><span class="kbd">Ctrl</span> + <span class="kbd">C</span> / <span class="kbd">Ctrl</span> + <span class="kbd">V</span></td>
+              <td>Sao chép và dán Nốt đã chọn</td>
+            </tr>
+            <tr>
+              <td><span class="kbd">Ctrl</span> + <span class="kbd">M</span></td>
+              <td><strong>Mute / Unmute:</strong> Tắt/Bật tạm thời nốt mà không cần rút dây nối</td>
+            </tr>
+            <tr>
+              <td><span class="kbd">Ctrl</span> + <span class="kbd">B</span></td>
+              <td><strong>Bypass:</strong> Bỏ qua nốt (nối thẳng tín hiệu từ đầu vào sang đầu ra)</td>
+            </tr>
+            <tr>
+              <td><span class="kbd">Shift</span> + Kéo chuột qua nhiều nốt</td>
+              <td>Chọn nhanh nhiều nốt để di chuyển hoặc gom nhóm (Group)</td>
+            </tr>
+            <tr>
+              <td><span class="kbd">Ctrl</span> + <span class="kbd">S</span></td>
+              <td>Lưu đồ thị Workflow hiện tại thành file JSON</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PHẦN 7: KHẮC PHỤC SỰ CỐ THƯỜNG GẶP (FAQ & TROUBLESHOOTING) -->
+    <section class="section-wrapper" id="troubleshooting">
+      <div class="section-header">
+        <span class="section-tag">Giải đáp thắc mắc</span>
+        <h2 class="section-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          Sửa Lỗi Thường Gặp Khi Cài Đặt &amp; Chạy ComfyUI
+        </h2>
+        <p class="section-subtitle">
+          Tổng hợp các trường hợp lỗi phổ biến nhất trên Windows và cách khắc phục nhanh chóng.
+        </p>
+      </div>
+
+      <div class="faq-list">
+
+        <div class="faq-item open">
+          <button class="faq-question">
+            <span>1. Bị lỗi "CUDA out of memory" (Tràn bộ nhớ VRAM của Card màn hình)?</span>
+            <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer">
+            <p><strong>Nguyên nhân:</strong> Card của bạn có ít VRAM (4GB - 8GB) trong khi ảnh sinh ra quá lớn hoặc mô hình quá nặng (như FLUX.1 dev FP16).<br>
+            <strong>Cách khắc phục:</strong><br>
+            1. Mở file <code style="font-family:var(--font-mono);">run_nvidia_gpu.bat</code> bằng Notepad.<br>
+            2. Thêm cờ <code style="color:var(--emerald-light); font-family:var(--font-mono);">--lowvram</code> hoặc <code style="color:var(--emerald-light); font-family:var(--font-mono);">--medvram</code> vào sau dòng lệnh:<br>
+            <code style="display:block; padding:8px; background:var(--bg-code); margin:8px 0; border-radius:4px; font-family:var(--font-mono);">.\python_embeded\python.exe -s ComfyUI\main.py --windows-standalone-build --lowvram</code>
+            3. Nếu chạy FLUX, hãy dùng model định dạng <strong>FP8 (flux1-dev-fp8.safetensors)</strong> hoặc định dạng <strong>GGUF (Q4/Q5)</strong> để giảm 50% mức tiêu thụ VRAM.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>2. Mở workflow lên thấy các Nốt bị đổi màu đỏ (Missing Custom Nodes)?</span>
+            <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer">
+            <p><strong>Nguyên nhân:</strong> Workflow bạn kéo vào sử dụng các plugin nốt mở rộng mà máy bạn chưa tải về.<br>
+            <strong>Cách khắc phục:</strong> Bấm vào nút <strong>Manager</strong> ở góc menu bên phải &rarr; Chọn <strong>"Install Missing Custom Nodes"</strong>. Hệ thống sẽ liệt kê chính xác các node còn thiếu kèm nút Install. Bạn chỉ cần bấm Install rồi khởi động lại ComfyUI là xong.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>3. Nhấp vào run_nvidia_gpu.bat cửa sổ đen chớp lên rồi tự tắt ngay?</span>
+            <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer">
+            <p><strong>Nguyên nhân:</strong> 99% trường hợp là do đường dẫn thư mục có dấu tiếng Việt (ví dụ: <code style="font-family:var(--font-mono);">D:\Phần mềm AI\ComfyUI</code>) hoặc ổ cứng bị đầy.<br>
+            <strong>Cách khắc phục:</strong><br>
+            &bull; Đổi tên toàn bộ thư mục cha mẹ thành tiếng Anh không dấu, không ký tự lạ.<br>
+            &bull; Để xem lỗi chính xác: Mở cửa sổ CMD, kéo file <code style="font-family:var(--font-mono);">run_nvidia_gpu.bat</code> vào rồi nhấn Enter, màn hình sẽ giữ lại thông báo lỗi chi tiết thay vì bị tắt.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>4. Làm thế nào để cập nhật ComfyUI lên phiên bản mới nhất sau này?</span>
+            <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer">
+            <p>
+            Trong thư mục <code style="font-family:var(--font-mono);">ComfyUI_windows_portable/update/</code> có sẵn 2 file script:<br>
+            &bull; Chạy <code style="color:var(--emerald-light); font-family:var(--font-mono);">update_comfyui.bat</code>: Chỉ kéo cập nhật code mới nhất từ GitHub.<br>
+            &bull; Hoặc mở giao diện ComfyUI &rarr; bấm <strong>Manager</strong> &rarr; bấm <strong>Update All</strong> để cập nhật cả phần mềm lẫn các custom node.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <ul class="footer-links">
+        <li><a href="https://comfy.org/" target="_blank" rel="noopener noreferrer">Trang Chủ Comfy.org</a></li>
+        <li><a href="https://github.com/Comfy-Org/ComfyUI" target="_blank" rel="noopener noreferrer">GitHub Repo</a></li>
+        <li><a href="https://github.com/Comfy-Org/ComfyUI/releases/tag/v0.41.0" target="_blank" rel="noopener noreferrer">Release v0.41.0</a></li>
+        <li><a href="https://civitai.com/" target="_blank" rel="noopener noreferrer">Civitai Models</a></li>
+        <li><a href="https://huggingface.co/" target="_blank" rel="noopener noreferrer">HuggingFace</a></li>
+      </ul>
+      <p style="margin-bottom:6px;">Tài liệu hướng dẫn ComfyUI &bull; Xây dựng chuyên sâu cho cộng đồng sáng tạo AI tại Việt Nam.</p>
+      <p style="font-size:0.78rem; color:var(--text-muted);">&copy; 2026 ComfyUI Guide &bull; Tham khảo dữ liệu chính thức từ comfy.org &amp; Comfy-Org/ComfyUI.</p>
+      <p style="margin-top:10px; font-weight:700; color:var(--primary-light); font-size:0.88rem; letter-spacing:0.02em;">Nội dung được tạo bởi DEVKIT AI</p>
+    </div>
+  </footer>
+
+  <!-- Scroll To Top Button -->
+  <button id="scroll-top-btn" class="scroll-top" title="Lên đầu trang" aria-label="Scroll to top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+  </button>
+
+  <!-- JAVASCRIPT FOR INTERACTIVITY -->
+  <script>
+    // 1. Reading Progress Bar & Scroll Top Button
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('progress-bar').style.width = scrolled + '%';
+
+      const scrollTopBtn = document.getElementById('scroll-top-btn');
+      if (winScroll > 300) {
+        scrollTopBtn.classList.add('visible');
+      } else {
+        scrollTopBtn.classList.remove('visible');
+      }
+    });
+
+    document.getElementById('scroll-top-btn').addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // 2. Theme Toggle (Dark / Light)
+    const themeBtn = document.getElementById('theme-btn');
+    const moonIcon = document.getElementById('moon-icon');
+    const sunIcon = document.getElementById('sun-icon');
+    let currentTheme = localStorage.getItem('comfy_theme') || 'dark';
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      if (theme === 'light') {
+        moonIcon.style.display = 'none';
+        sunIcon.style.display = 'block';
+      } else {
+        moonIcon.style.display = 'block';
+        sunIcon.style.display = 'none';
+      }
+      localStorage.setItem('comfy_theme', theme);
+    }
+    applyTheme(currentTheme);
+
+    themeBtn.addEventListener('click', () => {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(currentTheme);
+    });
+
+    // 3. Tab Switcher
+    function switchTab(tabId) {
+      document.querySelectorAll('.install-tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.install-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      const targetContent = document.getElementById(tabId);
+      if (targetContent) targetContent.classList.add('active');
+
+      const clickedBtn = Array.from(document.querySelectorAll('.install-tab-btn')).find(b => {
+        return b.getAttribute('onclick').includes(tabId);
+      });
+      if (clickedBtn) clickedBtn.classList.add('active');
+    }
+
+    // 4. Copy to Clipboard Utility
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Đã sao chép vào bộ nhớ tạm!');
+      }).catch(err => {
+        console.error('Copy failed:', err);
+      });
+    }
+
+    // Toast Notification
+    function showToast(message) {
+      let toast = document.getElementById('toast-notification');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast-notification';
+        toast.style.position = 'fixed';
+        toast.style.bottom = '20px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%) translateY(50px)';
+        toast.style.background = 'rgba(16, 185, 129, 0.95)';
+        toast.style.color = '#fff';
+        toast.style.padding = '8px 18px';
+        toast.style.borderRadius = '9999px';
+        toast.style.fontSize = '0.85rem';
+        toast.style.fontWeight = '700';
+        toast.style.boxShadow = '0 8px 20px rgba(0,0,0,0.3)';
+        toast.style.zIndex = '9999';
+        toast.style.fontFamily = 'Tahoma, sans-serif';
+        toast.style.transition = 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = message;
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(50px)';
+      }, 2200);
+    }
+
+    // 5. FAQ Accordion Toggle
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        item.classList.toggle('open');
+      });
+    });
+
+    // 6. Active Navigation Link on Scroll
+    const sections = document.querySelectorAll('section[id]');
+    window.addEventListener('scroll', () => {
+      const scrollY = window.pageYOffset;
+      sections.forEach(current => {
+        const sectionHeight = current.offsetHeight;
+        const sectionTop = current.offsetTop - 100;
+        const sectionId = current.getAttribute('id');
+        const navLink = document.querySelector(`.nav-links a[href*="${sectionId}"]`);
+        if (navLink) {
+          if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+            navLink.classList.add('active');
+          } else {
+            navLink.classList.remove('active');
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
