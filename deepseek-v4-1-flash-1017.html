@@ -1,0 +1,2155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="claude:viewport-fit-sides" content="cover">
+  <title>DeepSeek-V4.1-Flash-1017: Tổng Quan, Benchmark Toàn Cầu & Hướng Dẫn 1 Tỷ Token Free</title>
+
+  <!-- Google Fonts: JetBrains Mono for code only -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Design Tokens với Typography chuẩn Tahoma */
+    :root {
+      --font-display: 'Tahoma', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-body: 'Tahoma', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+
+      /* Light Theme (Khoa học, sáng, cao cấp) */
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --bg-elevated: #ffffff;
+      --border-subtle: #e2e8f0;
+      --border-strong: #cbd5e1;
+
+      --text-main: #0f172a;
+      --text-muted: #334155;
+      --text-faint: #64748b;
+
+      --brand-deepseek: #0284c7;
+      --brand-deepseek-subtle: #e0f2fe;
+      --brand-deepseek-glow: rgba(2, 132, 199, 0.15);
+
+      --color-anthropic: #c2410c;
+      --color-anthropic-subtle: #ffedd5;
+
+      --color-openai: #10a37f;
+      --color-openai-subtle: #e6f7f2;
+
+      --color-gemini: #2563eb;
+      --color-gemini-subtle: #eff6ff;
+
+      --color-glm: #7c3aed;
+      --color-glm-subtle: #f5f3ff;
+
+      --accent-green: #059669;
+      --accent-green-subtle: #ecfdf5;
+
+      --accent-amber: #d97706;
+      --accent-amber-subtle: #fffbeb;
+
+      --card-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+      --card-shadow-hover: 0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 8px -2px rgba(15, 23, 42, 0.04);
+      --badge-radius: 9999px;
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg-canvas: #090d16;
+        --bg-surface: #111827;
+        --bg-subtle: #1a2234;
+        --bg-elevated: #1e293b;
+        --border-subtle: #243046;
+        --border-strong: #334155;
+
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --text-faint: #64748b;
+
+        --brand-deepseek: #38bdf8;
+        --brand-deepseek-subtle: rgba(56, 189, 248, 0.12);
+        --brand-deepseek-glow: rgba(56, 189, 248, 0.25);
+
+        --color-anthropic: #fb923c;
+        --color-anthropic-subtle: rgba(251, 146, 60, 0.15);
+
+        --color-openai: #34d399;
+        --color-openai-subtle: rgba(52, 211, 153, 0.15);
+
+        --color-gemini: #60a5fa;
+        --color-gemini-subtle: rgba(96, 165, 250, 0.15);
+
+        --color-glm: #a78bfa;
+        --color-glm-subtle: rgba(167, 139, 250, 0.15);
+
+        --accent-green: #10b981;
+        --accent-green-subtle: rgba(16, 185, 129, 0.12);
+
+        --accent-amber: #f59e0b;
+        --accent-amber-subtle: rgba(245, 158, 11, 0.12);
+
+        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        --card-shadow-hover: 0 16px 32px rgba(0, 0, 0, 0.45);
+      }
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg-canvas: #090d16;
+      --bg-surface: #111827;
+      --bg-subtle: #1a2234;
+      --bg-elevated: #1e293b;
+      --border-subtle: #243046;
+      --border-strong: #334155;
+
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-faint: #64748b;
+
+      --brand-deepseek: #38bdf8;
+      --brand-deepseek-subtle: rgba(56, 189, 248, 0.12);
+      --brand-deepseek-glow: rgba(56, 189, 248, 0.25);
+
+      --color-anthropic: #fb923c;
+      --color-anthropic-subtle: rgba(251, 146, 60, 0.15);
+
+      --color-openai: #34d399;
+      --color-openai-subtle: rgba(52, 211, 153, 0.15);
+
+      --color-gemini: #60a5fa;
+      --color-gemini-subtle: rgba(96, 165, 250, 0.15);
+
+      --color-glm: #a78bfa;
+      --color-glm-subtle: rgba(167, 139, 250, 0.15);
+
+      --accent-green: #10b981;
+      --accent-green-subtle: rgba(16, 185, 129, 0.12);
+
+      --accent-amber: #f59e0b;
+      --accent-amber-subtle: rgba(245, 158, 11, 0.12);
+
+      --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      --card-shadow-hover: 0 16px 32px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Reset & Base Setup */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 15px;
+    }
+
+    body {
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
+      padding-block: 0 4rem;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1220px;
+      margin-inline: auto;
+      width: 100%;
+    }
+
+    /* Header & Sticky Nav */
+    .navbar-wrapper {
+      position: sticky;
+      top: env(safe-area-inset-top, 0px);
+      z-index: 100;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background-color: rgba(248, 250, 252, 0.9);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+      margin-inline: calc(max(16px, env(safe-area-inset-left, 0px)) * -1);
+      padding-inline: max(16px, env(safe-area-inset-left, 0px));
+    }
+
+    :root[data-theme="dark"] .navbar-wrapper {
+      background-color: rgba(9, 13, 22, 0.9);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .navbar-wrapper {
+        background-color: rgba(9, 13, 22, 0.9);
+      }
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      box-shadow: 0 4px 10px var(--brand-deepseek-glow);
+    }
+
+    .brand-text h1 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+
+    .brand-text span {
+      font-size: 0.75rem;
+      color: var(--brand-deepseek);
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      list-style: none;
+    }
+
+    @media (max-width: 1040px) {
+      .nav-links {
+        display: none;
+      }
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.925rem;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--brand-deepseek);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .theme-toggle-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      border-color: var(--brand-deepseek);
+      color: var(--brand-deepseek);
+    }
+
+    .btn-devkit-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: #dc2626;
+      color: #ffffff !important;
+      font-weight: bold;
+      font-size: 0.875rem;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      box-shadow: 0 3px 10px rgba(220, 38, 38, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .btn-devkit-badge:hover {
+      background: #b91c1c;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(220, 38, 38, 0.35);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding-block: 52px 36px;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--brand-deepseek-subtle);
+      color: var(--brand-deepseek);
+      border: 1px solid rgba(2, 132, 199, 0.25);
+      padding: 6px 16px;
+      border-radius: var(--badge-radius);
+      font-size: 0.825rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 18px;
+    }
+
+    .hero-eyebrow-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--brand-deepseek);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(2, 132, 199, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.3rem, 4.8vw, 3.8rem);
+      font-weight: bold;
+      line-height: 1.18;
+      letter-spacing: -0.01em;
+      margin-bottom: 18px;
+      color: var(--text-main);
+      text-wrap: balance;
+    }
+
+    .hero-title .gradient-text {
+      color: var(--brand-deepseek);
+      border-bottom: 3px solid var(--brand-deepseek);
+      padding-bottom: 2px;
+    }
+
+    .hero-desc {
+      font-size: clamp(1.05rem, 1.8vw, 1.2rem);
+      color: var(--text-muted);
+      max-width: 820px;
+      margin-inline: auto;
+      margin-bottom: 34px;
+      line-height: 1.65;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 46px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 26px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--brand-deepseek), #0369a1);
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.975rem;
+      box-shadow: 0 4px 14px var(--brand-deepseek-glow);
+      transition: all 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px var(--brand-deepseek-glow);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 26px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.975rem;
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--card-shadow);
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--brand-deepseek);
+      color: var(--brand-deepseek);
+      transform: translateY(-2px);
+    }
+
+    /* Key Spec Stat Grid */
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 56px;
+    }
+
+    .stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 22px 20px;
+      text-align: left;
+      box-shadow: var(--card-shadow);
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--brand-deepseek);
+      box-shadow: var(--card-shadow-hover);
+    }
+
+    .stat-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--brand-deepseek);
+    }
+
+    .stat-card.accent-green::before { background: var(--accent-green); }
+    .stat-card.accent-anthropic::before { background: var(--color-anthropic); }
+    .stat-card.accent-amber::before { background: var(--accent-amber); }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 2.1rem;
+      font-weight: bold;
+      color: var(--text-main);
+      line-height: 1.1;
+      margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-sub {
+      font-size: 0.825rem;
+      color: var(--text-faint);
+    }
+
+    /* Section Headers */
+    .section-wrap {
+      margin-bottom: 68px;
+    }
+
+    .section-header {
+      margin-bottom: 30px;
+    }
+
+    .section-tag {
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--brand-deepseek);
+      margin-bottom: 6px;
+      display: inline-block;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.7rem, 2.8vw, 2.2rem);
+      font-weight: bold;
+      color: var(--text-main);
+      line-height: 1.3;
+      text-wrap: balance;
+    }
+
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-top: 8px;
+      max-width: 800px;
+    }
+
+    /* Architecture Features */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 22px;
+    }
+
+    .feature-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 26px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .feature-card:hover {
+      border-color: var(--brand-deepseek);
+      box-shadow: var(--card-shadow-hover);
+    }
+
+    .feature-icon-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      background: var(--brand-deepseek-subtle);
+      color: var(--brand-deepseek);
+    }
+
+    .feature-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--text-main);
+      line-height: 1.35;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.925rem;
+      line-height: 1.6;
+    }
+
+    .feature-badge-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .feature-pill {
+      font-size: 0.775rem;
+      font-family: var(--font-mono);
+      padding: 4px 10px;
+      border-radius: var(--badge-radius);
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Release Date Info Box */
+    .release-meta-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-left: 5px solid var(--brand-deepseek);
+      border-radius: var(--radius-md);
+      padding: 22px 26px;
+      margin-bottom: 32px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .release-meta-content h4 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .release-meta-content p {
+      color: var(--text-muted);
+      font-size: 0.925rem;
+    }
+
+    .release-tags {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .release-date-pill {
+      background: var(--brand-deepseek-subtle);
+      color: var(--brand-deepseek);
+      border: 1px solid rgba(2, 132, 199, 0.25);
+      padding: 6px 14px;
+      border-radius: var(--badge-radius);
+      font-weight: bold;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Simulator Box */
+    .simulator-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--card-shadow);
+      margin-top: 32px;
+    }
+
+    .simulator-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .simulator-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--text-main);
+    }
+
+    .simulator-title span {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: normal;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .slider-control-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--bg-subtle);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .slider-label {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--text-muted);
+    }
+
+    .slider-value-display {
+      font-family: var(--font-mono);
+      font-weight: bold;
+      color: var(--brand-deepseek);
+      font-size: 1.15rem;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    input[type=range] {
+      accent-color: var(--brand-deepseek);
+      cursor: pointer;
+      width: 150px;
+    }
+
+    .simulator-preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    @media (max-width: 768px) {
+      .simulator-preview {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .preview-card {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px;
+    }
+
+    .preview-card-header {
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .preview-thought-box {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-strong);
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      min-height: 100px;
+      white-space: pre-wrap;
+    }
+
+    .preview-final-answer {
+      font-size: 0.925rem;
+      color: var(--text-main);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      min-height: 100px;
+    }
+
+    /* GLOBAL BENCHMARK SECTION (HUGGING FACE SOURCE) */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--card-shadow);
+      margin-bottom: 30px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.925rem;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .comparison-table th {
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-weight: bold;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .col-highlight {
+      background: var(--brand-deepseek-subtle);
+      color: var(--text-main);
+      font-weight: bold;
+    }
+
+    th.col-highlight {
+      background: rgba(2, 132, 199, 0.14);
+      color: var(--brand-deepseek);
+      border-top: 3px solid var(--brand-deepseek);
+    }
+
+    .model-header-tag {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 3px;
+    }
+
+    .tag-ds1017 { background: var(--brand-deepseek-subtle); color: var(--brand-deepseek); }
+    .tag-dsflash { background: var(--bg-subtle); color: var(--text-muted); }
+    .tag-anthropic { background: var(--color-anthropic-subtle); color: var(--color-anthropic); }
+    .tag-openai { background: var(--color-openai-subtle); color: var(--color-openai); }
+    .tag-gemini { background: var(--color-gemini-subtle); color: var(--color-gemini); }
+    .tag-glm { background: var(--color-glm-subtle); color: var(--color-glm); }
+
+    .score-badge-win {
+      color: var(--accent-green);
+      font-weight: bold;
+      font-family: var(--font-mono);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .score-badge {
+      font-family: var(--font-mono);
+      color: var(--text-main);
+    }
+
+    .score-badge-muted {
+      font-family: var(--font-mono);
+      color: var(--text-faint);
+    }
+
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .comparison-table tr:hover td {
+      background-color: rgba(148, 163, 184, 0.05);
+    }
+
+    .comparison-table tr:hover td.col-highlight {
+      background-color: rgba(2, 132, 199, 0.18);
+    }
+
+    /* Benchmark Category Tabs / Cards */
+    .benchmarks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 22px;
+      margin-bottom: 36px;
+    }
+
+    .benchmark-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .benchmark-card h4 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 4px;
+      color: var(--text-main);
+    }
+
+    .benchmark-card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    .bar-row {
+      margin-bottom: 14px;
+    }
+
+    .bar-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .bar-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.825rem;
+      margin-bottom: 5px;
+    }
+
+    .bar-model-name {
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    .bar-score-val {
+      font-family: var(--font-mono);
+      font-weight: bold;
+      color: var(--text-main);
+    }
+
+    .bar-track {
+      width: 100%;
+      height: 10px;
+      background: var(--bg-subtle);
+      border-radius: var(--badge-radius);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: var(--badge-radius);
+      transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .fill-ds1017 { background: #0284c7; }
+    .fill-dsflash { background: #94a3b8; }
+    .fill-anthropic { background: #ea580c; }
+    .fill-openai { background: #10a37f; }
+    .fill-gemini { background: #2563eb; }
+    .fill-glm { background: #7c3aed; }
+
+    /* DEVKIT AI YouTube & Free 1B Tokens Section */
+    .devkit-cta-banner {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #032b4b 100%);
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 44px 32px;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .devkit-cta-banner::before {
+      content: "";
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.3) 0%, rgba(56, 189, 248, 0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .devkit-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .devkit-badge-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(220, 38, 38, 0.25);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      padding: 6px 14px;
+      border-radius: var(--badge-radius);
+      font-size: 0.825rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+
+    .devkit-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.9rem, 3.4vw, 2.7rem);
+      font-weight: bold;
+      line-height: 1.2;
+      margin-bottom: 14px;
+      color: #ffffff;
+    }
+
+    .devkit-title span {
+      color: #38bdf8;
+      border-bottom: 2px solid #38bdf8;
+    }
+
+    .devkit-desc {
+      font-size: 1.05rem;
+      color: #cbd5e1;
+      max-width: 800px;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .devkit-youtube-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 36px;
+    }
+
+    .youtube-channel-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .youtube-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #ff0000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 1.4rem;
+      box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+      flex-shrink: 0;
+    }
+
+    .youtube-text h5 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .youtube-text p {
+      font-size: 0.875rem;
+      color: #cbd5e1;
+    }
+
+    .btn-youtube-sub {
+      background: #ff0000;
+      color: white;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-weight: bold;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+    }
+
+    .btn-youtube-sub:hover {
+      background: #cc0000;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(255, 0, 0, 0.45);
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+
+    .step-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      position: relative;
+    }
+
+    .step-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--brand-deepseek);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      font-family: var(--font-mono);
+    }
+
+    .step-box h4 {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .step-box p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    /* Code Tabs */
+    .code-tabs-wrapper {
+      background: #020617;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    .code-tabs-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0b1329;
+      padding: 8px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .tab-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn.active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #38bdf8;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #e2e8f0;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+
+    .code-content-pane {
+      padding: 18px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+
+    .code-content-pane pre {
+      margin: 0;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 36px;
+      margin-top: 50px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      color: var(--text-faint);
+      font-size: 0.875rem;
+    }
+
+    footer a {
+      color: var(--brand-deepseek);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 18px;
+      list-style: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Navbar -->
+  <div class="navbar-wrapper">
+    <div class="container">
+      <nav class="navbar">
+        <a href="#" class="brand">
+          <div class="brand-icon">DS</div>
+          <div class="brand-text">
+            <h1>DeepSeek-V4.1-Flash-1017</h1>
+            <span>Scientific Tech Report</span>
+          </div>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="#about">Tổng Quan 1017</a></li>
+          <li><a href="#global-benchmark">Bảng Benchmark Toàn Cầu</a></li>
+          <li><a href="#visual-charts">So Sánh Hiệu Năng</a></li>
+          <li><a href="#free-tokens">1 Tỷ Token Free</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <button class="theme-toggle-btn" id="themeToggle" aria-label="Đổi giao diện Sáng/Tối">
+            <svg id="themeIconSun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+          <a href="https://www.youtube.com/@devkitai" target="_blank" rel="noopener noreferrer" class="btn-devkit-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+            Kênh DEVKIT AI
+          </a>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <main class="container">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-eyebrow">
+        <span class="hero-eyebrow-pulse"></span>
+        Checkpoint 1017 Mới Nhất • Tháng 10/2026
+      </div>
+
+      <h1 class="hero-title">
+        DeepSeek-V4.1-Flash-<span class="gradient-text">1017</span>
+      </h1>
+
+      <p class="hero-desc">
+        Bản nâng cấp snapshot 1017 chính thức từ <strong>deepseek-ai</strong>: Kiến trúc <strong>Causal Encoder-Decoder (CED)</strong> 763B MoE (kích hoạt 8B–16B/token), giảm chi phí RAM KV-Cache xuống <strong>890 Bytes/Token</strong> và vượt trội trên các bài đánh giá Agentic Coding toàn cầu.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#free-tokens" class="btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          Nhận ~1 Tỷ Token Miễn Phí (DEVKIT AI)
+        </a>
+        <a href="#global-benchmark" class="btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          So Sánh Với Anthropic, OpenAI &amp; Gemini
+        </a>
+      </div>
+
+      <!-- Quick Metrics Strip -->
+      <div class="stat-strip">
+        <div class="stat-card">
+          <div class="stat-label">Tổng Quy Mô / Kích Hoạt</div>
+          <div class="stat-value">763B / 16B</div>
+          <div class="stat-sub">552B Backbone + 196B Engram Memory</div>
+        </div>
+
+        <div class="stat-card accent-green">
+          <div class="stat-label">Dung Lượng KV-Cache</div>
+          <div class="stat-value">890 B/tok</div>
+          <div class="stat-sub">CSA2 + Bounded Replay (Hỗ trợ FP4 KV)</div>
+        </div>
+
+        <div class="stat-card accent-anthropic">
+          <div class="stat-label">Ngữ Cảnh Tối Đa (Context)</div>
+          <div class="stat-value">1,000,000</div>
+          <div class="stat-sub">1M Tokens Context Window (256K Output)</div>
+        </div>
+
+        <div class="stat-card accent-amber">
+          <div class="stat-label">Nguồn Hướng Dẫn</div>
+          <div class="stat-value">~1 Tỷ Token</div>
+          <div class="stat-sub">Các chương trình miễn phí được DEVKIT AI tổng hợp</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 1: Giới thiệu & Ngày công bố -->
+    <section id="about" class="section-wrap">
+      <div class="release-meta-box">
+        <div class="release-meta-content">
+          <h4>Thông Tin Ngày Công Bố &amp; Định Danh Model</h4>
+          <p>Model <strong>DeepSeek-V4.1-Flash-1017</strong> chính thức được cập nhật trên repo <a href="https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017" target="_blank" rel="noopener noreferrer">Hugging Face deepseek-ai</a> vào <strong>ngày 17 tháng 10 năm 2026</strong>. Hậu tố <em>1017</em> biểu thị snapshot build mới nhất tối ưu hóa khả năng suy luận súc tích, tăng tốc độ phản hồi và gia tăng đột phá điểm số Agentic Benchmarks.</p>
+        </div>
+        <div class="release-tags">
+          <div class="release-date-pill">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            Công Bố: 17/10/2026
+          </div>
+          <div class="release-date-pill" style="background: var(--accent-green-subtle); color: var(--accent-green); border-color: rgba(5,150,105,0.25);">
+            Bản Quyền: MIT License (Open Weights)
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <span class="section-tag">Công Nghệ Cốt Lõi</span>
+        <h2 class="section-title">Các Đột Phá Kiến Trúc Của Bản Cập Nhật 1017</h2>
+        <p class="section-subtitle">DeepSeek tiếp tục nâng tầm dòng mô hình Flash với việc tích hợp Engram Memory và thuật toán nén KV Cache tiên tiến nhất hiện nay.</p>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon-badge">⚡</div>
+          <h3>Causal Encoder-Decoder (CED) &amp; MoE Định Tuyến 6/384</h3>
+          <p>Sở hữu 40 Transformer layers chia đều giữa Encoder và Decoder. Cơ chế định tuyến chỉ kích hoạt 6 trong 384 chuyên gia (experts) cho mỗi token cùng 1 shared expert. Nhờ đó, model sở hữu dung lượng kiến thức khổng lồ của 763B tham số nhưng độ trễ và chi phí suy luận chỉ tương đương model 8B–16B.</p>
+          <div class="feature-badge-list">
+            <span class="feature-pill">6/384 Active Experts</span>
+            <span class="feature-pill">8B Prefill Active</span>
+            <span class="feature-pill">16B Generation Active</span>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-badge">🧠</div>
+          <h3>Engram Memory 196B Tích Hợp Sẵn</h3>
+          <p>Trang bị hệ tầng Engram Memory cố định 196 tỷ tham số như một kho dữ liệu tri thức tĩnh (code syntax, thư viện, tài liệu toán học, kernel OS). Khi truy xuất thông tin nền tảng, model không cần kích hoạt lại các nơ-ron suy luận phức tạp, giúp tăng tốc độ phản xạ.</p>
+          <div class="feature-badge-list">
+            <span class="feature-pill">196B Engram Memory</span>
+            <span class="feature-pill">Bộ Nhớ Cố Định Tối Ưu</span>
+            <span class="feature-pill">BF16 / FP8 Tensor</span>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon-badge">📉</div>
+          <h3>Nén KV-Cache Kỷ Lục: 890 Bytes/Token</h3>
+          <p>Nhờ Compressed Sparse Attention 2 (CSA2) và kỹ thuật Bounded Replay hỗ trợ định dạng FP4 Main KV Caching. Mức tiêu hao RAM giảm hơn 65% so với các model cùng phân khúc, cho phép phục vụ cửa sổ ngữ cảnh 1 triệu token (1M tokens) với chi phí phần cứng siêu rẻ.</p>
+          <div class="feature-badge-list">
+            <span class="feature-pill">CSA2 Attention</span>
+            <span class="feature-pill">FP4 Main KV Caching</span>
+            <span class="feature-pill">1M Context Window</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Reasoning Simulator -->
+      <div class="simulator-box">
+        <div class="simulator-top">
+          <div class="simulator-title">
+            Mô Phỏng: Điều Khiển Reasoning Effort (1 – 100)
+            <span>Thử kéo thanh trượt để trải nghiệm khả năng chuyển đổi giữa phản xạ nhanh và suy luận logic sâu</span>
+          </div>
+          <div class="slider-control-group">
+            <span class="slider-label">Reasoning Effort:</span>
+            <input type="range" id="effortSlider" min="1" max="100" value="65">
+            <span class="slider-value-display" id="effortVal">65</span>
+          </div>
+        </div>
+
+        <div class="simulator-preview">
+          <div class="preview-card">
+            <div class="preview-card-header">
+              <span>Chuỗi Suy Luận Nội Bộ (Chain of Thought)</span>
+              <span id="thoughtStats" style="font-family: var(--font-mono); color: var(--brand-deepseek); font-weight: bold;">182 tokens suy luận</span>
+            </div>
+            <div class="preview-thought-box" id="thoughtContent">
+&lt;thought&gt;
+Phân tích yêu cầu tối ưu thuật toán xử lý dữ liệu luồng 1 triệu bản ghi...
+1. Khảo sát cấu trúc bộ nhớ cache hiện tại.
+2. Áp dụng kỹ thuật CSA2 để giảm áp lực I/O bộ nhớ nén KV.
+3. Dự thảo triển khai vòng lặp không đồng bộ và kiểm tra an toàn concurrency.
+&lt;/thought&gt;
+            </div>
+          </div>
+
+          <div class="preview-card">
+            <div class="preview-card-header">
+              <span>Câu Trả Lời Trực Tiếp (Final Response)</span>
+              <span id="speedBadge" style="font-family: var(--font-mono); color: var(--accent-green); font-weight: bold;">115 tokens/s</span>
+            </div>
+            <div class="preview-final-answer" id="answerContent">
+Để tối ưu hóa luồng dữ liệu 1 triệu bản ghi, ta thực hiện phân bổ bộ đệm chunk 4KB và tận dụng cấu trúc nén bảng băm phân tầng. Dưới đây là giải pháp kiến trúc và mã nguồn cài đặt đạt chuẩn độ trễ dưới 2ms.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: So Sánh Benchmark Toàn Cầu (Hugging Face Source) -->
+    <section id="global-benchmark" class="section-wrap">
+      <div class="section-header">
+        <span class="section-tag">Bảng Dữ Liệu Độc Quyền Từ Hugging Face</span>
+        <h2 class="section-title">So Sánh Benchmark: DeepSeek 1017 Với Anthropic, OpenAI, Gemini &amp; GLM</h2>
+        <p class="section-subtitle">Dữ liệu thực nghiệm chính thức từ trang model card <strong>deepseek-ai/DeepSeek-V4.1-Flash-1017</strong> và Technical Report khi chạy ở chế độ Maximum Reasoning Effort = 100.</p>
+      </div>
+
+      <div class="table-container">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th style="min-width: 220px;">Benchmark (Tiêu chuẩn đánh giá)</th>
+              <th class="col-highlight" style="min-width: 170px;">
+                <span class="model-header-tag tag-ds1017">DeepSeek 1017</span>
+                <div>V4.1-Flash-1017 (Mới)</div>
+              </th>
+              <th style="min-width: 150px;">
+                <span class="model-header-tag tag-dsflash">DeepSeek Base</span>
+                <div>V4.1-Flash Gốc</div>
+              </th>
+              <th style="min-width: 160px;">
+                <span class="model-header-tag tag-anthropic">Anthropic</span>
+                <div>Opus 5.0 / 3.7</div>
+              </th>
+              <th style="min-width: 160px;">
+                <span class="model-header-tag tag-openai">OpenAI</span>
+                <div>GPT-5.6 Sol / o1</div>
+              </th>
+              <th style="min-width: 160px;">
+                <span class="model-header-tag tag-gemini">Google Gemini</span>
+                <div>Gemini 2.0 / 2.5 Flash</div>
+              </th>
+              <th style="min-width: 150px;">
+                <span class="model-header-tag tag-glm">Zhipu AI</span>
+                <div>GLM-5.3 Flash</div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Agentic & Software Engineering -->
+            <tr style="background: rgba(148, 163, 184, 0.08);">
+              <td colspan="7" style="font-weight: bold; color: var(--text-main); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                🛠️ Lập Trình &amp; AI Agent Tự Động Hóa (Agentic SWE)
+              </td>
+            </tr>
+            <tr>
+              <td><strong>DeepSWE v1.1 (Resolved %)</strong></td>
+              <td class="col-highlight"><span class="score-badge-win">77.0%</span></td>
+              <td><span class="score-badge">74.2%</span></td>
+              <td><span class="score-badge">74.0%</span></td>
+              <td><span class="score-badge">73.0%</span></td>
+              <td><span class="score-badge-muted">65.2%</span></td>
+              <td><span class="score-badge">66.9%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Terminal-Bench 4.0 (Pass@1 %)</strong></td>
+              <td class="col-highlight"><span class="score-badge">42.3%</span></td>
+              <td><span class="score-badge">31.2%</span></td>
+              <td><span class="score-badge-win">51.8%</span></td>
+              <td><span class="score-badge">39.9%</span></td>
+              <td><span class="score-badge">34.6%</span></td>
+              <td><span class="score-badge">37.9%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Terminal-Bench 2.1 (Pass@1 %)</strong></td>
+              <td class="col-highlight"><span class="score-badge-win">91.4%</span></td>
+              <td><span class="score-badge">90.6%</span></td>
+              <td><span class="score-badge">89.1%</span></td>
+              <td><span class="score-badge">88.8%</span></td>
+              <td><span class="score-badge">86.4%</span></td>
+              <td><span class="score-badge">88.2%</span></td>
+            </tr>
+            <tr>
+              <td><strong>NL2Repo-Bench (Score)</strong></td>
+              <td class="col-highlight"><span class="score-badge">68.2</span></td>
+              <td><span class="score-badge">64.0</span></td>
+              <td><span class="score-badge-win">75.3</span></td>
+              <td><span class="score-badge">56.8</span></td>
+              <td><span class="score-badge">54.2</span></td>
+              <td><span class="score-badge">58.0</span></td>
+            </tr>
+            <tr>
+              <td><strong>Automation-Bench v1.0.6 (%)</strong></td>
+              <td class="col-highlight"><span class="score-badge-win">60.5%</span></td>
+              <td><span class="score-badge">54.8%</span></td>
+              <td><span class="score-badge">50.3%</span></td>
+              <td><span class="score-badge">45.8%</span></td>
+              <td><span class="score-badge">44.0%</span></td>
+              <td><span class="score-badge">48.8%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Agents' Last Exam (%)</strong></td>
+              <td class="col-highlight"><span class="score-badge-win">35.4%</span></td>
+              <td><span class="score-badge">31.8%</span></td>
+              <td><span class="score-badge">28.6%</span></td>
+              <td><span class="score-badge">26.7%</span></td>
+              <td><span class="score-badge">24.5%</span></td>
+              <td><span class="score-badge">28.5%</span></td>
+            </tr>
+
+            <!-- Reasoning & Mathematics -->
+            <tr style="background: rgba(148, 163, 184, 0.08);">
+              <td colspan="7" style="font-weight: bold; color: var(--text-main); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                🧠 Suy Luận Cao Cấp &amp; Toán Học (Reasoning &amp; Math)
+              </td>
+            </tr>
+            <tr>
+              <td><strong>GPQA Diamond (Khoa học cấp PhD)</strong></td>
+              <td class="col-highlight"><span class="score-badge">91.8%</span></td>
+              <td><span class="score-badge">90.9%</span></td>
+              <td><span class="score-badge">93.4%</span></td>
+              <td><span class="score-badge-win">94.1%</span></td>
+              <td><span class="score-badge">86.2%</span></td>
+              <td><span class="score-badge">88.1%</span></td>
+            </tr>
+            <tr>
+              <td><strong>HLE (Humanity's Last Exam w/ tools)</strong></td>
+              <td class="col-highlight"><span class="score-badge-win">65.2%</span></td>
+              <td><span class="score-badge">63.9%</span></td>
+              <td><span class="score-badge">63.6%</span></td>
+              <td><span class="score-badge">58.4%</span></td>
+              <td><span class="score-badge">55.0%</span></td>
+              <td><span class="score-badge">62.5%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Codeforces Rating (Thi đấu thuật toán)</strong></td>
+              <td class="col-highlight"><span class="score-badge-win">3510 (Legendary GM)</span></td>
+              <td><span class="score-badge">3471</span></td>
+              <td><span class="score-badge">3320</span></td>
+              <td><span class="score-badge">3380</span></td>
+              <td><span class="score-badge">2950</span></td>
+              <td><span class="score-badge">2890</span></td>
+            </tr>
+            <tr>
+              <td><strong>MathArena Apex Bench v1.1 (%)</strong></td>
+              <td class="col-highlight"><span class="score-badge-win">72.1%</span></td>
+              <td><span class="score-badge">65.6%</span></td>
+              <td><span class="score-badge">65.8%</span></td>
+              <td><span class="score-badge">54.3%</span></td>
+              <td><span class="score-badge">52.8%</span></td>
+              <td><span class="score-badge">56.6%</span></td>
+            </tr>
+
+            <!-- Vision & Multimodal Tool Use -->
+            <tr style="background: rgba(148, 163, 184, 0.08);">
+              <td colspan="7" style="font-weight: bold; color: var(--text-main); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                👁️ Thị Giác Máy Tính &amp; Đa Phương Thức Có Công Cụ (Vision w/ Tools)
+              </td>
+            </tr>
+            <tr>
+              <td><strong>BabyVision w/ tools (Pass@1 %)</strong></td>
+              <td class="col-highlight"><span class="score-badge">92.5%</span></td>
+              <td><span class="score-badge">89.6%</span></td>
+              <td><span class="score-badge-win">94.1%</span></td>
+              <td><span class="score-badge">88.9%</span></td>
+              <td><span class="score-badge">87.5%</span></td>
+              <td><span class="score-badge-muted">—</span></td>
+            </tr>
+            <tr>
+              <td><strong>Chartography w/ tools (Pass@1 %)</strong></td>
+              <td class="col-highlight"><span class="score-badge">83.0%</span></td>
+              <td><span class="score-badge">78.9%</span></td>
+              <td><span class="score-badge-win">84.0%</span></td>
+              <td><span class="score-badge">79.9%</span></td>
+              <td><span class="score-badge">76.3%</span></td>
+              <td><span class="score-badge-muted">—</span></td>
+            </tr>
+            <tr>
+              <td><strong>ZeroBench-main w/ tools (Pass@5 %)</strong></td>
+              <td class="col-highlight"><span class="score-badge">51.0%</span></td>
+              <td><span class="score-badge">49.0%</span></td>
+              <td><span class="score-badge">52.0%</span></td>
+              <td><span class="score-badge-win">53.0%</span></td>
+              <td><span class="score-badge">46.5%</span></td>
+              <td><span class="score-badge-muted">—</span></td>
+            </tr>
+
+            <!-- Architecture & Specs -->
+            <tr style="background: rgba(148, 163, 184, 0.08);">
+              <td colspan="7" style="font-weight: bold; color: var(--text-main); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                ⚡ Kiến Trúc, Bộ Nhớ &amp; Bản Quyền
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Context Window</strong></td>
+              <td class="col-highlight"><span class="score-badge-win">1,000,000 (1M)</span></td>
+              <td><span class="score-badge-win">1,000,000 (1M)</span></td>
+              <td><span class="score-badge">200K – 1M</span></td>
+              <td><span class="score-badge">128K – 256K</span></td>
+              <td><span class="score-badge-win">1M – 2M</span></td>
+              <td><span class="score-badge">128K – 200K</span></td>
+            </tr>
+            <tr>
+              <td><strong>Dung Lượng KV-Cache / Token</strong></td>
+              <td class="col-highlight"><span class="score-badge-win">890 Bytes</span> (FP4)</td>
+              <td><span class="score-badge">~1.1 KB</span></td>
+              <td><span class="score-badge">~2.2 KB</span></td>
+              <td><span class="score-badge">~2.0 KB</span></td>
+              <td><span class="score-badge">~1.8 KB</span></td>
+              <td><span class="score-badge">~2.4 KB</span></td>
+            </tr>
+            <tr>
+              <td><strong>Giấy Phép Mô Hình</strong></td>
+              <td class="col-highlight"><span class="score-badge-win">MIT (Open Weights)</span></td>
+              <td><span class="score-badge-win">MIT (Open Weights)</span></td>
+              <td>Độc quyền Cloud API</td>
+              <td>Độc quyền Cloud API</td>
+              <td>Độc quyền Cloud API</td>
+              <td>Open Weights (Có ràng buộc)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 3: Biểu Đồ Trực Quan Các Hạng Mục Nổi Bật -->
+    <section id="visual-charts" class="section-wrap">
+      <div class="section-header">
+        <span class="section-tag">Trực Quan Hóa Dữ Liệu</span>
+        <h2 class="section-title">So Sánh Tỷ Lệ Giải Quyết Trên Các Benchmark Trọng Điểm</h2>
+        <p class="section-subtitle">DeepSeek-V4.1-Flash-1017 khẳng định vị thế dẫn đầu trong các tác vụ giải quyết sự cố thực tế và tự động hóa hệ điều hành.</p>
+      </div>
+
+      <div class="benchmarks-grid">
+        <!-- DeepSWE v1.1 -->
+        <div class="benchmark-card">
+          <h4>DeepSWE v1.1 - Lập Trình AI Tự Chủ (%)</h4>
+          <p>Tỷ lệ giải quyết hoàn chỉnh các issue phức tạp trên repo mã nguồn thực tế.</p>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">DeepSeek 1017</span>
+              <span class="bar-score-val" style="color: var(--brand-deepseek);">77.0% (Winner)</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-ds1017" style="width: 77.0%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">DeepSeek V4.1 Flash Base</span>
+              <span class="bar-score-val">74.2%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-dsflash" style="width: 74.2%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">Anthropic Opus 5.0</span>
+              <span class="bar-score-val" style="color: var(--color-anthropic);">74.0%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-anthropic" style="width: 74.0%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">OpenAI GPT-5.6 Sol</span>
+              <span class="bar-score-val" style="color: var(--color-openai);">73.0%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-openai" style="width: 73.0%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">GLM-5.3 Flash</span>
+              <span class="bar-score-val" style="color: var(--color-glm);">66.9%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-glm" style="width: 66.9%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">Google Gemini 2.0 Flash</span>
+              <span class="bar-score-val" style="color: var(--color-gemini);">65.2%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-gemini" style="width: 65.2%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Automation-Bench v1.0.6 -->
+        <div class="benchmark-card">
+          <h4>Automation-Bench v1.0.6 - Tự Động Hóa (%)</h4>
+          <p>Khả năng tự động gọi công cụ, xử lý quy trình end-to-end mà không cần con người.</p>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">DeepSeek 1017</span>
+              <span class="bar-score-val" style="color: var(--brand-deepseek);">60.5% (Winner)</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-ds1017" style="width: 60.5%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">DeepSeek V4.1 Flash Base</span>
+              <span class="bar-score-val">54.8%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-dsflash" style="width: 54.8%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">Anthropic Opus 5.0</span>
+              <span class="bar-score-val" style="color: var(--color-anthropic);">50.3%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-anthropic" style="width: 50.3%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">GLM-5.3 Flash</span>
+              <span class="bar-score-val" style="color: var(--color-glm);">48.8%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-glm" style="width: 48.8%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">OpenAI GPT-5.6 Sol</span>
+              <span class="bar-score-val" style="color: var(--color-openai);">45.8%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-openai" style="width: 45.8%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">Google Gemini 2.0 Flash</span>
+              <span class="bar-score-val" style="color: var(--color-gemini);">44.0%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-gemini" style="width: 44.0%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MathArena Apex Bench -->
+        <div class="benchmark-card">
+          <h4>MathArena Apex Bench v1.1 (%)</h4>
+          <p>Giải các bài toán Olympic, giải tích cao cấp và tối ưu hóa lý thuyết đồ thị.</p>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">DeepSeek 1017</span>
+              <span class="bar-score-val" style="color: var(--brand-deepseek);">72.1% (Winner)</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-ds1017" style="width: 72.1%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">Anthropic Opus 5.0</span>
+              <span class="bar-score-val" style="color: var(--color-anthropic);">65.8%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-anthropic" style="width: 65.8%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">DeepSeek V4.1 Flash Base</span>
+              <span class="bar-score-val">65.6%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-dsflash" style="width: 65.6%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">GLM-5.3 Flash</span>
+              <span class="bar-score-val" style="color: var(--color-glm);">56.6%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-glm" style="width: 56.6%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">OpenAI GPT-5.6 Sol</span>
+              <span class="bar-score-val" style="color: var(--color-openai);">54.3%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-openai" style="width: 54.3%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-meta">
+              <span class="bar-model-name">Google Gemini 2.0 Flash</span>
+              <span class="bar-score-val" style="color: var(--color-gemini);">52.8%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill fill-gemini" style="width: 52.8%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Hướng Dẫn Nhận ~1 Tỷ Token Free & Link Kênh DEVKIT AI -->
+    <section id="free-tokens" class="section-wrap">
+      <div class="devkit-cta-banner">
+        <div class="devkit-content">
+          <div class="devkit-badge-top">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            Hướng Dẫn &amp; Tổng Hợp Từ DEVKIT AI
+          </div>
+
+          <h2 class="devkit-title">
+            Hướng Dẫn Nhận <span>~1 Tỷ Token (1 Billion Tokens)</span> Miễn Phí Trải Nghiệm DeepSeek 1017
+          </h2>
+
+          <p class="devkit-desc">
+            Không cần thủ tục rườm rà hay thẻ visa quốc tế. Kênh <strong>DEVKIT AI</strong> trên YouTube tổng hợp và hướng dẫn cách tiếp cận các chương trình miễn phí từ nhiều nhà cung cấp khác nhau. Hạn mức, điều kiện và thời hạn có thể thay đổi theo từng nguồn; hãy kiểm tra thông tin mới nhất trong video và trang đăng ký chính thức.
+          </p>
+
+          <!-- DEVKIT AI YouTube Channel Card -->
+          <div class="devkit-youtube-card">
+            <div class="youtube-channel-info">
+              <div class="youtube-avatar">▶</div>
+              <div class="youtube-text">
+                <h5>Kênh YouTube: DEVKIT AI</h5>
+                <p>Kênh công nghệ chuyên sâu về AI Engineering, Claude Code, DeepSeek, Agentic Tools &amp; Tự Động Hóa Lập Trình hàng đầu.</p>
+              </div>
+            </div>
+
+            <a href="https://www.youtube.com/@devkitai" target="_blank" rel="noopener noreferrer" class="btn-youtube-sub">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+              Xem Video Hướng Dẫn &amp; Đăng Ký
+            </a>
+          </div>
+
+          <!-- 4 Steps Implementation Process -->
+          <h3 style="font-family: var(--font-display); font-size: 1.35rem; color: #ffffff; margin-bottom: 18px;">
+            4 Bước Đơn Giản Để Kích Hoạt Token Miễn Phí:
+          </h3>
+
+          <div class="steps-grid">
+            <div class="step-box">
+              <div class="step-number">01</div>
+              <h4>Truy Cập Link Video DEVKIT AI</h4>
+              <p>Mở video phân tích DeepSeek 1017 trên kênh YouTube DEVKIT AI và nhấp vào đường link liên kết đối tác ở phần mô tả video.</p>
+            </div>
+
+            <div class="step-box">
+              <div class="step-number">02</div>
+              <h4>Tạo API Key &amp; Nhận Token</h4>
+              <p>Đăng ký tài khoản nhà phát triển, vào phần <em>API Keys</em> → nhấp <em>Create Secret Key</em>. Hạn mức token khuyến mãi sẽ được cộng trực tiếp vào ví.</p>
+            </div>
+
+            <div class="step-box">
+              <div class="step-number">03</div>
+              <h4>Tích Hợp Vào Editor Yêu Thích</h4>
+              <p>Dán Base URL và API Key vào các công cụ như <strong>Cursor, Cline, Roo-Code, Claude Code</strong> hoặc các nền tảng chat như NextChat, LibreChat.</p>
+            </div>
+
+            <div class="step-box">
+              <div class="step-number">04</div>
+              <h4>Sử Dụng Không Giới Hạn</h4>
+              <p>Thoải mái phân tích văn bản lớn, debug toàn bộ source code của dự án với 1 triệu token context mà không lo cạn ví!</p>
+            </div>
+          </div>
+
+          <!-- Code Integration Snippets -->
+          <div class="code-tabs-wrapper">
+            <div class="code-tabs-header">
+              <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('curl')">cURL</button>
+                <button class="tab-btn" onclick="switchTab('python')">Python (OpenAI SDK)</button>
+                <button class="tab-btn" onclick="switchTab('nodejs')">Node.js / TypeScript</button>
+              </div>
+              <button class="copy-btn" id="copyCodeBtn" onclick="copyActiveCode()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Sao Chép Code
+              </button>
+            </div>
+
+            <div class="code-content-pane" id="codePaneCurl">
+<pre><code>curl https://api.deepseek.com/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_FREE_DEVKIT_API_KEY" \
+  -d '{
+    "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+    "messages": [
+      {"role": "system", "content": "Bạn là chuyên gia AI từ kênh DEVKIT AI."},
+      {"role": "user", "content": "Hãy viết mã giải thuật tối ưu hóa bộ nhớ với DeepSeek V4.1 Flash 1017."}
+    ],
+    "temperature": 1.0,
+    "max_tokens": 4096
+  }'</code></pre>
+            </div>
+
+            <div class="code-content-pane" id="codePanePython" style="display: none;">
+<pre><code>from openai import OpenAI
+
+# Sử dụng API Key từ một nguồn miễn phí được giới thiệu trong video DEVKIT AI
+client = OpenAI(
+    api_key="YOUR_FREE_DEVKIT_API_KEY",
+    base_url="https://api.deepseek.com/v1"
+)
+
+response = client.chat.completions.create(
+    model="deepseek-ai/DeepSeek-V4.1-Flash-1017",
+    messages=[
+        {"role": "system", "content": "Bạn là trợ lý AI thông minh chuyên về lập trình."},
+        {"role": "user", "content": "Tối ưu hóa pipeline xử lý 100K token với KV-Cache 890 B/tok."}
+    ],
+    temperature=1.0,
+    stream=True
+)
+
+for chunk in response:
+    content = chunk.choices[0].delta.content or ""
+    print(content, end="", flush=True)</code></pre>
+            </div>
+
+            <div class="code-content-pane" id="codePaneNodejs" style="display: none;">
+<pre><code>import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "YOUR_FREE_DEVKIT_API_KEY",
+  baseURL: "https://api.deepseek.com/v1"
+});
+
+async function runDeepSeek() {
+  const stream = await client.chat.completions.create({
+    model: "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+    messages: [
+      { role: "system", content: "Chuyên viên kiến trúc phần mềm AI DEVKIT." },
+      { role: "user", content: "Viết Agentic Tool Call với mô hình DeepSeek 1017." }
+    ],
+    temperature: 1.0,
+    stream: true,
+  });
+
+  for await (const chunk of stream) {
+    process.stdout.write(chunk.choices[0]?.delta?.content || "");
+  }
+}
+
+runDeepSeek();</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div>
+        <strong>DeepSeek-V4.1-Flash-1017 Scientific Hub</strong> • Tài liệu biên soạn khoa học và cập nhật 2026.
+        <div style="margin-top: 4px;">Nguồn chính thức: <a href="https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017" target="_blank" rel="noopener noreferrer">Hugging Face DeepSeek 1017 Model Card</a></div>
+      </div>
+
+      <ul class="footer-links">
+        <li><a href="https://www.youtube.com/@devkitai" target="_blank" rel="noopener noreferrer">Kênh YouTube DEVKIT AI</a></li>
+        <li><a href="https://huggingface.co/deepseek-ai" target="_blank" rel="noopener noreferrer">DeepSeek AI Org</a></li>
+        <li><a href="https://z.ai" target="_blank" rel="noopener noreferrer">Zhipu AI (GLM)</a></li>
+        <li><a href="#about">Về Đầu Trang ↑</a></li>
+      </ul>
+    </footer>
+  </main>
+
+  <script>
+    // Theme toggle logic
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const rootElement = document.documentElement;
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('deepseek_theme') || 'light';
+      rootElement.setAttribute('data-theme', savedTheme);
+      updateThemeIcon(savedTheme);
+    }
+
+    function toggleTheme() {
+      const currentTheme = rootElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      rootElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('deepseek_theme', newTheme);
+      updateThemeIcon(newTheme);
+    }
+
+    function updateThemeIcon(theme) {
+      const isDark = theme === 'dark';
+      themeToggleBtn.innerHTML = isDark
+        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`
+        : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+    }
+
+    themeToggleBtn.addEventListener('click', toggleTheme);
+    initTheme();
+
+    // Reasoning Effort Interactive Simulator
+    const effortSlider = document.getElementById('effortSlider');
+    const effortVal = document.getElementById('effortVal');
+    const thoughtStats = document.getElementById('thoughtStats');
+    const thoughtContent = document.getElementById('thoughtContent');
+    const speedBadge = document.getElementById('speedBadge');
+    const answerContent = document.getElementById('answerContent');
+
+    const simulationData = [
+      {
+        min: 1, max: 25,
+        tokens: "24 tokens suy luận",
+        speed: "165 tokens/s",
+        thought: "<thought>\nYêu cầu: Viết hàm tối ưu luồng dữ liệu.\nLựa chọn giải pháp trực tiếp: Sử dụng Buffer chunk 4KB và stream async.\n</thought>",
+        answer: "Dưới đây là giải pháp tối ưu hóa trực tiếp bằng Buffer 4KB dạng streaming, giảm thiểu tối đa overhead bộ nhớ:\n\nconst stream = fs.createReadStream('data.bin', { highWaterMark: 4096 });"
+      },
+      {
+        min: 26, max: 60,
+        tokens: "95 tokens suy luận",
+        speed: "135 tokens/s",
+        thought: "<thought>\n1. Khảo sát khối lượng dữ liệu 1 triệu bản ghi.\n2. Phân tích xung đột garbage collection (GC) nếu khởi tạo object tràn lan.\n3. Đề xuất phương pháp TypedArray hoặc Struct trong WASM/C++ để tránh áp lực GC.\n</thought>",
+        answer: "Để xử lý 1 triệu bản ghi với độ trễ thấp, phương pháp hiệu quả nhất là sử dụng TypedArray cố định kích thước nhằm cô lập rác bộ nhớ (GC Zero-Allocation). Kỹ thuật này giúp giữ tốc độ ổn định 100K RPS."
+      },
+      {
+        min: 61, max: 85,
+        tokens: "182 tokens suy luận",
+        speed: "115 tokens/s",
+        thought: "<thought>\nPhân tích yêu cầu tối ưu thuật toán xử lý dữ liệu luồng 1 triệu bản ghi...\n1. Khảo sát cấu trúc bộ nhớ cache hiện tại.\n2. Áp dụng kỹ thuật CSA2 để giảm áp lực I/O bộ nhớ nén KV.\n3. Dự thảo triển khai vòng lặp không đồng bộ và kiểm tra an toàn concurrency.\n</thought>",
+        answer: "Để tối ưu hóa luồng dữ liệu 1 triệu bản ghi, ta thực hiện phân bổ bộ đệm chunk 4KB và tận dụng cấu trúc nén bảng băm phân tầng. Dưới đây là giải pháp kiến trúc và mã nguồn cài đặt đạt chuẩn độ trễ dưới 2ms."
+      },
+      {
+        min: 86, max: 100,
+        tokens: "390 tokens suy luận sâu (Full Proof)",
+        speed: "92 tokens/s",
+        thought: "<thought>\nSuy luận đa tầng: Lập luận toán học & phân tích độ phức tạp O(N).\n- Xét bài toán xử lý song song với Lock-Free Ring Buffer (Disruptor Pattern).\n- Chứng minh không xảy ra Race Condition thông qua Memory Barrier.\n- Tối ưu hóa layout cấu trúc dữ liệu theo ranh giới Cache Line (64 Bytes Padding) để tránh False Sharing.\n- Đo lường dự kiến: IPC (Instructions Per Cycle) tăng 3.4x.\n</thought>",
+        answer: "Giải pháp kiến trúc cấp hệ thống (Level 100 Reasoning): Sử dụng Lock-Free Ring Buffer kết hợp Cache-line Padding (64B) để triệt tiêu hoàn toàn False Sharing. Bộ nhớ được cấp phát tĩnh một lần duy nhất tại khởi động hệ thống, mang lại độ trễ P99.9 dưới 150 micro-giây."
+      }
+    ];
+
+    effortSlider.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      effortVal.textContent = val;
+
+      const item = simulationData.find(d => val >= d.min && val <= d.max) || simulationData[2];
+      thoughtStats.textContent = item.tokens;
+      speedBadge.textContent = item.speed;
+      thoughtContent.textContent = item.thought;
+      answerContent.textContent = item.answer;
+    });
+
+    // Code Tab Switching
+    let currentActiveTab = 'curl';
+    function switchTab(tabId) {
+      currentActiveTab = tabId;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.code-content-pane').forEach(pane => pane.style.display = 'none');
+
+      if (tabId === 'curl') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('codePaneCurl').style.display = 'block';
+      } else if (tabId === 'python') {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('codePanePython').style.display = 'block';
+      } else if (tabId === 'nodejs') {
+        document.querySelectorAll('.tab-btn')[2].classList.add('active');
+        document.getElementById('codePaneNodejs').style.display = 'block';
+      }
+    }
+
+    function copyActiveCode() {
+      let codeText = "";
+      if (currentActiveTab === 'curl') {
+        codeText = document.getElementById('codePaneCurl').innerText;
+      } else if (currentActiveTab === 'python') {
+        codeText = document.getElementById('codePanePython').innerText;
+      } else if (currentActiveTab === 'nodejs') {
+        codeText = document.getElementById('codePaneNodejs').innerText;
+      }
+
+      navigator.clipboard.writeText(codeText).then(() => {
+        const btn = document.getElementById('copyCodeBtn');
+        const origHTML = btn.innerHTML;
+        btn.innerHTML = `✓ Đã Sao Chép!`;
+        setTimeout(() => {
+          btn.innerHTML = origHTML;
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
