@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Tài liệu hướng dẫn DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic: nguồn gốc, năng lực, ứng dụng, cài đặt local và API.">
+<title>DeepSeek V4 Pro Qwen3.5 9B Heretic — Model Guide</title>
+<style>
+:root{--bg:#080d18;--panel:#101a2b;--panel2:#142238;--text:#e9f0fb;--muted:#9aabc2;--line:#263852;--cyan:#54d7f2;--violet:#a78bfa;--orange:#ffad70;--green:#70e0b0}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 80% 0%,#142b49 0,transparent 35%),var(--bg);color:var(--text);font:16px/1.7 Inter,Segoe UI,Arial,sans-serif}
+a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}.wrap{max-width:1120px;margin:auto;padding:28px 22px 70px}
+.hero{padding:48px 0 32px;border-bottom:1px solid var(--line)}.eyebrow{color:var(--cyan);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:.78rem}
+h1{font-size:clamp(2rem,5vw,3.7rem);line-height:1.12;letter-spacing:-.04em;margin:14px 0}.sub{color:var(--muted);font-size:1.1rem;max-width:850px}
+.tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}.tag{border:1px solid #36506e;background:#102139;border-radius:999px;padding:5px 11px;font-size:.82rem;color:#cfe8ff}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:25px 0}.metric,.card{background:linear-gradient(145deg,#132239,#0e1727);border:1px solid var(--line);border-radius:15px;padding:17px}.metric b{display:block;font-size:1.45rem;color:var(--cyan)}.metric span{color:var(--muted);font-size:.85rem}
+.layout{display:grid;grid-template-columns:245px minmax(0,1fr);gap:28px;margin-top:28px}nav{position:sticky;top:18px;align-self:start;background:#0d1726;border:1px solid var(--line);border-radius:14px;padding:16px}nav strong{display:block;margin-bottom:10px}nav a{display:block;color:#b9c9df;padding:5px 0;font-size:.9rem}
+main section{margin:0 0 38px;scroll-margin-top:20px}h2{font-size:1.65rem;line-height:1.25;margin:0 0 15px}h3{font-size:1.12rem;margin:20px 0 8px;color:#d9e9ff}p{margin:10px 0}.muted{color:var(--muted)}.notice{border-left:4px solid var(--orange);background:#2a211c;padding:14px 17px;border-radius:8px;margin:16px 0}.good{border-left-color:var(--green);background:#102820}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+ul,ol{padding-left:22px}li{margin:5px 0}.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;min-width:560px;background:#0e1828}td,th{padding:11px 13px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--cyan);background:#14243a}td{color:#d5e0ef}code{font-family:Consolas,monospace;color:#a8e8ff;background:#091321;padding:2px 5px;border-radius:5px}
+pre{position:relative;overflow:auto;background:#050b13;border:1px solid #263a52;border-radius:12px;padding:18px;color:#d5e9ff;font:13px/1.65 Consolas,monospace;white-space:pre}
+.copy{position:absolute;right:10px;top:10px;border:1px solid #3c5875;background:#16283e;color:white;border-radius:7px;padding:5px 9px;cursor:pointer}.codebox{position:relative;margin:12px 0}
+.pill{display:inline-block;padding:2px 8px;border-radius:6px;background:#1d314c;color:#cce8ff;font-size:.8rem}.step{display:flex;gap:13px;margin:15px 0}.num{flex:0 0 30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#173c54;color:var(--cyan);font-weight:800}
+footer{border-top:1px solid var(--line);padding-top:22px;color:var(--muted);font-size:.88rem}
+@media(max-width:850px){.layout{grid-template-columns:1fr}nav{position:static;display:grid;grid-template-columns:repeat(2,1fr);gap:0 12px}.metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.wrap{padding:18px 14px 50px}.grid2,.grid3{grid-template-columns:1fr}.hero{padding-top:28px}nav{grid-template-columns:1fr 1fr}}
+
+/* Visual refresh v2 */
+:root{--bg:#070b14;--panel:#0e1726;--panel2:#14243a;--text:#edf4ff;--muted:#9aabc2;--line:#263b56;--cyan:#67e8f9;--violet:#b8a1ff;--orange:#ffbd83;--green:#7ee7b8}
+body{background:radial-gradient(900px 520px at 88% -8%,rgba(48,111,177,.25),transparent 65%),radial-gradient(700px 450px at -8% 25%,rgba(111,68,190,.12),transparent 68%),#070b14;letter-spacing:.005em}
+.wrap{max-width:1240px;padding:30px 26px 80px}
+.hero{position:relative;overflow:hidden;padding:64px 36px 38px;border:1px solid #29415f;border-radius:24px;background:linear-gradient(120deg,rgba(15,29,49,.97),rgba(8,17,31,.91)),radial-gradient(circle at 85% 25%,#19486a,transparent 35%);box-shadow:0 25px 80px #0008}
+.hero:after{content:"9B";position:absolute;right:4%;top:10%;font-size:clamp(7rem,20vw,15rem);font-weight:900;letter-spacing:-.1em;color:#8bdfff0b;pointer-events:none}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;padding:6px 12px;border:1px solid #315878;border-radius:99px;background:#10253a;color:#8deaff}
+h1{font-size:clamp(2.4rem,5.5vw,4.7rem);max-width:900px;margin:20px 0 15px;text-wrap:balance}
+.sub{max-width:850px;font-size:1.08rem;line-height:1.8}
+.tags{position:relative;z-index:1}.tag{background:#10243a;border-color:#2d4a68;color:#cbeaff;padding:6px 13px}
+.metrics{position:relative;z-index:1;grid-template-columns:repeat(4,minmax(0,1fr));margin:30px 0 0}
+.metric{background:linear-gradient(145deg,#142a43,#0c1728);border-color:#2b4663;box-shadow:inset 0 1px #ffffff0a}
+.metric b{font-size:1.65rem;letter-spacing:-.04em}
+.layout{grid-template-columns:230px minmax(0,1fr);gap:32px;margin-top:34px}
+nav{top:20px;background:#0b1422eF;backdrop-filter:blur(14px);border-color:#273d59;box-shadow:0 14px 40px #0004}
+nav strong{font-size:.82rem;text-transform:uppercase;letter-spacing:.13em;color:#78dff2;margin-bottom:12px}
+nav a{padding:7px 9px;border-radius:7px;color:#b7c8dc;transition:.18s}
+nav a:hover{background:#142942;color:#8ceaff;text-decoration:none}
+main section{margin-bottom:48px;padding-bottom:6px}
+h2{font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-.025em;display:flex;align-items:center;gap:12px}
+h2:before{content:"";width:5px;height:27px;border-radius:8px;background:linear-gradient(var(--cyan),var(--violet));display:inline-block}
+h3{color:#d9ecff}
+.card{background:linear-gradient(145deg,#111f32,#0c1523);border-color:#2a3f5b;box-shadow:0 12px 30px #0002}
+.grid2,.grid3{gap:15px}
+.notice{border:1px solid #745338;border-left:4px solid var(--orange);background:linear-gradient(100deg,#302319,#1b1820);padding:17px 19px}
+.good{border-color:#2d765c;border-left-color:var(--green);background:linear-gradient(100deg,#102d27,#111d25)}
+.tablewrap{border-color:#2b405d;box-shadow:0 10px 30px #0002}
+table{background:#0c1625}td,th{padding:13px 15px}th{background:#142840}tr:last-child td{border-bottom:0}
+pre{border-color:#2a405c;box-shadow:inset 0 1px #ffffff08}
+.copy{background:#18314b;border-color:#3a6383}.copy:hover{background:#214565}
+.pill{background:#17334d;color:#9cecff}
+.bench-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+.bench-card{border:1px solid #2b4260;border-radius:16px;padding:19px;background:linear-gradient(145deg,#12243a,#0c1625)}
+.bench-card h3{margin:0 0 5px;font-size:1.15rem}.bench-kicker{font-size:.8rem;color:#9eb4cd;text-transform:uppercase;letter-spacing:.1em}
+.bar-row{margin:15px 0}.bar-head{display:flex;justify-content:space-between;gap:10px;font-size:.9rem;margin-bottom:6px}.bar-track{height:9px;border-radius:99px;background:#26374d;overflow:hidden}.bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#36c9e7,#9b8bff)}
+.score{font-weight:800;color:#a6edff;font-variant-numeric:tabular-nums}
+.verdict{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.verdict>div{padding:16px;border-radius:13px;border:1px solid #2b4260;background:#101d2e}
+.verdict b{display:block;margin-bottom:5px}.verdict span{font-size:.9rem;color:#b3c4d8}
+footer{margin-top:50px;padding:28px;border:1px solid var(--line);border-radius:16px;background:#0b1421}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.hero{padding:40px 24px}.bench-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.wrap{padding:14px 12px 45px}.hero{padding:30px 18px;border-radius:17px}.metrics{gap:8px}.metric{padding:13px}.metric b{font-size:1.3rem}.verdict{grid-template-columns:1fr}nav{grid-template-columns:1fr 1fr}}
+
+</style>
+</head>
+<body><div class="wrap">
+<header class="hero">
+<div class="eyebrow">AI Model Documentation · Cập nhật 07/11/2026</div>
+<h1>DeepSeek-V4-Pro<br>Qwen3.5-9B <span style="color:var(--cyan)">UNCENSORED</span></h1>
+<p class="sub">Hướng dẫn kỹ thuật về model community fine-tune/distillation 9B được chỉnh sửa bằng Heretic: hiểu đúng nguồn gốc, khả năng, giới hạn và cách triển khai trên máy cá nhân hoặc qua API.</p>
+<div class="tags"><span class="tag">9B Parameters</span><span class="tag">BF16 Safetensors</span><span class="tag">Heretic / Abliteration</span><span class="tag">Apache-2.0 (repo ghi nhận)</span><span class="tag">Reasoning · Math · STEM</span></div>
+<div class="metrics">
+<div class="metric"><b>9B</b><span>Tham số</span></div>
+<div class="metric"><b>18.8 GB</b><span>Dung lượng repo BF16</span></div>
+<div class="metric"><b>30/10/2026</b><span>Commit khởi tạo trên HF</span></div>
+<div class="metric"><b>3 / 100</b><span>Lượt từ chối theo model card</span></div>
+</div>
+</header>
+
+<div class="layout">
+<nav><strong>Nội dung</strong>
+<a href="#overview">1. Model là gì?</a><a href="#date">2. Ngày phát hành</a><a href="#lineage">3. Nguồn gốc & kiến trúc</a><a href="#features">4. Chức năng</a><a href="#compare">5. So sánh sức mạnh</a><a href="#uses">6. Ứng dụng</a><a href="#hardware">7. Phần cứng</a><a href="#install-lm">8. Cài bằng LM Studio</a><a href="#install-cli">9. Cài bằng llama.cpp</a><a href="#api">10. Chạy API</a><a href="#python">11. Python Transformers</a><a href="#limits">12. Giới hạn & an toàn</a><a href="#sources">13. Nguồn tham khảo</a>
+</nav>
+
+<main>
+<section id="overview"><h2>1. Đây là model gì?</h2>
+<p><b>xtools-at/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic</b> là một bản model cộng đồng được đăng trên Hugging Face. Theo model card, nó là phiên bản <i>decensored</i> của <code>Jackrong/DeepSeek-V4-Pro-Qwen3.5-9B</code>, được xử lý bằng <b>Heretic v2.0.0.dev0</b>.</p>
+<div class="notice"><b>Đừng nhầm tên gọi:</b> đây không phải bản DeepSeek-V4-Pro chính thức thu nhỏ do DeepSeek phát hành. Model card mô tả một model Qwen3.5-9B được fine-tune/distill từ đầu ra của DeepSeek-V4-Pro, sau đó một tài khoản cộng đồng áp dụng Heretic để giảm hành vi từ chối. Tên “DeepSeek-V4-Pro” nói về nguồn teacher/distillation, không chứng minh đây là trọng số DeepSeek-V4-Pro.</div>
+<p>Hiểu ngắn gọn: đây là một <b>student model 9B thiên về suy luận</b>, học từ dữ liệu phản hồi của model teacher mạnh hơn, rồi được chỉnh sửa theo hướng ít từ chối hơn. Nó phù hợp thử nghiệm local, nghiên cứu hành vi model và các tác vụ toán học/khoa học; không nên mặc định ngang tầm model teacher.</p>
+</section>
+
+<section id="date"><h2>2. Model ra mắt ngày nào?</h2>
+<p>Trang lịch sử commit Hugging Face ghi nhận commit khởi tạo và tải các thành phần model vào <b>30/10/2026 lúc khoảng 10:21 (giờ hiển thị trên Hugging Face)</b>. Các file tokenizer, processor và model được tải tiếp trong cùng ngày. README được cập nhật ngày 02/11/2026.</p>
+<p class="muted">Vì vậy, mốc công khai có thể xác nhận từ lịch sử repository là <b>30/10/2026</b>. Đây là ngày commit đầu tiên của repository, không nhất thiết là ngày tác giả bắt đầu huấn luyện model gốc hoặc ngày phát hành model teacher.</p>
+</section>
+
+<section id="lineage"><h2>3. Nguồn gốc, kiến trúc và thông số</h2>
+<div class="card">
+<p><b>Chuỗi nguồn gốc theo Model Tree trên Hugging Face:</b></p>
+<p>Qwen/Qwen3.5-9B-Base → Qwen3.5-9B / Unsloth → Jackrong/DeepSeek-V4-Pro-Qwen3.5-9B → xtools-at bản UNCENSORED-heretic.</p>
+</div>
+<div class="tablewrap"><table><tr><th>Thuộc tính</th><th>Thông tin</th></tr>
+<tr><td>Repository</td><td><code>xtools-at/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic</code></td></tr>
+<tr><td>Họ kiến trúc</td><td>Qwen3.5; config/repo gắn tag qwen3_5</td></tr>
+<tr><td>Quy mô</td><td>9 tỷ tham số (9B)</td></tr>
+<tr><td>Định dạng gốc</td><td>Safetensors, BF16</td></tr>
+<tr><td>Dung lượng các shard</td><td>Khoảng 18.8 GB</td></tr>
+<tr><td>Kiểu tác vụ được gắn nhãn</td><td>Text generation; trang model có cả tag image-text-to-text và processor đa phương thức</td></tr>
+<tr><td>Giấy phép hiển thị</td><td>Apache-2.0 trên repository; nên kiểm tra cả giấy phép model cha và điều kiện sử dụng dữ liệu</td></tr>
+<tr><tr><td>Inference Provider</td><td>Trang HF hiện ghi chưa có provider hosted triển khai sẵn</td></tr></table></div>
+<h3>Distillation là gì?</h3><p>Distillation (chưng cất tri thức) là cách dùng đầu ra của một model teacher để huấn luyện model student nhỏ hơn. Model card của bản Jackrong nói dữ liệu SFT tập trung khoảng 250.000 mẫu toán học và STEM, dùng DeepSeek-V4-Pro ở chế độ Max Effect làm nguồn tạo dữ liệu; sau SFT có một giai đoạn RL tinh chỉnh nhẹ bằng GSPO. Đây là thông tin do tác giả công bố, không phải đánh giá độc lập.</p>
+<h3>Heretic / Abliteration là gì?</h3><p>Heretic là công cụ tự động tìm và can thiệp vào các hướng biểu diễn liên quan đến hành vi từ chối (refusal direction) trong mạng. Mục tiêu là giảm các câu trả lời từ chối mà không làm thay đổi quá lớn hành vi hữu ích. Kỹ thuật này <b>không bổ sung kiến thức mới</b>, không làm model thông minh hơn, và cũng không đảm bảo model sẽ trả lời chính xác hơn.</p>
+<div class="tablewrap"><table><tr><th>Thông số ARA được công bố</th><th>Giá trị</th></tr><tr><td>start_layer_index</td><td>9</td></tr><tr><td>end_layer_index</td><td>24</td></tr><tr><td>preserve_good_behavior_weight</td><td>0.8264</td></tr><tr><td>steer_bad_behavior_weight</td><td>0.0003</td></tr><tr><td>overcorrect_relative_weight</td><td>0.9645</td></tr><tr><td>neighbor_count</td><td>12</td></tr></table></div>
+</section>
+
+<section id="features"><h2>4. Chức năng và năng lực chính</h2>
+<div class="grid2">
+<div class="card"><h3>Reasoning / suy luận</h3><p>Phân rã bài toán thành các bước, lập luận có cấu trúc và xử lý câu hỏi cần nhiều bước. Chất lượng tùy độ khó và prompt.</p></div>
+<div class="card"><h3>Toán học & STEM</h3><p>Định hướng dữ liệu huấn luyện gồm toán, vật lý, hóa học và các chủ đề khoa học/kỹ thuật.</p></div>
+<div class="card"><h3>Ít từ chối hơn</h3><p>Model card báo cáo 3/100 lượt từ chối so với 100/100 ở bản Jackrong gốc trong phép thử của tác giả. Không phải chứng nhận an toàn hay benchmark độc lập.</p></div>
+<div class="card"><h3>Instruction following</h3><p>Có thể làm theo chỉ dẫn, định dạng đầu ra có cấu trúc và xử lý yêu cầu phân tích. Nên kiểm tra JSON/schema trong workflow thực tế.</p></div>
+<div class="card"><h3>Code & tool-use thử nghiệm</h3><p>Tác giả báo cáo cải thiện nhỏ ở programming và tool calling dù không dùng dữ liệu SFT chuyên code. Đây là khả năng chuyển giao sơ bộ, không phải model coding chuyên dụng.</p></div>
+<div class="card"><h3>Local inference</h3><p>Có thể triển khai bằng Transformers; dùng GGUF quantization từ repository chuyển đổi bên thứ ba để chạy LM Studio hoặc llama.cpp.</p></div>
+</div>
+<div class="notice">Model card của bản Heretic có nhắc đến tag image-text-to-text và ví dụ dùng processor với ảnh. Tuy nhiên, đừng suy ra rằng mọi bản quantized/GGUF đều hỗ trợ vision đầy đủ. Hãy xác minh processor, kiến trúc runtime và multimodal support của đúng file đang tải.</div>
+</section>
+
+
+<section id="compare"><h2>5. So sánh sức mạnh với các model khác</h2>
+<p>Đây là phần quan trọng nhất để định vị model. Theo model card của bản Heretic, model 9B có kết quả rất tốt ở toán phổ thông và một tập con MMLU-Pro về Math/Physics/Chemistry. Tuy nhiên, đây là benchmark do tác giả công bố; một số bảng dùng cấu hình inference và tập câu hỏi khác nhau, vì vậy không được gộp thành một bảng xếp hạng tuyệt đối.</p>
+<div class="notice good"><b>Kết luận nhanh:</b> đáng chú ý ở toán và STEM so với các baseline 9B được tác giả thử nghiệm. Chưa có bằng chứng đủ mạnh để kết luận nó vượt các model lớn ở coding, agent hoặc năng lực tổng quát. Cũng không thể xem bản 9B này ngang DeepSeek-V4-Pro gốc.</div>
+
+<div class="bench-grid">
+ <div class="bench-card">
+  <div class="bench-kicker">Benchmark 1 · GSM8K</div>
+  <h3>Toán học phổ thông</h3>
+  <p class="muted">Điểm accuracy theo bảng so sánh trong model card. Bản 9B dùng NVFP4 + vLLM, trung bình 4 lần chạy.</p>
+  <div class="bar-row"><div class="bar-head"><span>MiMo-V2.5-Pro</span><b class="score">99.60%</b></div><div class="bar-track"><div class="bar-fill" style="width:99.6%"></div></div></div>
+  <div class="bar-row"><div class="bar-head"><span>Llama 3.1 405B Instruct</span><b class="score">96.80%</b></div><div class="bar-track"><div class="bar-fill" style="width:96.8%"></div></div></div>
+  <div class="bar-row"><div class="bar-head"><span>Llama 3.3 70B Instruct</span><b class="score">94.84%</b></div><div class="bar-track"><div class="bar-fill" style="width:94.84%"></div></div></div>
+  <div class="bar-row"><div class="bar-head"><span><b>DeepSeek-V4-Pro-Qwen3.5-9B</b></span><b class="score">94.50%</b></div><div class="bar-track"><div class="bar-fill" style="width:94.5%"></div></div></div>
+  <div class="bar-row"><div class="bar-head"><span>DeepSeek-V4-Pro (teacher)</span><b class="score">92.60%</b></div><div class="bar-track"><div class="bar-fill" style="width:92.6%"></div></div></div>
+  <div class="bar-row"><div class="bar-head"><span>DeepSeek-V3</span><b class="score">89.30%</b></div><div class="bar-track"><div class="bar-fill" style="width:89.3%"></div></div></div>
+  <p class="muted"><b>Đọc kết quả:</b> 94.50% là số rất cao trên GSM8K, gần mốc Llama 3.3 70B theo bảng được công bố. Không có nghĩa model 9B mạnh ngang 70B trên mọi tác vụ.</p>
+ </div>
+ <div class="bench-card">
+  <div class="bench-kicker">Benchmark 2 · MMLU-Pro subset</div>
+  <h3>Math · Physics · Chemistry</h3>
+  <p class="muted">1.500 câu tổng cộng: 500 câu mỗi nhóm. Các model trong bảng dùng GGUF Q8-family, 8K context (ngoại lệ cấu hình được ghi ở model card).</p>
+  <div class="bar-row"><div class="bar-head"><span><b>DeepSeek-V4-Pro-Qwen3.5-9B</b></span><b class="score">90.53%</b></div><div class="bar-track"><div class="bar-fill" style="width:90.53%"></div></div></div>
+  <div class="bar-row"><div class="bar-head"><span>Qwen3.5-9B</span><b class="score">89.60%</b></div><div class="bar-track"><div class="bar-fill" style="width:89.6%"></div></div></div>
+  <div class="bar-row"><div class="bar-head"><span>Claude Mythos-distilled 27B</span><b class="score">86.20%</b></div><div class="bar-track"><div class="bar-fill" style="width:86.2%"></div></div></div>
+  <div class="bar-row"><div class="bar-head"><span>Claude Mythos-distilled 9B</span><b class="score">81.07%</b></div><div class="bar-track"><div class="bar-fill" style="width:81.07%"></div></div></div>
+  <div class="bar-row"><div class="bar-head"><span>DeepSeek-V4-Pro-Qwen3.5-4B</span><b class="score">76.47%</b></div><div class="bar-track"><div class="bar-fill" style="width:76.47%"></div></div></div>
+  <p class="muted"><b>So với Qwen3.5-9B:</b> +0.93 điểm phần trăm trung bình; Math +1.80, Physics +0.40, Chemistry +0.60 theo cùng phép thử do tác giả thực hiện.</p>
+ </div>
+</div>
+
+<h3>Bảng so sánh chi tiết</h3>
+<div class="tablewrap"><table>
+<tr><th>Model</th><th>Quy mô</th><th>GSM8K</th><th>MMLU-Pro subset (3 môn)</th><th>Nhận xét</th></tr>
+<tr><td><b>DeepSeek-V4-Pro-Qwen3.5-9B Heretic</b></td><td>9B</td><td>94.50%</td><td>90.53%</td><td>Rất nổi bật trong hai bài test được công bố; ít refusal hơn do Heretic.</td></tr>
+<tr><td>Qwen3.5-9B</td><td>9B</td><td>Không có số cùng phép thử ở bảng này</td><td>89.60%</td><td>Baseline cùng họ model; thấp hơn 0.93 điểm trong mẫu MMLU-Pro 3 môn của tác giả.</td></tr>
+<tr><td>Claude Mythos-distilled 9B</td><td>9B</td><td>Không báo cáo</td><td>81.07%</td><td>Thấp hơn trong tập mẫu MMLU-Pro được báo cáo.</td></tr>
+<tr><td>Claude Mythos-distilled 27B</td><td>27B</td><td>Không báo cáo</td><td>86.20%</td><td>Model lớn hơn nhưng vẫn thấp hơn trong phép thử cụ thể này.</td></tr>
+<tr><td>DeepSeek-V4-Pro</td><td>Model teacher lớn</td><td>92.60%</td><td>Không có số cùng phép thử</td><td>Teacher dùng tạo dữ liệu; không thể suy ra student 9B thay thế được teacher.</td></tr>
+<tr><td>Llama 3.3 70B Instruct</td><td>70B</td><td>94.84%</td><td>Không báo cáo</td><td>Gần điểm GSM8K trong bảng tác giả; không có so sánh đa tác vụ.</td></tr>
+</table></div>
+
+<h3>So sánh với bảng benchmark chính thức của Qwen3.5-9B</h3>
+<p>Trang Qwen chính thức công bố nhiều benchmark rộng hơn: MMLU-Pro 82.5, GPQA Diamond 81.7, LiveCodeBench v6 65.6, IFEval 91.5, BFCL-V4 66.1, TAU2-Bench 79.1. Đây là các điểm trong bộ đánh giá của Qwen, <b>không cùng giao thức</b> với bài MMLU-Pro 1.500 câu của model Heretic. Không được đặt 90.53 và 82.5 cạnh nhau để tuyên bố Heretic hơn 8 điểm: khác tập câu hỏi/phạm vi đánh giá.</p>
+<div class="tablewrap"><table>
+<tr><th>Năng lực</th><th>Qwen3.5-9B official score</th><th>Heretic 9B</th><th>Kết luận hợp lý</th></tr>
+<tr><td>MMLU-Pro</td><td>82.5 (bảng Qwen)</td><td>90.53 (500 câu x 3 môn, tác giả tự test)</td><td>Không so trực tiếp do khác tập con/giao thức.</td></tr>
+<tr><td>GPQA Diamond</td><td>81.7</td><td>Chưa thấy số tương ứng</td><td>Chưa đủ dữ liệu để kết luận.</td></tr>
+<tr><td>LiveCodeBench v6</td><td>65.6</td><td>Chưa có benchmark cùng chuẩn</td><td>Không nên gọi đây là model coding mạnh hơn Qwen.</td></tr>
+<tr><td>IFEval</td><td>91.5</td><td>Chưa có benchmark cùng chuẩn</td><td>Chưa đủ dữ liệu để so instruction-following.</td></tr>
+<tr><td>BFCL-V4 / TAU2-Bench</td><td>66.1 / 79.1</td><td>Chưa có số tương ứng đáng tin cậy</td><td>Tool-use/agent chưa được chứng minh vượt trội.</td></tr>
+</table></div>
+
+<div class="verdict">
+ <div><b style="color:#7ee7b8">Mạnh nhất theo dữ liệu hiện có</b><span>Toán GSM8K và STEM trong tập MMLU-Pro subset do tác giả công bố.</span></div>
+ <div><b style="color:#ffce91">Cần kiểm chứng thêm</b><span>Coding, agentic workflow, tool calling, đa phương thức và tác vụ dài.</span></div>
+ <div><b style="color:#b8a1ff">Không nên kết luận</b><span>Không thể nói model 9B ngang hoặc vượt DeepSeek-V4-Pro ở năng lực tổng quát.</span></div>
+</div>
+<div class="notice"><b>Lưu ý về độ tin cậy benchmark:</b> các số GSM8K/MMLU-Pro ở phần trên lấy từ model card của tác giả model, không phải benchmark độc lập được xác minh toàn diện. GSM8K dùng NVFP4 + vLLM trong khi MMLU-Pro dùng MTP-Q8_0 GGUF + llama.cpp. Model card cũng tự cảnh báo MMLU-Pro chỉ lấy mẫu 500 câu mỗi môn và không đại diện toàn bộ năng lực/safety. Hãy xem đây là tín hiệu đáng quan tâm, không phải bảng xếp hạng cuối cùng.</div>
+</section>
+
+<section id="uses"><h2>6. Công dụng và ứng dụng thực tế</h2>
+<ul>
+<li><b>Học tập/nghiên cứu:</b> giải thích bài toán, phân tích công thức, hỗ trợ diễn giải các khái niệm STEM.</li>
+<li><b>Trợ lý local:</b> hỏi đáp tài liệu, brainstorm, tóm tắt và phân tích văn bản trong môi trường riêng tư.</li>
+<li><b>Thử nghiệm AI agent:</b> làm backend cho agent, kiểm thử function calling/tool-use sau khi tự định nghĩa và xác thực schema.</li>
+<li><b>Đánh giá safety/alignment:</b> nghiên cứu khác biệt giữa model gốc và model đã giảm refusal trong môi trường được kiểm soát.</li>
+<li><b>Red-team có ủy quyền:</b> tạo dữ liệu thử nghiệm hoặc kiểm tra bộ lọc nội bộ; không dùng để truy cập trái phép hay gây hại.</li>
+<li><b>Prototype coding:</b> hỗ trợ giải thích code, viết snippet và phân tích lỗi ở mức thử nghiệm; nên đối chiếu với model coding chuyên dụng.</li>
+</ul>
+<h3>Không nên dùng làm</h3><ul><li>Thay thế chuyên gia trong quyết định y tế, pháp lý, tài chính hoặc an toàn hệ thống.</li><li>Hệ thống tự động thực thi lệnh shell, giao dịch hoặc thao tác production mà không có sandbox, xác nhận và kiểm soát quyền.</li><li>Cơ sở dữ liệu sự thật tuyệt đối: model vẫn có thể hallucinate, tính sai hoặc bịa nguồn.</li></ul>
+</section>
+
+<section id="hardware"><h2>7. Yêu cầu phần cứng và khả năng chạy RTX 3060 12GB</h2>
+<p>File gốc trên Hugging Face là BF16 khoảng 18.8 GB, chưa tính KV cache, context, runtime và bộ nhớ phụ. Vì vậy <b>không thể kỳ vọng nạp toàn bộ BF16 vào VRAM 12GB</b>. Có thể offload một phần sang RAM nhưng sẽ chậm và cần RAM dư.</p>
+<div class="tablewrap"><table><tr><th>Định dạng</th><th>Dung lượng tham khảo</th><th>Đánh giá với RTX 3060 12GB</th></tr>
+<tr><td>BF16 / FP16</td><td>~18.8 GB weights</td><td>Không phù hợp chạy hoàn toàn trên VRAM 12GB</td></tr>
+<tr><td>Q8_0</td><td>~9.5 GB theo collection HF</td><td>Có thể rất sát giới hạn; context/KV cache dễ làm thiếu VRAM</td></tr>
+<tr><td>Q4_K_M</td><td>~5.7 GB theo collection HF</td><td>Lựa chọn thực tế để bắt đầu; vẫn cần thêm VRAM cho context/cache</td></tr>
+</table></div>
+<p class="muted">Các con số quant là ước lượng tham khảo được hiển thị trong collection Hugging Face, không phải cam kết chính xác cho mọi bản build. Kích thước file, overhead và chất lượng có thể khác theo quantizer. Nên chọn bản GGUF Q4_K_M hoặc quant tương đương, đặt context ban đầu 4K–8K và theo dõi VRAM/RAM.</p>
+<div class="notice good"><b>Khuyến nghị cho máy RTX 3060 12GB + RAM 32GB:</b> ưu tiên GGUF Q4_K_M trong LM Studio hoặc llama.cpp. Không tải bộ BF16 18.8GB nếu mục tiêu là chạy gọn trên GPU. Với context dài, tốc độ và bộ nhớ sẽ bị ảnh hưởng rõ.</div>
+</section>
+
+<section id="install-lm"><h2>8. Cài đặt bằng LM Studio (Windows – dễ nhất)</h2>
+<div class="step"><div class="num">1</div><div><b>Cài LM Studio</b><p>Tải ứng dụng từ <a href="https://lmstudio.ai/" target="_blank" rel="noopener">lmstudio.ai</a>, cài đặt và cập nhật phiên bản mới.</p></div></div>
+<div class="step"><div class="num">2</div><div><b>Tìm bản GGUF đã quantize</b><p>Mở Discover/Search trong LM Studio, tìm chính xác tên model. Có thể tìm repository quantized của cộng đồng, ví dụ <code>mradermacher/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic-i1-GGUF</code>. Đây là bản chuyển đổi bên thứ ba, không phải repo BF16 gốc của xtools-at.</p></div></div>
+<div class="step"><div class="num">3</div><div><b>Chọn quant phù hợp</b><p>Chọn file có tên chứa <code>Q4_K_M</code> để bắt đầu trên RTX 3060 12GB. Kiểm tra đúng model card, file size, context support và ghi chú quantizer trước khi tải.</p></div></div>
+<div class="step"><div class="num">4</div><div><b>Nạp model</b><p>Vào Chat, chọn model vừa tải. Đặt context length 4096 hoặc 8192 trước, GPU offload tối đa trong mức VRAM còn trống; nếu lỗi CUDA out of memory, giảm context hoặc số layer GPU offload.</p></div></div>
+<div class="step"><div class="num">5</div><div><b>Kiểm tra chất lượng</b><p>Thử một bài toán, một câu hỏi STEM, một yêu cầu tóm tắt và một tác vụ định dạng JSON. So sánh kết quả với model gốc nếu cần đánh giá ảnh hưởng của Heretic.</p></div></div>
+<p><a href="https://huggingface.co/mradermacher/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic-i1-GGUF" target="_blank" rel="noopener">Mở repository GGUF i1 của mradermacher</a> · <a href="https://huggingface.co/xtools-at/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic" target="_blank" rel="noopener">Mở model gốc xtools-at</a></p>
+</section>
+
+<section id="install-cli"><h2>9. Cài đặt bằng llama.cpp (Windows)</h2>
+<p>Cách này phù hợp nếu anh muốn chạy model qua terminal hoặc tạo local server. Cần tải đúng file GGUF đã quantize; repository xtools-at gốc cung cấp Safetensors BF16, không phải file GGUF.</p>
+<h3>8.1 Cài llama.cpp</h3><p>Tải bản build Windows phù hợp từ <a href="https://github.com/ggml-org/llama.cpp/releases" target="_blank" rel="noopener">llama.cpp Releases</a>, giải nén, mở PowerShell tại thư mục có <code>llama-cli.exe</code> và <code>llama-server.exe</code>.</p>
+<h3>8.2 Tải GGUF</h3><p>Vào repo quantized bên thứ ba, chọn file <code>*Q4_K_M.gguf</code> (nếu có), tải về ví dụ lưu tại <code>D:\AI\Models\DeepSeek-Heretic\model-Q4_K_M.gguf</code>.</p>
+<h3>8.3 Chạy hội thoại</h3>
+<div class="codebox"><button class="copy" onclick="copyCode(this)">Copy</button><pre>.\llama-cli.exe -m "D:\AI\Models\DeepSeek-Heretic\model-Q4_K_M.gguf" `
+  -ngl 99 -c 8192 -n 512 -cnv</pre></div>
+<p>Nếu thiếu VRAM, giảm <code>-ngl</code> hoặc giảm context <code>-c 4096</code>. Cú pháp/tùy chọn có thể thay đổi theo phiên bản llama.cpp.</p>
+<h3>8.4 Mở OpenAI-compatible local API</h3>
+<div class="codebox"><button class="copy" onclick="copyCode(this)">Copy</button><pre>.\llama-server.exe -m "D:\AI\Models\DeepSeek-Heretic\model-Q4_K_M.gguf" `
+  -ngl 99 -c 8192 --host 127.0.0.1 --port 1234</pre></div>
+<p>API base URL: <code>http://127.0.0.1:1234/v1</code>. Chỉ bind localhost khi thử nghiệm trên máy cá nhân. Không mở trực tiếp ra Internet nếu chưa có xác thực và reverse proxy an toàn.</p>
+</section>
+
+<section id="api"><h2>10. Gọi API từ ứng dụng khác</h2>
+<p>Khi server llama.cpp đang chạy, thử bằng PowerShell:</p>
+<div class="codebox"><button class="copy" onclick="copyCode(this)">Copy</button><pre>$body = @{
+  model = "local-model"
+  messages = @(
+    @{ role = "user"; content = "Giải thích định luật Newton thứ hai." }
+  )
+  temperature = 0.6
+  max_tokens = 512
+} | ConvertTo-Json -Depth 8
+
+Invoke-RestMethod `
+  -Uri "http://127.0.0.1:1234/v1/chat/completions" `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body $body</pre></div>
+<p>Trong client hỗ trợ OpenAI-compatible API, cấu hình:</p>
+<div class="tablewrap"><table><tr><th>Trường</th><th>Giá trị</th></tr><tr><td>Base URL</td><td><code>http://127.0.0.1:1234/v1</code></td></tr><tr><td>API Key</td><td>Không cần với server local mặc định; nhập giá trị bất kỳ nếu client bắt buộc</td></tr><tr><td>Model</td><td><code>local-model</code> hoặc tên model server trả về</td></tr></table></div>
+</section>
+
+<section id="python"><h2>11. Chạy bằng Python Transformers (bản BF16)</h2>
+<p>Đây là hướng dẫn cho máy có GPU/RAM đủ lớn hoặc môi trường cloud. Bản gốc 18.8GB BF16 không phù hợp nạp toàn bộ trên RTX 3060 12GB.</p>
+<div class="codebox"><button class="copy" onclick="copyCode(this)">Copy</button><pre>python -m venv .venv
+# Windows PowerShell:
+.\.venv\Scripts\Activate.ps1
+
+python -m pip install --upgrade pip
+pip install torch transformers accelerate safetensors</pre></div>
+<p>Ví dụ nạp model theo hướng dẫn trên model card. Cần phiên bản Transformers có hỗ trợ kiến trúc/config model hiện hành; nếu gặp lỗi kiến trúc chưa được nhận diện, kiểm tra README mới nhất và phiên bản thư viện tương thích.</p>
+<div class="codebox"><button class="copy" onclick="copyCode(this)">Copy</button><pre>import torch
+from transformers import AutoProcessor, AutoModelForMultimodalLM
+
+repo = "xtools-at/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic"
+
+processor = AutoProcessor.from_pretrained(repo)
+model = AutoModelForMultimodalLM.from_pretrained(
+    repo,
+    torch_dtype="auto",
+    device_map="auto"
+)
+
+messages = [{
+    "role": "user",
+    "content": [{"type": "text", "text": "Giải thích sự khác nhau giữa SFT và distillation."}]
+}]
+
+inputs = processor.apply_chat_template(
+    messages,
+    add_generation_prompt=True,
+    tokenize=True,
+    return_dict=True,
+    return_tensors="pt"
+).to(model.device)
+
+with torch.no_grad():
+    outputs = model.generate(**inputs, max_new_tokens=300)
+
+answer = processor.decode(
+    outputs[0][inputs["input_ids"].shape[-1]:],
+    skip_special_tokens=True
+)
+print(answer)</pre></div>
+<div class="notice">Đoạn code bám theo ví dụ processor/model trong trang Hugging Face. Hãy kiểm tra API class của phiên bản Transformers đang cài; không dùng <code>trust_remote_code=True</code> một cách tùy tiện. Chỉ bật remote code nếu đã đọc và tin tưởng mã nguồn.</div>
+</section>
+
+<section id="limits"><h2>12. Giới hạn, độ tin cậy và lưu ý bảo mật</h2>
+<ul>
+<li><b>Model thử nghiệm:</b> tác giả tự ghi nhận có thể hallucinate, suy luận sai và không ổn định với câu hỏi khó/thiếu dữ kiện.</li>
+<li><b>Benchmark không toàn diện:</b> phần MMLU-Pro được báo cáo dựa trên 500 câu lấy mẫu ngẫu nhiên mỗi nhóm Math, Physics, Chemistry; không phải toàn bộ benchmark.</li>
+<li><b>Code chưa phải thế mạnh đã được chứng minh:</b> model card nói không có coding-specific SFT; mức cải thiện tool-use/programming chỉ là quan sát sơ bộ.</li>
+<li><b>Uncensored không đồng nghĩa chính xác:</b> giảm refusal không làm tăng độ đúng, không đảm bảo an toàn và có thể khiến model đáp lại yêu cầu rủi ro.</li>
+<li><b>Kiểm tra file tải về:</b> ưu tiên repository chính chủ, kiểm tra commit, file, checksum nếu có; không chạy script lạ từ nguồn không tin cậy.</li>
+<li><b>Cô lập agent:</b> nếu kết nối model với OpenCode, Claude Code, shell hoặc tool, chạy trong tài khoản ít quyền, thư mục sandbox và yêu cầu xác nhận trước hành động ghi/xóa/chạy lệnh.</li>
+<li><b>API:</b> không public port 1234/8000 trực tiếp; dùng localhost, VPN hoặc reverse proxy có authentication, firewall và giới hạn truy cập.</li>
+</ul>
+</section>
+
+<section id="sources"><h2>13. Nguồn tham khảo chính</h2>
+<ol>
+<li><a href="https://huggingface.co/xtools-at/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic" target="_blank" rel="noopener">Hugging Face – Model card xtools-at</a> — nguồn chính về mô tả Heretic, thông số ARA, benchmark do tác giả báo cáo và hướng dẫn Transformers/vLLM/SGLang.</li>
+<li><a href="https://huggingface.co/xtools-at/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic/commits/main" target="_blank" rel="noopener">Hugging Face – Commit history</a> — xác nhận commit khởi tạo ngày 30/10/2026 và README update 02/11/2026.</li>
+<li><a href="https://huggingface.co/Jackrong/DeepSeek-V4-Pro-Qwen3.5-9B" target="_blank" rel="noopener">Jackrong – Model gốc distillation</a> — nguồn teacher, dữ liệu và mục tiêu huấn luyện của bản 9B.</li>
+<li><a href="https://huggingface.co/mradermacher/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic-i1-GGUF" target="_blank" rel="noopener">mradermacher – GGUF quantized</a> — một lựa chọn GGUF cộng đồng; cần tự kiểm tra đúng quant/file trước khi tải.</li>
+<li><a href="https://github.com/ggml-org/llama.cpp" target="_blank" rel="noopener">llama.cpp</a> · <a href="https://lmstudio.ai/" target="_blank" rel="noopener">LM Studio</a> · <a href="https://huggingface.co/docs/transformers/index" target="_blank" rel="noopener">Transformers docs</a>.</li>
+</ol>
+<p class="muted">Tài liệu được tổng hợp từ model card và metadata công khai tại thời điểm 07/11/2026. Thông tin benchmark và chất lượng do tác giả model công bố cần được xem là claim của publisher, không phải kiểm chứng độc lập. Kiểm tra lại trang nguồn trước khi triển khai production.</p>
+</section>
+<footer>
+<b>DEVKIT AI · Model Guide</b><br>DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic · Phiên bản tài liệu 2.0 · 07/11/2026
+</footer>
+</main></div>
+<script>
+function copyCode(btn){
+ const pre=btn.parentElement.querySelector('pre');
+ const text=pre.innerText;
+ navigator.clipboard.writeText(text).then(()=>{
+  const old=btn.innerText;btn.innerText='Đã copy';setTimeout(()=>btn.innerText=old,1300);
+ }).catch(()=>{btn.innerText='Copy thủ công';});
+}
+</script>
+</body></html>
