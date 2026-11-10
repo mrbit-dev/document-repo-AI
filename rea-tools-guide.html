@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cẩm Nang Toàn Tập REA: Reverse Engineer Anything Cho AI Coding Agents | rea.tools</title>
+  <meta name="description"
+    content="Hướng dẫn toàn diện về REA (Reverse Engineer Anything - morluto/rea): Khái niệm, lợi ích, cơ chế Decompile-Understand-Recreate, cài đặt với Claude Code, Cursor, Codex và cách sử dụng thực chiến.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #070b14;
+      --bg-card: #0d1424;
+      --bg-card-hover: #131d33;
+      --bg-code: #050811;
+      --border: #1b263b;
+      --border-accent: rgba(6, 182, 212, 0.35);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary: #06b6d4;
+      /* Neon Cyan */
+      --primary-hover: #67e8f9;
+      --primary-glow: rgba(6, 182, 212, 0.2);
+      --secondary: #6366f1;
+      /* Electric Indigo */
+      --secondary-glow: rgba(99, 102, 241, 0.2);
+      --accent: #ec4899;
+      /* Cyber Pink */
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', Consolas, Monaco, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.65;
+      font-size: 15px;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 10% 8%, rgba(6, 182, 212, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 90% 25%, rgba(99, 102, 241, 0.1) 0%, transparent 45%),
+        radial-gradient(circle at 50% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* TOP NAV */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7, 11, 20, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .nav-logo-icon {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 17px;
+      color: #040810;
+      box-shadow: 0 0 16px var(--primary-glow);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      font-family: inherit;
+    }
+
+    .btn-outline {
+      background: rgba(27, 38, 59, 0.5);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0891b2, #4f46e5);
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(6, 182, 212, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #06b6d4, #4338ca);
+      transform: translateY(-1px);
+    }
+
+    /* LAYOUT */
+    .layout-wrapper {
+      max-width: 1420px;
+      margin: 0 auto;
+      display: flex;
+      gap: 32px;
+      padding: 32px 24px 80px;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 290px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 75px;
+      height: calc(100vh - 100px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+      padding-right: 12px;
+    }
+
+    .sidebar-section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin: 20px 0 8px 12px;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+    }
+
+    .sidebar-menu li a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+
+    .sidebar-menu li a:hover,
+    .sidebar-menu li a.active {
+      color: var(--primary);
+      background: rgba(6, 182, 212, 0.08);
+      border-left: 2px solid var(--primary);
+      padding-left: 10px;
+    }
+
+    /* MAIN CONTENT */
+    .main-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* HERO BANNER */
+    .hero-card {
+      background: linear-gradient(145deg, rgba(13, 20, 36, 0.95) 0%, rgba(9, 14, 26, 0.98) 100%);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 42px;
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .hero-card::after {
+      content: '';
+      position: absolute;
+      top: -40%;
+      right: -15%;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .badge-cyan {
+      background: rgba(6, 182, 212, 0.12);
+      color: var(--primary);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .badge-indigo {
+      background: rgba(99, 102, 241, 0.12);
+      color: var(--secondary);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .badge-pink {
+      background: rgba(236, 72, 153, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(236, 72, 153, 0.3);
+    }
+
+    .badge-green {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .hero-title {
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 16px;
+      color: #fff;
+      background: linear-gradient(90deg, #ffffff 30%, var(--primary) 70%, var(--secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 860px;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 14px 18px;
+    }
+
+    .stat-val {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--primary);
+      font-family: var(--font-mono);
+      margin-bottom: 2px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* SECTIONS */
+    .content-section {
+      margin-bottom: 50px;
+      scroll-margin-top: 90px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--primary);
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: var(--border-accent);
+      box-shadow: 0 4px 22px rgba(0, 0, 0, 0.25);
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* WORKFLOW DIAGRAM */
+    .workflow-container {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin: 20px 0;
+    }
+
+    .workflow-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      position: relative;
+    }
+
+    .workflow-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .workflow-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+    }
+
+    .workflow-step-num {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .step-1 .workflow-step-num {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .step-2 .workflow-step-num {
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--secondary);
+      border: 1px solid var(--secondary);
+    }
+
+    .step-3 .workflow-step-num {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .workflow-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .workflow-desc {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* COMPARISON GRID */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .comp-col {
+      background: var(--bg-card);
+      border-radius: 14px;
+      padding: 24px;
+      border: 1px solid var(--border);
+    }
+
+    .comp-col.bad {
+      border-color: rgba(239, 68, 68, 0.3);
+      background: linear-gradient(180deg, rgba(239, 68, 68, 0.04) 0%, var(--bg-card) 100%);
+    }
+
+    .comp-col.good {
+      border-color: rgba(6, 182, 212, 0.4);
+      background: linear-gradient(180deg, rgba(6, 182, 212, 0.05) 0%, var(--bg-card) 100%);
+    }
+
+    .comp-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comp-col.bad .comp-header {
+      color: var(--danger);
+    }
+
+    .comp-col.good .comp-header {
+      color: var(--primary);
+    }
+
+    .comp-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .comp-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* CODE BOX */
+    .code-box {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin: 16px 0;
+      overflow: hidden;
+    }
+
+    .code-header {
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .btn-copy {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-copy:hover {
+      background: var(--primary);
+      color: #040810;
+      border-color: var(--primary);
+    }
+
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #67e8f9;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: rgba(255, 255, 255, 0.07);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #a5f3fc;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+
+    /* CALLOUTS */
+    .callout {
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .callout-icon {
+      font-size: 20px;
+      line-height: 1;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .callout-info {
+      background: rgba(6, 182, 212, 0.07);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      color: #cffafe;
+    }
+
+    .callout-success {
+      background: rgba(16, 185, 129, 0.07);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #d1fae5;
+    }
+
+    .callout-warn {
+      background: rgba(245, 158, 11, 0.07);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      color: #fef3c7;
+    }
+
+    /* TABS */
+    .tab-container {
+      margin: 16px 0;
+    }
+
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* FEATURE GRID */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-accent);
+    }
+
+    .feature-icon {
+      font-size: 26px;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    .feature-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* TABLE */
+    .table-container {
+      overflow-x: auto;
+      margin: 18px 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      text-align: left;
+    }
+
+    thead {
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      padding: 12px 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* FAQ ACCORDION */
+    details.faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    details.faq-item:hover {
+      border-color: var(--border-accent);
+    }
+
+    details.faq-item summary {
+      padding: 16px 20px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    details.faq-item summary::after {
+      content: '+';
+      font-size: 20px;
+      color: var(--primary);
+      transition: transform 0.2s;
+    }
+
+    details.faq-item[open] summary::after {
+      transform: rotate(45deg);
+    }
+
+    .faq-body {
+      padding: 0 20px 18px;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      margin-top: 4px;
+      padding-top: 12px;
+    }
+
+    /* TOAST */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--success);
+      color: #040810;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13.5px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+      pointer-events: none;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .layout-wrapper {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .workflow-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-card {
+        padding: 24px;
+      }
+
+      .hero-title {
+        font-size: 26px;
+      }
+
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .top-nav {
+        padding: 12px 16px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        color: #000;
+      }
+
+      .top-nav,
+      .sidebar,
+      .btn,
+      .btn-copy,
+      #toast {
+        display: none !important;
+      }
+
+      .layout-wrapper {
+        padding: 0;
+      }
+
+      .hero-card,
+      .card,
+      .comp-col,
+      .workflow-container,
+      .code-box {
+        border-color: #ccc;
+        background: #fff;
+        color: #000;
+        box-shadow: none;
+      }
+
+      .hero-title,
+      .section-title,
+      .card-title {
+        color: #000 !important;
+        -webkit-text-fill-color: initial;
+      }
+
+      pre {
+        color: #111;
+        background: #f4f4f4;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP NAV -->
+  <header class="top-nav">
+    <a href="#" class="nav-brand">
+      <div class="nav-logo-icon">R</div>
+      <div>REA <span style="font-weight: 400; color: var(--text-muted); font-size: 13px;">• Reverse Engineer
+          Anything</span></div>
+    </a>
+    <div class="nav-actions">
+      <a href="https://rea.tools/" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+        🌐 rea.tools
+      </a>
+      <a href="https://github.com/morluto/rea" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+        </svg>
+        GitHub
+      </a>
+      <button class="btn btn-primary" onclick="window.print()">🖨 In / Xuất PDF</button>
+    </div>
+  </header>
+
+  <!-- LAYOUT -->
+  <div class="layout-wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-section-title">MỤC LỤC TÀI LIỆU</div>
+      <ul class="sidebar-menu">
+        <li><a href="#tong-quan" class="active"><span>📌</span> Tổng quan & Khái niệm</a></li>
+        <li><a href="#van-de"><span>⚠️</span> Vấn đề & Khoảng trống</a></li>
+        <li><a href="#triet-ly"><span>🔄</span> Triết lý: 3 Giai Đoạn</a></li>
+        <li><a href="#loi-ich"><span>💎</span> Lợi ích cốt lõi</a></li>
+        <li><a href="#doi-tuong"><span>🎯</span> Định dạng mục tiêu hỗ trợ</a></li>
+        <li><a href="#cai-dat"><span>🚀</span> Hướng dẫn cài đặt</a></li>
+        <li><a href="#tich-hop-agent"><span>🤖</span> Tích hợp Claude Code, Cursor</a></li>
+        <li><a href="#cli-tools"><span>💻</span> Lệnh CLI & MCP Tools</a></li>
+        <li><a href="#kich-ban"><span>💡</span> Kịch bản thực chiến</a></li>
+        <li><a href="#bao-mat"><span>🛡</span> Bảo mật & Local Execution</a></li>
+        <li><a href="#faqs"><span>❓</span> Câu hỏi & Khắc phục lỗi</a></li>
+      </ul>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- HERO BANNER -->
+      <div class="hero-card" id="tong-quan">
+        <div class="hero-badges">
+          <span class="badge badge-cyan">🔬 Reverse Engineer Anything</span>
+          <span class="badge badge-indigo">⚡ Model Context Protocol (MCP)</span>
+          <span class="badge badge-green">🤖 Built for AI Coding Agents</span>
+          <span class="badge badge-pink">🔒 100% Local & Private</span>
+        </div>
+        <h1 class="hero-title">REA: Trao Quyền "Dịch Ngược Phần Mềm" Cho AI Coding Agent</h1>
+        <p class="hero-desc">
+          <strong>REA</strong> (viết tắt của <em>Reverse Engineer Anything</em> — tác giả <em>Moe Lueker / morluto</em>,
+          trang chủ <strong>rea.tools</strong>) là bộ công cụ mã nguồn mở và máy chủ <strong>Model Context Protocol
+            (MCP)</strong> đột phá. Nó đóng vai trò cầu nối trung gian giữa các phần mềm dịch ngược chuyên sâu (Ghidra,
+          Hopper, IDA, JADX, AST parsers) và các AI coding agents (Claude Code, Cursor, Codex, Windsurf, Gemini CLI),
+          cho phép AI mổ xẻ, hiểu và tái tạo mã nguồn từ ứng dụng đóng mà <strong>không cần có source code ban
+            đầu</strong>.
+        </p>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <div class="stat-val">Zero Code Needed</div>
+            <div class="stat-label">Dịch ngược trực tiếp từ binary & app</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val">3 Bước Chuẩn</div>
+            <div class="stat-label">Decompile ➔ Understand ➔ Recreate</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val">Native MCP</div>
+            <div class="stat-label">Tương thích 1-click mọi Agent hàng đầu</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val">Zero Hallucination</div>
+            <div class="stat-label">Cung cấp bằng chứng kỹ thuật xác thực</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHẦN 1: VẤN ĐỀ -->
+      <section class="content-section" id="van-de">
+        <div class="section-header">
+          <div class="section-icon">⚠️</div>
+          <h2 class="section-title">1. Vấn Đề Lớn: Rào Cản Dịch Ngược Cổ Điển & Hạn Chế Của LLM</h2>
+        </div>
+        <div class="card">
+          <p style="margin-bottom: 16px;">
+            Khi bạn cần tìm hiểu một ứng dụng Electron, một file binary <code>.exe</code>, một thư viện
+            <code>.dll</code>, hay một API bí mật của website đối thủ... bạn thường đối mặt với hai bức tường lớn:
+          </p>
+
+          <div class="comparison-grid">
+            <div class="comp-col bad">
+              <div class="comp-header">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Khi Tự Làm Thủ Công Hoặc Dùng LLM Thuần Túy
+              </div>
+              <ul class="comp-list">
+                <li>❌ <strong>Đòi hỏi chuyên môn siêu khó:</strong> Bạn phải học assembly x86/ARM, nắm vững Ghidra, IDA
+                  Pro, r2, mổ xẻ hex dump mất hàng tuần trời.</li>
+                <li>❌ <strong>LLM bị "ảo giác" (Hallucination):</strong> Khi ném file mã máy hoặc minified code vào
+                  ChatGPT/Claude, mô hình tự bịa ra logic dựa trên phỏng đoán thiếu căn cứ.</li>
+                <li>❌ <strong>Tràn Context Window:</strong> Các file binary đã decompile hay assembly dump chứa hàng
+                  triệu dòng dữ liệu thô, làm tê liệt cửa sổ ngữ cảnh của AI.</li>
+                <li>❌ <strong>Nguy cơ bảo mật:</strong> Upload file thực thi nội bộ hoặc mã nhạy cảm lên các dịch vụ đám
+                  mây công cộng.</li>
+              </ul>
+            </div>
+            <div class="comp-col good">
+              <div class="comp-header">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Khi Sử Dụng REA + AI Coding Agent
+              </div>
+              <ul class="comp-list">
+                <li>✅ <strong>Agent tự động điều khiển công cụ dịch ngược:</strong> AI tự gọi REA để quét static AST,
+                  decompile hàm mục tiêu, trích xuất chuỗi và xrefs.</li>
+                <li>✅ <strong>Dựa trên bằng chứng xác thực (Evidence-based):</strong> REA trả về các chứng cứ kỹ thuật
+                  cụ thể (call graphs, strings, IPC channels) nên AI không bao giờ bịa đặt.</li>
+                <li>✅ <strong>Tối ưu hóa token (Compact Profiles):</strong> Cơ chế schema rút gọn chỉ nạp dữ liệu liên
+                  quan đến hàm cần phân tích, bảo tồn context window.</li>
+                <li>✅ <strong>100% Cục bộ (Local Sandbox):</strong> Toàn bộ quá trình giải mã chạy hoàn toàn trên máy
+                  tính cá nhân của bạn.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHẦN 2: TRIẾT LÝ 3 BƯỚC -->
+      <section class="content-section" id="triet-ly">
+        <div class="section-header">
+          <div class="section-icon">🔄</div>
+          <h2 class="section-title">2. Triết Lý Cốt Lõi: Mô Hình Tư Duy 3 Giai Đoạn</h2>
+        </div>
+        <div class="card">
+          <p style="margin-bottom: 20px;">
+            REA được xây dựng dựa trên chu trình làm việc 3 bước khép kín giúp biến phần mềm đã đóng gói thành code hiện
+            đại:
+          </p>
+
+          <div class="workflow-container">
+            <div class="workflow-grid">
+
+              <!-- STEP 1 -->
+              <div class="workflow-card step-1">
+                <div class="workflow-step-num">1</div>
+                <h3 class="workflow-title">Decompile (Giải Mã)</h3>
+                <p class="workflow-desc">
+                  Mở các file ứng dụng mục tiêu (binary C/C++, gói Electron <code>.asar</code>, file <code>.apk</code>
+                  Android, assembly <code>.dll</code> hoặc frontend web) để trích xuất cấu trúc thư mục, bảng symbol,
+                  chuỗi text, các hàm và IPC channels khả đọc.
+                </p>
+              </div>
+
+              <!-- STEP 2 -->
+              <div class="workflow-card step-2">
+                <div class="workflow-step-num">2</div>
+                <h3 class="workflow-title">Understand (Thấu Hiểu)</h3>
+                <p class="workflow-desc">
+                  Agent sử dụng REA MCP để lần theo dấu vết (Trace) đường đi của dữ liệu: <em>"Hàm này nhận đầu vào từ
+                    đâu? Mã hóa bằng thuật toán gì? Gọi qua endpoint nào?"</em>. Mọi kết luận đều đi kèm bằng chứng mã
+                  nguồn rõ ràng.
+                </p>
+              </div>
+
+              <!-- STEP 3 -->
+              <div class="workflow-card step-3">
+                <div class="workflow-step-num">3</div>
+                <h3 class="workflow-title">Recreate (Tái Tạo)</h3>
+                <p class="workflow-desc">
+                  Sau khi đã hiểu rõ logic thực thi, AI Coding Agent chuyển thể chính xác thuật toán đó sang ngôn ngữ và
+                  kiến trúc hiện tại của dự án bạn (ví dụ: viết lại thuật toán mã hóa C++ thành TypeScript cho NestJS).
+                </p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHẦN 3: LỢI ÍCH -->
+      <section class="content-section" id="loi-ich">
+        <div class="section-header">
+          <div class="section-icon">💎</div>
+          <h2 class="section-title">3. Lợi Ích Cốt Lõi Của REA Cho Lập Trình Viên</h2>
+        </div>
+        <div class="grid-3">
+          <div class="feature-card">
+            <div class="feature-icon">🚀</div>
+            <h3 class="feature-title">Xóa Bỏ Rào Cản Kỹ Thuật</h3>
+            <p class="feature-desc">Không cần phải là chuyên gia an ninh mạng hay thạo Assembly, bất kỳ lập trình viên
+              nào cũng có thể "khám nghiệm" phần mềm thông qua ngôn ngữ tự nhiên.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔌</div>
+            <h3 class="feature-title">Chuẩn Giao Thức MCP</h3>
+            <p class="feature-desc">Tích hợp mượt mà vào Claude Code, Cursor, Codex, Windsurf, Gemini CLI... Tự động
+              thêm prompt workflow và tool schemas chỉ với 1 lệnh setup.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3 class="feature-title">Hỗ Trợ Đa Mục Tiêu Phong Phú</h3>
+            <p class="feature-desc">Xử lý từ ứng dụng Desktop Electron, native binaries (Mach-O, ELF, PE), file thư viện
+              .NET, file nén APK Android đến Web SPA và WebAssembly.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🧩</div>
+            <h3 class="feature-title">Tương Thích Mọi Disassembler</h3>
+            <p class="feature-desc">Tận dụng sức mạnh sẵn có của các engine dịch ngược nổi tiếng như Ghidra (NSA),
+              Hopper, IDA Pro hoặc chạy parser AST tĩnh hoàn toàn tự động.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🛡</div>
+            <h3 class="feature-title">Quyền Riêng Tư Tuyệt Đối</h3>
+            <p class="feature-desc">Tất cả quá trình bóc tách mã nguồn thực hiện 100% cục bộ trên máy trạm của bạn.
+              Không có file binary nhạy cảm nào bị gửi lên cloud.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⏱</div>
+            <h3 class="feature-title">Rút Ngắn Thời Gian Nghiên Cứu</h3>
+            <p class="feature-desc">Rút ngắn quy trình tìm kiếm API ngầm, kiểm thử tương thích (interoperability), phân
+              tích giao thức mạng từ nhiều tuần xuống chỉ còn vài phút.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHẦN 4: ĐỐI TƯỢNG HỖ TRỢ -->
+      <section class="content-section" id="doi-tuong">
+        <div class="section-header">
+          <div class="section-icon">🎯</div>
+          <h2 class="section-title">4. Các Mục Tiêu & Định Dạng REA Hỗ Trợ Phân Tích</h2>
+        </div>
+        <div class="card">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Định dạng / Mục tiêu</th>
+                  <th>Công nghệ nền tảng</th>
+                  <th>Khả năng phân tích của REA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>JavaScript & Electron Apps</strong></td>
+                  <td>Gói <code>.asar</code>, Webpack / Vite bundles, Minified JS</td>
+                  <td>Giải nén tự động, phân tích AST tĩnh, bóc tách API ngầm, IPC channels, trích xuất cấu trúc source
+                    maps.</td>
+                </tr>
+                <tr>
+                  <td><strong>Native Binaries</strong></td>
+                  <td>C/C++, Rust, Go, Swift (PE .exe, ELF, Mach-O)</td>
+                  <td>Kết nối với <strong>Ghidra, Hopper, IDA Pro</strong> để lấy symbol tables, pseudocode, danh sách
+                    x-refs, hàm xuất khẩu.</td>
+                </tr>
+                <tr>
+                  <td><strong>.NET Assemblies</strong></td>
+                  <td>C#, VB.NET, F# (<code>.dll</code>, <code>.exe</code> managed)</td>
+                  <td>Dịch ngược mã trung gian IL, bóc tách cấu trúc metadata, class, method, thuộc tính tương tự
+                    ILSpy/dnSpy.</td>
+                </tr>
+                <tr>
+                  <td><strong>Mobile Apps (Android)</strong></td>
+                  <td>File <code>.apk</code>, <code>.aab</code>, DEX, Resources</td>
+                  <td>Trích xuất manifest, assets, kết nối JADX để dịch ngược bytecode Java/Kotlin sang mã nguồn dễ đọc.
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Websites & Web Apps</strong></td>
+                  <td>Frontend SPAs, WebSocket, XHR APIs</td>
+                  <td>Truy vết thuật toán tạo chữ ký bảo vệ (HMAC, signature headers), giải mã state machines và
+                    endpoints nội bộ.</td>
+                </tr>
+                <tr>
+                  <td><strong>Firmware & WebAssembly</strong></td>
+                  <td>WASM Bytecode, SQLite databases, IoT images</td>
+                  <td>Phân tích cấu trúc bảng dữ liệu, hàm export/import WASM, mổ xẻ cấu trúc phân vùng binary.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHẦN 5: CÀI ĐẶT -->
+      <section class="content-section" id="cai-dat">
+        <div class="section-header">
+          <div class="section-icon">🚀</div>
+          <h2 class="section-title">5. Hướng Dẫn Cài Đặt Chi Tiết</h2>
+        </div>
+        <div class="card">
+          <p style="margin-bottom: 14px;"><strong>Yêu cầu hệ điều hành & môi trường:</strong></p>
+          <ul style="margin-left: 20px; color: var(--text-muted); margin-bottom: 18px;">
+            <li>Đã cài đặt <strong>Node.js phiên bản 20+ hoặc 22+</strong>: Kiểm tra bằng <code>node -v</code>.</li>
+            <li>Hỗ trợ hoàn hảo: <strong>macOS, Linux, Windows</strong>.</li>
+            <li>Đã có sẵn ít nhất một AI Coding Agent (Claude Code, Cursor, Codex, Windsurf, v.v.).</li>
+          </ul>
+
+          <div class="tab-container">
+            <div class="tab-nav">
+              <button class="tab-btn active" onclick="switchTab(event, 'tab-install-wizard')">Cách 1: Wizard Tự Động
+                (Khuyên Dùng)</button>
+              <button class="tab-btn" onclick="switchTab(event, 'tab-install-global')">Cách 2: Cài Đặt Toàn Cục (CLI
+                Global)</button>
+              <button class="tab-btn" onclick="switchTab(event, 'tab-install-doctor')">Kiểm Tra: Lệnh Doctor</button>
+            </div>
+
+            <!-- TAB 1: WIZARD -->
+            <div class="tab-pane active" id="tab-install-wizard">
+              <p style="margin-bottom: 12px;">
+                Đây là phương thức nhanh và chính xác nhất. REA sẽ quét toàn bộ các AI Agent đang có trên máy bạn, hỏi
+                bạn muốn tích hợp vào đâu và tự động cấu hình file setting:
+              </p>
+              <div class="code-box">
+                <div class="code-header">
+                  <span>Terminal (bash / zsh / powershell)</span>
+                  <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code>npx rea-agents@latest setup</code></pre>
+              </div>
+              <div class="callout callout-info">
+                <div class="callout-icon">💡</div>
+                <div>
+                  <strong>Điều gì sẽ xảy ra?</strong> Wizard tương tác sẽ nhận diện Claude Code, Cursor, Windsurf... tạo
+                  bản sao lưu (backup) cấu hình cũ của bạn, sau đó chèn cấu hình máy chủ MCP <code>rea</code> cùng các
+                  chỉ dẫn quy trình (rules/skills) tương ứng.
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 2: GLOBAL -->
+            <div class="tab-pane" id="tab-install-global">
+              <p style="margin-bottom: 12px;">
+                Cài đặt gói <code>rea-agents</code> dưới dạng công cụ dòng lệnh toàn cục để có thể gọi trực tiếp lệnh
+                <code>rea</code> từ bất kỳ thư mục nào:
+              </p>
+              <div class="code-box">
+                <div class="code-header">
+                  <span>Terminal</span>
+                  <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code>npm install --global rea-agents</code></pre>
+              </div>
+              <p style="margin-top: 10px; font-size: 13.5px; color: var(--text-muted);">
+                Sau khi cài, bạn có thể chạy <code>rea --help</code> để xem toàn bộ danh mục tính năng.
+              </p>
+            </div>
+
+            <!-- TAB 3: DOCTOR -->
+            <div class="tab-pane" id="tab-install-doctor">
+              <p style="margin-bottom: 12px;">
+                Chạy chẩn đoán môi trường để kiểm tra xem hệ thống đã có các công cụ dịch ngược (Ghidra, Hopper, JADX)
+                hoặc thiếu dependencies nào không:
+              </p>
+              <div class="code-box">
+                <div class="code-header">
+                  <span>Chạy kiểm tra môi trường</span>
+                  <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code>npx rea-agents doctor</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHẦN 6: TÍCH HỢP VỚI CÁC AGENT -->
+      <section class="content-section" id="tich-hop-agent">
+        <div class="section-header">
+          <div class="section-icon">🤖</div>
+          <h2 class="section-title">6. Cấu Hình Chi Tiết Cho Từng AI Coding Agent</h2>
+        </div>
+        <div class="card">
+          <div class="tab-container">
+            <div class="tab-nav">
+              <button class="tab-btn active" onclick="switchTab(event, 'tab-agent-claude')">Claude Code</button>
+              <button class="tab-btn" onclick="switchTab(event, 'tab-agent-cursor')">Cursor IDE</button>
+              <button class="tab-btn" onclick="switchTab(event, 'tab-agent-codex')">Codex / Generic MCP</button>
+            </div>
+
+            <!-- CLAUDE CODE -->
+            <div class="tab-pane active" id="tab-agent-claude">
+              <p style="margin-bottom: 12px;">
+                Với <strong>Claude Code</strong>, sau khi chạy <code>npx rea-agents@latest setup</code>, REA sẽ tự động
+                thêm cấu hình máy chủ MCP vào <code>~/.claude.json</code> hoặc file cấu hình MCP của bạn:
+              </p>
+              <div class="code-box">
+                <div class="code-header">
+                  <span>Mẫu cấu hình MCP thủ công trong Claude Code settings</span>
+                  <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code>{
+  "mcpServers": {
+    "rea": {
+      "command": "npx",
+      "args": ["-y", "rea-agents@latest", "mcp"],
+      "env": {
+        "RE_MCP_OUTPUT_SCHEMA_PROFILE": "compact"
+      }
+    }
+  }
+}</code></pre>
+              </div>
+              <div class="callout callout-success">
+                <div class="callout-icon">🎯</div>
+                <div>
+                  <strong>Biến môi trường <code>RE_MCP_OUTPUT_SCHEMA_PROFILE=compact</code>:</strong> Giúp rút gọn định
+                  dạng output schemas, tiết kiệm token tối đa cho Claude Code mà vẫn giữ nguyên tính chính xác của các
+                  công cụ.
+                </div>
+              </div>
+            </div>
+
+            <!-- CURSOR -->
+            <div class="tab-pane" id="tab-agent-cursor">
+              <p style="margin-bottom: 12px;">
+                Trong <strong>Cursor</strong>, vào <code>Settings</code> ➔ <code>Features</code> ➔
+                <code>MCP Servers</code> ➔ Bấm <strong>Add new MCP Server</strong>:
+              </p>
+              <ul style="margin-left: 20px; color: var(--text-muted); line-height: 1.8; margin-bottom: 14px;">
+                <li><strong>Name:</strong> <code>rea</code></li>
+                <li><strong>Type:</strong> <code>command</code></li>
+                <li><strong>Command:</strong> <code>npx -y rea-agents@latest mcp</code></li>
+              </ul>
+              <p style="font-size: 13.5px;">Hoặc thêm trực tiếp vào file <code>.cursor/mcp.json</code> trong dự án của
+                bạn.</p>
+            </div>
+
+            <!-- CODEX / GENERIC -->
+            <div class="tab-pane" id="tab-agent-codex">
+              <p style="margin-bottom: 12px;">
+                Cho bất kỳ Agent nào hỗ trợ chuẩn MCP (như Windsurf, Codex CLI, Antigravity):
+              </p>
+              <div class="code-box">
+                <div class="code-header">
+                  <span>Cấu hình chuẩn MCP JSON</span>
+                  <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+                </div>
+                <pre><code>{
+  "mcpServers": {
+    "rea": {
+      "command": "npx",
+      "args": ["-y", "rea-agents@latest", "mcp"]
+    }
+  }
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHẦN 7: CLI COMMANDS & MCP TOOLS -->
+      <section class="content-section" id="cli-tools">
+        <div class="section-header">
+          <div class="section-icon">💻</div>
+          <h2 class="section-title">7. Bộ Lệnh CLI & Danh Mục MCP Tools Quyền Năng</h2>
+        </div>
+        <div class="card">
+          <h3 class="card-title">1. Các lệnh CLI dùng độc lập ngoài Terminal</h3>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 12px;">
+            Bạn có thể tự chạy các lệnh phân tích trước khi nhờ AI xử lý:
+          </p>
+
+          <div class="code-box">
+            <div class="code-header">
+              <span>Phân tích ứng dụng JavaScript / Electron</span>
+              <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code># Phân tích tĩnh gói app Electron trích xuất
+npx rea-agents analyze-javascript-application /duong/dan/app --json
+
+# Quét và phân tích tổng quan
+rea analyze ./Slack.app
+
+# Tìm kiếm chuỗi ký tự hoặc API bí mật trong app
+rea search ./target-app "api.internal.domain"
+
+# Theo dõi luồng xử lý tính năng
+rea trace ./target-app "auth_token_generator"</code></pre>
+          </div>
+
+          <h3 class="card-title" style="margin-top: 24px;">2. Các Tools mà REA cung cấp cho AI Coding Agent qua MCP</h3>
+          <div class="grid-3">
+            <div class="feature-card">
+              <h4 class="feature-title" style="color: var(--primary);">🛠 <code>analyze_target</code></h4>
+              <p class="feature-desc">Nhận diện định dạng mục tiêu (PE, ELF, Mach-O, ASAR, APK), trích xuất metadata
+                tổng quan, các dependencies và điểm khởi đầu (entry points).</p>
+            </div>
+            <div class="feature-card">
+              <h4 class="feature-title" style="color: var(--secondary);">🔍 <code>search_symbols_and_strings</code></h4>
+              <p class="feature-desc">Tìm kiếm các chuỗi văn bản cứng (hardcoded strings), URLs, API keys ngầm, tên hàm
+                và symbol tables bên trong tệp nhị phân.</p>
+            </div>
+            <div class="feature-card">
+              <h4 class="feature-title" style="color: var(--success);">🧩 <code>decompile_function</code></h4>
+              <p class="feature-desc">Điều khiển decompiler địa phương (Ghidra/Hopper/AST) để chuyển đổi một hàm nhị
+                phân cụ thể sang mã giả C hoặc AST dễ đọc.</p>
+            </div>
+            <div class="feature-card">
+              <h4 class="feature-title" style="color: var(--accent);">🌐 <code>trace_feature_flow</code></h4>
+              <p class="feature-desc">Truy vết đồ thị gọi hàm (call graph) và mối quan hệ chéo (cross-references) liên
+                quan trực tiếp đến một tính năng được yêu cầu.</p>
+            </div>
+            <div class="feature-card">
+              <h4 class="feature-title" style="color: #38bdf8;">⚡ <code>extract_ipc_channels</code></h4>
+              <p class="feature-desc">Đặc trị cho ứng dụng Electron: Quét toàn bộ kênh liên lạc giữa tiến trình Main và
+                Renderer để tìm các hàm ngầm không công khai.</p>
+            </div>
+            <div class="feature-card">
+              <h4 class="feature-title" style="color: #facc15;">📦 <code>extract_assets_and_routes</code></h4>
+              <p class="feature-desc">Trích xuất cấu trúc thư mục, routes API, giao diện và file cấu hình bị đóng gói
+                trong file nhị phân hoặc archive.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHẦN 8: KỊCH BẢN THỰC CHIẾN -->
+      <section class="content-section" id="kich-ban">
+        <div class="section-header">
+          <div class="section-icon">💡</div>
+          <h2 class="section-title">8. Hướng Dẫn Sử Dụng Thực Chiến & Kịch Bản Mẫu</h2>
+        </div>
+        <div class="card">
+          <p style="margin-bottom: 20px;">
+            Khi đã tích hợp REA vào Claude Code hoặc Cursor, bạn chỉ việc trò chuyện tự nhiên. Hãy xem 3 kịch bản thực
+            tế phổ biến nhất:
+          </p>
+
+          <!-- CASE 1 -->
+          <div
+            style="background: rgba(255, 255, 255, 0.02); border-left: 3px solid var(--primary); padding: 18px; border-radius: 0 10px 10px 0; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <strong style="color: var(--primary); font-size: 15px;">Kịch Bản 1: Tìm API Ngầm & Thuật Toán Tạo Header
+                Ký Của Ứng Dụng Electron</strong>
+              <span class="badge badge-cyan">Electron App</span>
+            </div>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 10px;">
+              Bạn muốn tích hợp với một ứng dụng desktop nhưng họ không cung cấp Public API.
+            </p>
+            <div class="code-box">
+              <div class="code-header">
+                <span>Prompt mẫu gửi cho Claude Code / Cursor</span>
+                <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><code>Hãy dùng REA phân tích file `app.asar` của ứng dụng tại đường dẫn `./dist/resources/app.asar`.
+1. Tìm tất cả các endpoint API gửi lên domain `api.example.com`.
+2. Kiểm tra xem header `X-App-Signature` được tạo ra bằng thuật toán nào (tìm HMAC hay secret key nếu có).
+3. Viết lại hàm tạo request đó bằng TypeScript và Axios cho dự án của tôi.</code></pre>
+            </div>
+            <div class="callout callout-success" style="margin-bottom: 0;">
+              <div class="callout-icon">🎯</div>
+              <div>
+                <strong>Hành động của AI:</strong> Agent tự gọi <code>rea.extract_ipc_channels</code> và phân tích AST
+                trong file <code>app.asar</code>, định vị chính xác file bundle chứa logic ký mã, trích xuất chuỗi salt
+                bí mật và viết ngay hàm TypeScript hoàn chỉnh cho bạn!
+              </div>
+            </div>
+          </div>
+
+          <!-- CASE 2 -->
+          <div
+            style="background: rgba(255, 255, 255, 0.02); border-left: 3px solid var(--secondary); padding: 18px; border-radius: 0 10px 10px 0; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <strong style="color: var(--secondary); font-size: 15px;">Kịch Bản 2: Tái Tạo Thuật Toán Nén / Tính Toán
+                Từ Thư Viện C++ Binary (.dll / .so)</strong>
+              <span class="badge badge-indigo">Native Binary</span>
+            </div>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 10px;">
+              Bạn có một file binary cũ từ nhà cung cấp nhưng đã mất mã nguồn gốc.
+            </p>
+            <div class="code-box">
+              <div class="code-header">
+                <span>Prompt mẫu gửi cho AI Agent</span>
+                <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><code>Dùng REA kiểm tra file thư viện `libcalculator.so`.
+1. Tìm hàm xuất khẩu `compute_custom_checksum`.
+2. Dịch ngược mã giả (pseudocode) của thuật toán này.
+3. Giải thích logic thuật toán và chuyển thể mã đó sang ngôn ngữ Python 3.</code></pre>
+            </div>
+          </div>
+
+          <!-- CASE 3 -->
+          <div
+            style="background: rgba(255, 255, 255, 0.02); border-left: 3px solid var(--accent); padding: 18px; border-radius: 0 10px 10px 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <strong style="color: var(--accent); font-size: 15px;">Kịch Bản 3: Kiểm Tra An Toàn Bảo Mật & Phát Hiện Lộ
+                Lọt Secret Trong File APK</strong>
+              <span class="badge badge-pink">Mobile Security</span>
+            </div>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 10px;">
+              Đánh giá xem app di động Android của công ty có vô tình bị lộ API keys quan trọng không.
+            </p>
+            <div class="code-box">
+              <div class="code-header">
+                <span>Prompt mẫu</span>
+                <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><code>Hãy dùng REA quét toàn bộ file `mobile-app.apk`.
+Tìm tất cả các API keys, AWS tokens, chuỗi kết nối database hardcoded và các URL staging/production còn sót lại trong mã nguồn.</code></pre>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- PHẦN 9: BẢO MẬT & LOCAL EXECUTION -->
+      <section class="content-section" id="bao-mat">
+        <div class="section-header">
+          <div class="section-icon">🛡</div>
+          <h2 class="section-title">9. Bảo Mật Dữ Liệu & Quy Tắc Thực Thi Cục Bộ</h2>
+        </div>
+        <div class="card">
+          <p style="margin-bottom: 16px;">
+            Khi thực hiện reverse engineering, việc bảo vệ tài sản trí tuệ và ngăn chặn mã độc hại là vô cùng quan
+            trọng:
+          </p>
+
+          <div class="grid-3">
+            <div class="feature-card">
+              <div class="feature-icon">🔒</div>
+              <h3 class="feature-title">100% Phân Tích Cục Bộ</h3>
+              <p class="feature-desc">Mọi tác vụ bóc tách, giải nén và phân tích mã đều chạy trong môi trường máy cá
+                nhân của bạn, không gửi file binary thô lên server trung gian.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">⚙️</div>
+              <h3 class="feature-title">Phân Tích Tĩnh An Toàn</h3>
+              <p class="feature-desc">REA ưu tiên phân tích tĩnh (Static Analysis) thay vì thực thi trực tiếp, giảm
+                thiểu rủi ro kích hoạt mã độc từ các phần mềm lạ chưa được kiểm chứng.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">📜</div>
+              <h3 class="feature-title">Tuân Thủ Giấy Phép & Đạo Đức</h3>
+              <p class="feature-desc">REA được phân phối theo giấy phép mã nguồn mở MIT, phục vụ mục đích kiểm thử bảo
+                mật, nghiên cứu khả năng tương thích và khôi phục dữ liệu hợp pháp.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHẦN 10: FAQS & KHẮC PHỤC SỰ CỐ -->
+      <section class="content-section" id="faqs">
+        <div class="section-header">
+          <div class="section-icon">❓</div>
+          <h2 class="section-title">10. Câu Hỏi Thường Gặp & Xử Lý Sự Cố (FAQs)</h2>
+        </div>
+
+        <details class="faq-item">
+          <summary>Tôi có bắt buộc phải cài đặt Ghidra hoặc IDA Pro không?</summary>
+          <div class="faq-body">
+            <strong>Không bắt buộc!</strong> Đối với các ứng dụng <strong>JavaScript, Electron, .NET Assemblies, Web và
+              cấu trúc file</strong>, REA có các parser tích hợp sẵn hoạt động hoàn toàn độc lập mà không cần bất kỳ
+            công cụ ngoài nào. Bạn chỉ cần cài Ghidra hoặc Hopper khi muốn dịch ngược các file nhị phân C/C++/Rust
+            compiled sang mã giả cấp cao.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>Làm sao để biết REA đã kết nối thành công với Claude Code hay Cursor?</summary>
+          <div class="faq-body">
+            Trong Claude Code, bạn có thể gõ <code>/tools</code> hoặc hỏi: <em>"Bạn có những công cụ nào của REA?"</em>.
+            Nếu thấy danh sách các tool như <code>analyze_target</code>, <code>decompile_function</code> xuất hiện là
+            kết nối đã thành công mỹ mãn!
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>Lỗi "Node version not supported" khi chạy lệnh setup?</summary>
+          <div class="faq-body">
+            REA yêu cầu Node.js phiên bản hiện đại (tối thiểu Node 20 LTS hoặc khuyên dùng Node 22/24). Hãy nâng cấp
+            Node.js thông qua nvm (<code>nvm install 22 && nvm use 22</code>) hoặc tải bản mới nhất từ trang chủ
+            nodejs.org.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>Làm cách nào để cập nhật REA lên phiên bản mới nhất?</summary>
+          <div class="faq-body">
+            Nếu dùng qua NPX, bạn chỉ cần gọi <code>npx rea-agents@latest setup</code>. Nếu đã cài global, chạy lệnh:
+            <code>rea update</code> hoặc <code>npm update -g rea-agents</code>.
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary>REA khác gì so với việc copy code vào ChatGPT?</summary>
+          <div class="faq-body">
+            File binary hoặc minified bundle không thể copy-paste trực tiếp vào chat do kích thước khổng lồ và mã nhị
+            phân không đọc được. REA đóng vai trò như "đôi mắt và đôi tay" của AI: mở ứng dụng, tìm kiếm đúng vị trí
+            trọng yếu, trích xuất bằng chứng kỹ thuật và chỉ chuyển phần logic cốt lõi vào context của LLM.
+          </div>
+        </details>
+      </section>
+
+      <!-- FOOTER -->
+      <footer
+        style="margin-top: 60px; padding: 24px 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-muted); flex-wrap: wrap; gap: 12px;">
+        <div>
+          Cẩm nang chuyên sâu về <strong>REA (Reverse Engineer Anything)</strong> • Dự án <a
+            href="https://github.com/morluto/rea" target="_blank"
+            style="color: var(--primary); text-decoration: none;">morluto/rea</a> & <a href="https://rea.tools"
+            target="_blank" style="color: var(--secondary); text-decoration: none;">rea.tools</a>
+        </div>
+        <div>
+          Cập nhật: Tháng 11/2026
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast">Đã sao chép vào clipboard!</div>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    // Copy code function
+    function copyCode(btn) {
+      const codeBlock = btn.closest('.code-box').querySelector('pre code') || btn.closest('.code-box').querySelector('pre');
+      const text = codeBlock.innerText;
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("Đã sao chép mã lệnh!");
+        const originalText = btn.innerText;
+        btn.innerText = "✓ Copied";
+        btn.style.color = "var(--success)";
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.style.color = "";
+        }, 2000);
+      }).catch(err => {
+        console.error("Lỗi sao chép: ", err);
+      });
+    }
+
+    // Toast
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.innerText = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2200);
+    }
+
+    // Tab switcher
+    function switchTab(evt, tabId) {
+      const container = evt.currentTarget.closest('.tab-container');
+      const tabBtns = container.querySelectorAll('.tab-btn');
+      const tabPanes = container.querySelectorAll('.tab-pane');
+
+      tabBtns.forEach(btn => btn.classList.remove('active'));
+      tabPanes.forEach(pane => pane.classList.remove('active'));
+
+      evt.currentTarget.classList.add('active');
+      const targetPane = document.getElementById(tabId);
+      if (targetPane) {
+        targetPane.classList.add('active');
+      }
+    }
+
+    // Scroll spy for sidebar
+    window.addEventListener('scroll', () => {
+      const sections = document.querySelectorAll('.content-section, .hero-card');
+      const navLinks = document.querySelectorAll('.sidebar-menu li a');
+
+      let currentSectionId = '';
+      sections.forEach(sec => {
+        const top = sec.offsetTop - 120;
+        if (window.scrollY >= top) {
+          currentSectionId = sec.getAttribute('id');
+        }
+      });
+
+      if (currentSectionId) {
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === '#' + currentSectionId) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>
