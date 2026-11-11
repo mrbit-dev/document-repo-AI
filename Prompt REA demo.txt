@@ -1,0 +1,237 @@
+# TASK: REVERSE ENGINEER AND REBUILD PEACHWEB.IO USING REA (dùng REA phân tích và xây dựng lại website)
+
+**Reference website:** https://peachweb.io/
+
+You are an autonomous senior frontend engineer and reverse-engineering specialist.
+
+Your mission is to use the installed **REA (Reverse Engineer Anything)** tools through MCP in DeepSeek Harness to deeply inspect, reverse engineer, and recreate the reference website as faithfully as technically possible.
+
+This is not a redesign project. Do not create a generic website inspired by the reference. Rebuild the actual website, preserving its visual identity, structure, content, images, animations, interactions, and responsive behavior.
+
+## 1. INVESTIGATE THE REFERENCE WEBSITE
+
+Start by checking the available REA MCP tools and their descriptions. Use the actual available REA capabilities instead of inventing commands.
+
+Open https://peachweb.io/ in a browser and investigate the entire website.
+
+Do not stop at the homepage's initial viewport.
+
+Explore the complete page from top to bottom, including:
+
+- Header and navigation.
+- Hero section.
+- Every content section.
+- Image galleries.
+- Product showcases.
+- 3D visual experiences.
+- CTA sections.
+- Footer.
+- Navigation menus and dropdowns.
+- All interactive elements.
+
+Use REA to inspect website structure, DOM, JavaScript, CSS, network resources, scripts, images, videos, fonts, and other accessible assets.
+
+Use browser automation and Chrome DevTools alongside REA when necessary.
+
+## 2. REVERSE ENGINEER ALL VISUAL DETAILS
+
+Inspect and record:
+
+- Exact section order and approximate dimensions.
+- Container widths and maximum widths.
+- Margins, padding, gaps, and alignment.
+- Font families, weights, sizes, and line heights.
+- Colors, gradients, borders, and shadows.
+- Image dimensions, crops, and positions.
+- Background images and visual compositions.
+- Button styles and hover states.
+- Sticky, fixed, and overlapping elements.
+
+Capture reference screenshots at multiple scroll positions.
+
+Inspect at desktop resolutions of 1920x1080, 1440x900, and 1366x768, plus mobile at 390x844 and 375x812.
+
+Download and reuse accessible original assets when permitted. Preserve their original aspect ratios and visual quality.
+
+Do not substitute original imagery with random stock images or generic placeholders.
+
+## 3. REVERSE ENGINEER ANIMATIONS — HIGHEST PRIORITY
+
+This is the most important part of the task.
+
+Observe the website while scrolling slowly and identify every animation.
+
+Pay particular attention to:
+
+- Scroll-triggered animations.
+- Scroll-linked animations.
+- GSAP and ScrollTrigger behavior, if present.
+- Parallax movement.
+- Pinned sections.
+- Horizontal scrolling.
+- Text reveal animations.
+- Image scaling and transitions.
+- Fade-in and fade-out effects.
+- Blur and opacity transitions.
+- Staggered animations.
+- 3D transformations.
+- Camera movement.
+- WebGL and Canvas effects.
+- Mouse-following interactions.
+- Hover animations.
+- Page loading animations.
+- Smooth scrolling.
+- Section-to-section transitions.
+
+For every important animation, determine:
+
+1. What element moves?
+2. What triggers the animation?
+3. What is its initial state?
+4. What is its final state?
+5. How does it behave during scrolling?
+6. Does it reverse when scrolling upward?
+7. Is it synchronized with scroll progress?
+8. Does it use pinning or parallax?
+9. What are its approximate duration and easing?
+
+If the original website uses Three.js, WebGL, GSAP, Lottie, or another animation technology, identify it through evidence and reproduce the behavior using an appropriate implementation.
+
+Do not replace sophisticated animations with simple fade-in effects.
+
+## 4. RECONSTRUCT THE COMPLETE WEBSITE
+
+After investigating the reference, implement the website directly in the existing project.
+
+First inspect the existing codebase and preserve its current architecture wherever practical.
+
+Use suitable technologies based on the evidence collected. For a new React project, consider:
+
+- React.
+- TypeScript.
+- Vite or Next.js.
+- GSAP and ScrollTrigger.
+- Three.js or React Three Fiber.
+- CSS Modules or Tailwind CSS.
+- Playwright for browser testing.
+
+Do not install unnecessary dependencies.
+
+Recreate every section and interaction.
+
+The implementation must reproduce:
+
+- Original page structure.
+- Original content and text.
+- Original visual hierarchy.
+- Original images and videos.
+- Original typography.
+- Original spacing and positioning.
+- Original background compositions.
+- Original animation behavior.
+- Original responsive layouts.
+
+The hero section deserves special attention. Reproduce its visual composition, 3D effects, motion, lighting, and interactions as closely as technically possible.
+
+Use actual original assets whenever accessible and permitted. If an asset cannot be obtained, create the closest feasible alternative and document the limitation.
+
+## 5. CREATE A COMPLETE LOCAL ASSET LIBRARY
+
+Organize the assets in the project:
+
+- public/assets/images/
+- public/assets/videos/
+- public/assets/fonts/
+- public/assets/icons/
+- public/assets/3d/
+
+Create an asset inventory documenting each asset and the section where it is used.
+
+Avoid unnecessary remote hotlinks.
+
+## 6. TEST AGAINST THE ORIGINAL WEBSITE
+
+Run the local website and open it in a browser.
+
+Use REA and Playwright where available to inspect and compare the local implementation against the reference.
+
+Compare screenshots at identical viewport dimensions and corresponding scroll positions.
+
+Check:
+
+- Hero layout.
+- Section dimensions.
+- Image positioning.
+- Typography.
+- Colors.
+- Spacing.
+- Scroll animations.
+- Parallax.
+- Pinned sections.
+- 3D effects.
+- Hover interactions.
+- Navigation.
+- Mobile behavior.
+
+Capture screenshots and use image overlays or pixel-difference comparisons where possible.
+
+Identify visual discrepancies and fix them directly in the source code.
+
+Repeat the process until the major differences are minimized.
+
+Do not claim visual accuracy without browser verification.
+
+## 7. EXECUTION REQUIREMENTS
+
+Work autonomously from investigation through implementation and testing.
+
+Do not stop after writing a plan.
+
+Do not ask unnecessary questions.
+
+Do not skip sections.
+
+Do not invent website features.
+
+Do not simplify complex animations.
+
+Do not use generic website templates.
+
+Do not overwrite unrelated project files.
+
+If REA cannot perform a particular operation, use the best available browser or analysis alternative and document the limitation.
+
+If the website contains inaccessible assets or server-side behavior, reproduce the observable result as closely as possible without claiming access to its private source code.
+
+## 8. FINAL DELIVERABLES
+
+Complete the actual working website in the existing project directory.
+
+Provide:
+
+- Complete source code.
+- All downloaded and recreated assets.
+- Fully implemented animations.
+- Responsive desktop and mobile layouts.
+- Documentation of the reverse-engineering findings.
+- Asset inventory.
+- Animation specifications.
+- Screenshots comparing the original and recreated website.
+- A list of any remaining differences.
+- Instructions for running and building the project.
+
+## FINAL OBJECTIVE
+
+Recreate https://peachweb.io/ with maximum possible visual and behavioral fidelity.
+
+The most important requirements are:
+
+1. The website must look like the original.
+2. Images and visual compositions must closely match.
+3. Layout and typography must closely match.
+4. Scroll animations must reproduce the original behavior.
+5. 3D and WebGL experiences must be recreated where applicable.
+6. All sections and interactions must work.
+7. Desktop and mobile experiences must be tested.
+
+**Start now. Inspect the available REA MCP tools, investigate PeachWeb completely, then implement, run, compare, and refine the website. Do not stop at analysis or planning.**
