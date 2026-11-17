@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenMausBot — Hướng dẫn toàn diện</title>
+<style>
+:root{--bg:#0b1020;--panel:#121a2d;--panel2:#18233b;--text:#e8edf8;--muted:#9ba9c2;--line:#293653;--cyan:#56d8e8;--violet:#a78bfa;--green:#69d6a4;--amber:#f5c56b;--red:#ff8585;--max:1180px}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:86px}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#172647 0,transparent 35%),var(--bg);color:var(--text);font:16px/1.72 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}.wrap{max-width:var(--max);margin:auto;padding:0 24px}
+header{padding:70px 0 42px;border-bottom:1px solid var(--line)}.eyebrow{color:var(--cyan);font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:12px}
+h1{font-size:clamp(38px,6vw,66px);line-height:1.04;letter-spacing:-.045em;margin:16px 0}.lead{font-size:19px;color:#c2cee2;max-width:820px}
+.pills{display:flex;gap:9px;flex-wrap:wrap;margin:22px 0}.pill{border:1px solid #35516c;background:#14253a;color:#bcecf0;padding:5px 11px;border-radius:99px;font-size:12px;font-weight:750}
+.hero-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;margin-top:30px}.hero-card,.card{background:linear-gradient(145deg,#17233b,#11192a);border:1px solid var(--line);border-radius:18px;padding:22px}.hero-card h3,.card h3{margin:0 0 8px}.hero-card p,.card p{color:var(--muted);margin:0}
+main{display:grid;grid-template-columns:250px minmax(0,1fr);gap:38px;padding-top:35px}.toc{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow:auto;padding:18px;background:#10182a;border:1px solid var(--line);border-radius:15px}.toc b{display:block;margin-bottom:10px;color:var(--cyan)}.toc a{display:block;padding:5px 0;color:#b5c2d8;font-size:13px}
+article{min-width:0}section{margin:0 0 52px}h2{font-size:29px;line-height:1.2;letter-spacing:-.025em;margin:0 0 17px}h3{font-size:19px;margin:26px 0 9px}p{margin:10px 0}li{margin:6px 0}.muted{color:var(--muted)}.note,.warn,.good{padding:15px 17px;border-radius:12px;margin:16px 0;border:1px solid}.note{background:#11273a;border-color:#23516b}.warn{background:#302516;border-color:#705326}.good{background:#102b25;border-color:#23664f}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.grid .card{padding:17px}.tag{font-size:11px;color:var(--cyan);font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+table{width:100%;border-collapse:collapse;margin:15px 0;font-size:14px}th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:#b8c8e2;background:#17233a}
+pre{position:relative;overflow:auto;background:#080d18;border:1px solid #26334d;border-radius:12px;padding:17px;color:#d8e7ff;font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#aee9ef}.copy{position:absolute;right:9px;top:9px;border:1px solid #3b4b69;background:#1b2941;color:#dce8ff;border-radius:7px;padding:5px 9px;cursor:pointer;font-size:11px}
+.step{display:grid;grid-template-columns:38px 1fr;gap:13px;margin:17px 0}.num{width:34px;height:34px;border-radius:10px;background:#17364a;color:var(--cyan);display:grid;place-items:center;font-weight:900}
+.kpi{font-size:27px;font-weight:850;color:var(--cyan);line-height:1.1}.small{font-size:13px;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:30px 0 55px;color:var(--muted);font-size:13px}
+@media(max-width:850px){main{grid-template-columns:1fr}.toc{position:relative;top:0;max-height:none;display:grid;grid-template-columns:repeat(2,1fr)}.toc b{grid-column:1/-1}.hero-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.wrap{padding:0 16px}.grid{grid-template-columns:1fr}.toc{grid-template-columns:1fr}header{padding-top:48px}h2{font-size:25px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<div class="eyebrow">AI AGENT FIELD GUIDE · CẬP NHẬT 17/11/2026</div>
+<h1>OpenMausBot<br><span style="color:var(--cyan)">AI Agent Team</span></h1>
+<p class="lead">Tài liệu tiếng Việt: OpenMausBot là gì, hoạt động ra sao, làm được gì, cách cài trên Windows / Ubuntu / VPS, kết nối Claude Code–Codex–Grok, truy cập từ xa và các lưu ý bảo mật.</p>
+<div class="pills"><span class="pill">OPEN SOURCE</span><span class="pill">SELF-HOSTED</span><span class="pill">DESKTOP + SERVER</span><span class="pill">CLAUDE · CODEX · GROK</span><span class="pill">COMPUTER USE</span></div>
+<div class="hero-grid">
+<div class="hero-card"><div class="tag">Hiểu nhanh trong 30 giây</div><h3>Một ứng dụng chat để quản lý cả đội AI Agent</h3><p>Mỗi bot có hồ sơ, model, hội thoại và công cụ riêng. Agent có thể chạy CLI trên máy của anh, dùng máy tính ảo/cloud desktop, gọi ứng dụng đã kết nối và yêu cầu anh duyệt các hành động nhạy cảm.</p></div>
+<div class="hero-card"><div class="kpi">24+</div><h3>Yêu cầu Node.js nếu chạy từ source / CLI</h3><p>Node.js 24 trở lên, pnpm và ít nhất một agent CLI đã cài + đăng nhập. Bản desktop phát hành đã nhúng harness server nên không cần tự dựng server riêng.</p></div>
+</div></div></header>
+<div class="wrap"><main>
+<nav class="toc"><b>MỤC LỤC</b>
+<a href="#overview">1. OpenMausBot là gì?</a><a href="#features">2. Công dụng & tính năng</a><a href="#architecture">3. Kiến trúc hoạt động</a><a href="#requirements">4. Điều kiện cài đặt</a><a href="#windows">5. Cài Windows</a><a href="#source">6. Chạy từ source</a><a href="#ubuntu">7. Ubuntu Desktop</a><a href="#vps">8. VPS / Self-host</a><a href="#agents">9. Kết nối Agent</a><a href="#integrations">10. Tích hợp & chi phí</a><a href="#security">11. Bảo mật</a><a href="#workflow">12. Ví dụ sử dụng</a><a href="#limits">13. Giới hạn hiện tại</a><a href="#faq">14. FAQ & nguồn</a>
+</nav>
+<article>
+<section id="overview"><h2>1. OpenMausBot là gì?</h2>
+<p><b>OpenMausBot</b> (còn gọi là MausBot, trước đây là OpenGrokBot) là dự án mã nguồn mở xây dựng một giao diện kiểu ứng dụng nhắn tin để tổ chức nhiều AI Agent. Dự án lấy cảm hứng từ Grok Bot nhưng là sản phẩm độc lập, không liên kết với xAI, Meta, OpenAI hay Manus.</p>
+<p>Thay vì chỉ có một chatbot, anh tạo nhiều bot như “Developer”, “Researcher”, “Marketing”, “SEO” hoặc “Assistant”. Mỗi bot có thể dùng model, chỉ dẫn, kênh làm việc, ứng dụng kết nối và môi trường máy tính khác nhau.</p>
+<div class="note"><b>Điểm quan trọng:</b> OpenMausBot chủ yếu là lớp giao diện + điều phối (orchestration/harness). Nó không tự cung cấp miễn phí Claude/GPT hay thay thế tài khoản model. Anh cần agent CLI hoặc engine tương thích và quyền truy cập model tương ứng.</div>
+<p>Trang dự án: <a href="https://github.com/milind-soni/OpenMausBot" target="_blank">GitHub OpenMausBot</a> · <a href="https://www.mausbot.com/" target="_blank">Website chính thức</a>.</p>
+</section>
+<section id="features"><h2>2. Công dụng và tính năng chính</h2>
+<div class="grid">
+<div class="card"><div class="tag">Multi-agent</div><h3>Nhiều bot chuyên môn</h3><p>Tạo bot theo vai trò, mỗi bot có personality, hướng dẫn, model và lịch sử hội thoại riêng.</p></div>
+<div class="card"><div class="tag">Model routing</div><h3>Chọn model theo bot</h3><p>Chọn Claude / Codex / Grok theo engine được cấu hình; có thể đổi model giữa cuộc trò chuyện.</p></div>
+<div class="card"><div class="tag">Computer use</div><h3>Agent có máy tính để thao tác</h3><p>Dùng cloud Linux desktop, Local VM cô lập hoặc máy host khi nền tảng hỗ trợ. Có thể xem màn hình và tiếp quản desktop.</p></div>
+<div class="card"><div class="tag">Approvals</div><h3>Duyệt hành động trước khi chạy</h3><p>Lệnh shell, chỉnh sửa file và yêu cầu nhạy cảm có thẻ Allow / Deny / trả lời trong chat.</p></div>
+<div class="card"><div class="tag">Integrations</div><h3>Kết nối ứng dụng</h3><p>Composio kết nối Gmail, Slack, GitHub, Notion, Linear và nhiều ứng dụng khác qua OAuth.</p></div>
+<div class="card"><div class="tag">Channels</div><h3>Phân chia ngữ cảnh</h3><p>Tạo kênh Work, Personal, từng dự án; mỗi kênh có transcript, chỉ dẫn, working folder và danh sách bot riêng.</p></div>
+<div class="card"><div class="tag">Automation</div><h3>Lịch chạy và webhook</h3><p>Bot có thể tạo routine theo lịch, webhook hoặc sự kiện từ ứng dụng đã kết nối. Máy phải online để nhận/xử lý các tác vụ local.</p></div>
+<div class="card"><div class="tag">MCP / CLI</div><h3>Điều khiển từ công cụ khác</h3><p>Có MCP server để client như Claude Desktop / Cursor quản lý bot, kênh và tác vụ trong phạm vi API được giới hạn; có CLI cho script/CI.</p></div>
+<div class="card"><div class="tag">Voice</div><h3>Đọc và nói câu trả lời</h3><p>Hỗ trợ một số nhà cung cấp giọng nói như ElevenLabs, Fish Audio, Grok và Chatterbox local; tùy nền tảng và cấu hình.</p></div>
+<div class="card"><div class="tag">Team templates</div><h3>Nhập đội bot từ Markdown</h3><p>Import bộ bot / playbook theo cấu trúc Markdown; kết nối và routine vẫn cần người dùng duyệt/bật.</p></div>
+</div>
+</section>
+<section id="architecture"><h2>3. Kiến trúc hoạt động</h2>
+<p>Ở chế độ desktop, có hai phần chính: ứng dụng giao diện và harness server. Giao diện gửi lệnh HTTP; server quản lý tiến trình agent, nhận sự kiện và đẩy luồng cập nhật về giao diện qua SSE.</p>
+<pre>Người dùng
+   │ chat / yêu cầu công việc
+   ▼
+OpenMausBot Desktop (React + Electron)
+   │ HTTP commands       ▲ SSE events
+   ▼                     │
+Harness Server (127.0.0.1:8799)
+   ├── Driver registry / event bus
+   ├── Permission broker (Allow / Deny)
+   ├── Claude CLI
+   ├── Codex CLI
+   ├── Grok CLI
+   ├── Boat cloud computer (tuỳ chọn)
+   └── Composio connected apps (tuỳ chọn)</pre>
+<p>Trạng thái, transcript và cấu hình local mặc định nằm trong thư mục <code>~/.openmausbot</code>. Trên Windows, thư mục home tương ứng là thư mục người dùng; không nên tự ý xóa thư mục dữ liệu này khi gỡ app.</p>
+<div class="note">Phân biệt hai cách triển khai: <b>Desktop app</b> phù hợp khi muốn bot chạy CLI trên chính máy đang dùng. <b>Self-host server</b> phù hợp khi muốn chạy harness trên máy chủ rồi kết nối desktop / điện thoại từ xa. Đây không phải cùng một kiểu cài đặt.</div>
+</section>
+<section id="requirements"><h2>4. Điều kiện cài đặt</h2>
+<table><thead><tr><th>Thành phần</th><th>Yêu cầu / ghi chú</th></tr></thead><tbody>
+<tr><td>Windows</td><td>Bản phát hành Windows x64; installer cài theo user, không cần quyền admin. SmartScreen có thể cảnh báo vì installer chưa ký code.</td></tr>
+<tr><td>Ubuntu Desktop</td><td>Ubuntu 24.04 x64; bản desktop đang ở trạng thái beta, GNOME là desktop được hỗ trợ.</td></tr>
+<tr><td>Node.js</td><td>Node 24+ khi chạy từ source hoặc dùng CLI self-host theo tài liệu.</td></tr>
+<tr><td>Package manager</td><td>pnpm khi build / chạy source.</td></tr>
+<tr><td>Agent CLI</td><td>Ít nhất một trong các CLI: <code>claude</code>, <code>codex</code>, <code>grok</code>; phải cài và đăng nhập riêng.</td></tr>
+<tr><td>Tài khoản / model</td><td>Đăng nhập hoặc cấu hình engine có quyền truy cập model. OpenMausBot không bao gồm subscription của nhà cung cấp.</td></tr>
+<tr><td>Tuỳ chọn</td><td>Composio key, Boat API key, ElevenLabs / Fish Audio key chỉ cần khi dùng các tích hợp tương ứng.</td></tr>
+</tbody></table>
+<p>Không thấy dự án công bố một mức RAM/CPU tối thiểu chung đủ tin cậy trong phần hướng dẫn được kiểm tra. Nhu cầu thực tế phụ thuộc agent CLI, model, browser và desktop ảo anh bật.</p>
+</section>
+<section id="windows"><h2>5. Cài trên Windows — cách dễ nhất</h2>
+<div class="good"><b>Khuyến nghị:</b> Với máy Windows của anh, nên bắt đầu bằng bản installer chính thức, không cần clone source hay cài pnpm để dùng app.</div>
+<div class="step"><div class="num">1</div><div><b>Tải installer</b><p>Mở trang <a href="https://github.com/milind-soni/OpenMausBot/releases/latest" target="_blank">GitHub Releases – Latest</a> và tải file <code>OpenMausBot-setup.exe</code> cho Windows x64.</p></div></div>
+<div class="step"><div class="num">2</div><div><b>Cài đặt</b><p>Chạy file setup. Installer hiện được mô tả là per-user, không cần admin. Nếu Windows SmartScreen báo Unknown publisher, chỉ tiếp tục khi anh đã tải đúng từ trang Releases chính thức: More info → Run anyway.</p></div></div>
+<div class="step"><div class="num">3</div><div><b>Kiểm tra agent CLI hiện có</b><p>Mở PowerShell và chạy:</p><pre><button class="copy" onclick="copyCode(this)">Copy</button>node -v
+claude --version
+codex --version</pre><p>Không nhất thiết phải có cả Claude lẫn Codex. Cài ít nhất một CLI và đăng nhập thành công. Nếu lệnh CLI chưa được nhận diện, xử lý PATH / cài CLI trước.</p></div></div>
+<div class="step"><div class="num">4</div><div><b>Mở OpenMausBot và tạo bot</b><p>Hoàn thành onboarding, chọn engine / model khả dụng. Tạo bot thử nghiệm, gửi yêu cầu đơn giản rồi kiểm tra luồng trả lời và thẻ xin quyền.</p></div></div>
+<div class="step"><div class="num">5</div><div><b>Thử Computer</b><p>Mở panel Computer, chọn môi trường cloud / Local VM hoặc This computer nếu muốn agent điều khiển máy Windows. Bắt đầu bằng một tác vụ không nhạy cảm và duyệt từng hành động.</p></div></div>
+<div class="warn"><b>Lưu ý Windows:</b> Theo bảng trạng thái hiện tại của dự án, local bot control được hỗ trợ trên Windows x64, nhưng tính năng explicit preview-only local screen capture được ghi là unavailable. Đừng hiểu hai tính năng này là một.</div>
+</section>
+<section id="source"><h2>6. Chạy từ source (Windows / macOS / Ubuntu)</h2>
+<p>Chỉ dùng cách này nếu muốn phát triển, sửa code hoặc chạy phiên bản từ repository. Yêu cầu Node 24+, pnpm và ít nhất một agent CLI đã đăng nhập.</p>
+<h3>PowerShell / Terminal</h3>
+<pre><button class="copy" onclick="copyCode(this)">Copy</button>git clone https://github.com/milind-soni/OpenMausBot
+cd OpenMausBot
+
+pnpm install</pre>
+<p>Mở ba terminal riêng và giữ các tiến trình chạy:</p>
+<pre><button class="copy" onclick="copyCode(this)">Copy</button># Terminal 1: harness server
+pnpm dev:server
+
+# Terminal 2: giao diện web dev
+pnpm dev
+
+# Terminal 3: Electron desktop
+pnpm dev:desktop</pre>
+<p>Địa chỉ mặc định trong môi trường phát triển: giao diện <code>http://127.0.0.1:5199</code>, harness <code>127.0.0.1:8799</code>.</p>
+<p>Kiểm tra chất lượng / build:</p>
+<pre><button class="copy" onclick="copyCode(this)">Copy</button>pnpm typecheck
+pnpm test
+pnpm build
+pnpm check:electron</pre>
+<p>Đóng gói trên Windows:</p>
+<pre><button class="copy" onclick="copyCode(this)">Copy</button>pnpm package:win</pre>
+</section>
+<section id="ubuntu"><h2>7. Ubuntu Desktop</h2>
+<p>Ubuntu 24.04 x64 có bản <code>.deb</code> và AppImage, nhưng trạng thái desktop được đánh dấu beta. GNOME là desktop được hỗ trợ. Tải từ <a href="https://github.com/milind-soni/OpenMausBot/releases/latest" target="_blank">Releases</a>.</p>
+<h3>Cài gói .deb (khuyến nghị theo dự án)</h3>
+<pre><button class="copy" onclick="copyCode(this)">Copy</button>sudo apt install ./OpenMausBot-amd64.deb</pre>
+<h3>Chạy AppImage</h3>
+<pre><button class="copy" onclick="copyCode(this)">Copy</button>chmod +x OpenMausBot.AppImage
+./OpenMausBot.AppImage</pre>
+<p>Cài và đăng nhập các CLI agent dưới đúng user Linux sẽ chạy OpenMausBot. Local control trên Ubuntu chỉ beta và có khác biệt lớn giữa Xorg và Wayland: Xorg có opt-in; Wayland hiện bị khóa theo safety gate. Chat, cloud và Local VM vẫn có thể dùng.</p>
+</section>
+<section id="vps"><h2>8. Cài trên VPS / self-host</h2>
+<p>Có hai mô hình đáng phân biệt:</p>
+<div class="grid">
+<div class="card"><div class="tag">Mô hình A</div><h3>Agent ở máy cá nhân, VPS làm máy tính từ xa</h3><p>OpenMausBot và CLI agent ở Windows / máy cá nhân. VPS chỉ cung cấp remote desktop cho bot qua mô hình BYO VPS. Phù hợp khi muốn giữ Claude Code / Codex trên máy mình.</p></div>
+<div class="card"><div class="tag">Mô hình B</div><h3>Harness chạy trên VPS</h3><p>Server chạy trên Ubuntu VPS; desktop app hoặc điện thoại pair vào server. Cần chuẩn bị đường truy cập an toàn và cài agent CLI ở đúng user chạy service nếu muốn agent chạy trên VPS.</p></div>
+</div>
+<h3>8.1. Node CLI trên Ubuntu VPS</h3>
+<p>Yêu cầu Node 24+. Cài / đăng nhập agent CLI trước, sau đó chạy setup:</p>
+<pre><button class="copy" onclick="copyCode(this)">Copy</button>npx openmausbot setup</pre>
+<p>Chọn đúng một cách truy cập phù hợp. Ví dụ:</p>
+<table><thead><tr><th>Điều kiện</th><th>Lệnh</th></tr></thead><tbody>
+<tr><td>Đã có HTTPS reverse proxy</td><td><code>npx openmausbot serve --public-url https://maus.example.com</code></td></tr>
+<tr><td>Có domain và mở được 80/443</td><td><code>npx openmausbot serve --domain maus.example.com</code></td></tr>
+<tr><td>Dùng Tailscale trên server và thiết bị</td><td><code>npx openmausbot serve --tailscale</code></td></tr>
+<tr><td>Chỉ truy cập trong LAN</td><td><code>npx openmausbot serve --lan</code></td></tr>
+<tr><td>Không có domain / tunnel sẵn</td><td><code>npx openmausbot login</code><br><code>npx openmausbot serve --tunnel</code></td></tr>
+</tbody></table>
+<p>Khi server chạy, nó in pairing link/code. Trên desktop app chọn <b>＋ → Connect to a server</b>, dán link. Pairing code dùng một lần và có thời hạn 10 phút; tạo code mới bằng <code>npx openmausbot pair</code>.</p>
+<h3>8.2. Docker Compose trên VPS có domain</h3>
+<p>Trên Ubuntu 22.04 / 24.04 x86-64 mới, tài liệu dự án có installer tự kiểm tra máy chủ và triển khai Docker + HTTPS:</p>
+<pre><button class="copy" onclick="copyCode(this)">Copy</button># Chỉ kiểm tra điều kiện máy chủ, không thay đổi hệ thống
+curl -fsSL https://raw.githubusercontent.com/milind-soni/OpenMausBot/main/deploy/install.sh | sudo sh -s -- --check
+
+# Cài đặt (thay bằng domain của anh)
+curl -fsSL https://raw.githubusercontent.com/milind-soni/OpenMausBot/main/deploy/install.sh | sudo sh -s -- --domain maus.example.com
+
+# Lấy pairing link/code
+cd /opt/openmausbot
+sudo docker compose exec omb openmausbot pair</pre>
+<p>Installer ghi dữ liệu ở <code>/opt/openmausbot</code>; xem tài liệu Deploy on a VPS trước khi chạy để biết các kiểm tra, file được tạo và dịch vụ bên ngoài được liên hệ.</p>
+<h3>8.3. Docker Compose thủ công trong mạng riêng</h3>
+<pre><button class="copy" onclick="copyCode(this)">Copy</button>git clone https://github.com/milind-soni/OpenMausBot
+cd OpenMausBot
+
+docker compose up -d --build
+docker compose exec omb openmausbot pair</pre>
+<p>Mặc định tài liệu đưa ra địa chỉ localhost:8080. Nếu cho thiết bị khác trong LAN truy cập, phải cấu hình bind/public URL theo hướng dẫn Compose; không phơi HTTP thuần ra Internet.</p>
+<div class="warn"><b>Quan trọng cho VPS:</b> Không tự mở port 8799 ra Internet. Harness mặc định nghe ở <code>127.0.0.1:8799</code>; hãy dùng Tailscale, tunnel hoặc HTTPS reverse proxy đúng cấu hình. Pairing code không thay thế TLS hay firewall.</div>
+<h3>8.4. Chạy nền bằng systemd</h3>
+<pre><button class="copy" onclick="copyCode(this)">Copy</button># Cài service với cách truy cập phù hợp
+npx openmausbot service install --tailscale
+
+# Tạo pairing code khi cần
+npx openmausbot pair</pre>
+<p>Lệnh service install tạo systemd unit trên Linux (hoặc launchd trên macOS) và in các lệnh sudo cần thiết. Dùng cùng user hệ điều hành cho setup và service; kiểm tra hướng dẫn self-hosting trước khi triển khai thật.</p>
+</section>
+<section id="agents"><h2>9. Kết nối Claude Code, Codex, Grok và engine riêng</h2>
+<p>OpenMausBot liệt kê các CLI agent được cài và đăng nhập trên máy. Các agent được nhắc trong README là Claude, Codex và Grok. Mỗi bot có thể chọn model phù hợp trong model picker, tùy provider và phiên bản CLI đang hoạt động.</p>
+<ul><li><b>Claude Code:</b> cài CLI và đăng nhập bằng tài khoản / phương thức được Anthropic hỗ trợ.</li><li><b>Codex:</b> cài CLI và xác thực theo tài liệu OpenAI.</li><li><b>Grok CLI:</b> cài CLI tương ứng và xác thực theo tài liệu xAI.</li></ul>
+<p>README cũng nêu khả năng cấu hình custom CLI binary hoặc wrapper tại Settings → Engines. Tài liệu custom engines mô tả thêm việc tích hợp CLI hỗ trợ ACP hoặc endpoint tương thích OpenAI.</p>
+<div class="note"><b>Liên quan 9Router / OmniRoute:</b> Có thể nghiên cứu cấu hình custom engine / wrapper để chuyển request tới endpoint tương thích, nhưng không nên mặc định rằng chỉ nhập API URL là mọi tính năng CLI hoạt động. CLI agent có thể có cơ chế đăng nhập, tool protocol và quyền riêng. Cần kiểm tra tài liệu <a href="https://github.com/milind-soni/OpenMausBot/blob/main/docs/custom-engines.md" target="_blank">Custom Engines</a> và thử nghiệm với một bot riêng trước.</div>
+</section>
+<section id="integrations"><h2>10. Tích hợp và chi phí</h2>
+<table><thead><tr><th>Dịch vụ / credential</th><th>Dùng để làm gì?</th><th>Có bắt buộc?</th></tr></thead><tbody>
+<tr><td>Claude / Codex / Grok CLI</td><td>Model và agent backend</td><td>Cần ít nhất một CLI để chat với agent</td></tr>
+<tr><td>Composio project key</td><td>Gmail, Slack, GitHub, Notion và các app khác</td><td>Không; chỉ cần khi kết nối app</td></tr>
+<tr><td>Boat API key</td><td>Máy Linux cloud riêng có desktop / terminal</td><td>Không; dịch vụ bên thứ ba, có thể tính phí sau trial</td></tr>
+<tr><td>ElevenLabs / Fish Audio</td><td>Giọng nói, đọc câu trả lời / hội thoại</td><td>Không; tùy engine và nền tảng</td></tr>
+<tr><td>Chatterbox local</td><td>Giọng nói qua server local</td><td>Không; cần tự triển khai</td></tr>
+</tbody></table>
+<p>Chat local cơ bản không cần các key tích hợp nói trên. Tuy nhiên, chi phí model vẫn phụ thuộc subscription / API của provider; Boat và một số dịch vụ bên thứ ba có thể phát sinh phí. “Open source” không có nghĩa là mọi dịch vụ cloud đều miễn phí.</p>
+</section>
+<section id="security"><h2>11. Bảo mật — cần đọc trước khi cho Agent làm việc</h2>
+<ul>
+<li><b>Giữ harness ở loopback:</b> mặc định server dùng <code>127.0.0.1:8799</code>. Không port-forward trực tiếp cổng này ra Internet.</li>
+<li><b>Dùng kênh truy cập có mã hóa:</b> Tailscale, tunnel hoặc HTTPS reverse proxy. HTTP chỉ nên dùng trong mạng riêng được kiểm soát.</li>
+<li><b>Pair từng thiết bị:</b> pairing code dùng một lần, thời hạn ngắn. Không gửi code lên chat công khai hoặc lưu trong ảnh/video hướng dẫn.</li>
+<li><b>Duyệt thao tác:</b> kiểm tra lệnh shell, file edit, đăng nhập và thao tác gửi/xóa dữ liệu trước khi Allow.</li>
+<li><b>Tách môi trường:</b> ưu tiên cloud computer / Local VM cho tác vụ thử nghiệm; không cấp quyền vào thư mục chứa SSH key, token hoặc dữ liệu quan trọng nếu không cần.</li>
+<li><b>Quản lý key:</b> chỉ nhập key trong app chính thức, không commit vào Git, không đưa vào prompt hoặc ảnh chụp màn hình.</li>
+<li><b>Cẩn trọng multi-user:</b> tài liệu self-hosting có cảnh báo về loopback trust khi nhiều người dùng chung server. Cấu hình access control trước khi mở cho nhóm.</li>
+</ul>
+<div class="warn">AI Agent có thể chạy lệnh và tương tác với ứng dụng. Chỉ cấp quyền tối thiểu cần thiết; không bật auto-approve toàn bộ trên máy có dữ liệu nhạy cảm.</div>
+</section>
+<section id="workflow"><h2>12. Ví dụ workflow thực tế</h2>
+<h3>Đội AI cho công việc DEVKIT AI</h3>
+<table><thead><tr><th>Bot</th><th>Nhiệm vụ</th><th>Công cụ gợi ý</th></tr></thead><tbody>
+<tr><td>Researcher</td><td>Đọc repo, tài liệu, changelog; tổng hợp tính năng và nguồn</td><td>Browser / GitHub connector</td></tr>
+<tr><td>Developer</td><td>Kiểm tra code, sửa lỗi, viết test trong project</td><td>Claude Code hoặc Codex CLI</td></tr>
+<tr><td>SEO Analyst</td><td>Phân tích từ khóa, cấu trúc bài, đề xuất tối ưu</td><td>Browser + app kết nối phù hợp</td></tr>
+<tr><td>Content Writer</td><td>Viết outline, kịch bản video, mô tả và checklist</td><td>Model + tài liệu dự án</td></tr>
+<tr><td>QA</td><td>Chạy test, kiểm tra giao diện và báo lỗi</td><td>Computer / Local VM</td></tr>
+</tbody></table>
+<p>Ví dụ yêu cầu cho bot Developer:</p>
+<pre>Đọc README và hướng dẫn dự án trước.
+Phân tích lỗi trong module đăng nhập.
+Không sửa file ngay.
+Hãy liệt kê nguyên nhân có khả năng cao, file liên quan
+và kế hoạch kiểm tra. Chờ tôi duyệt trước khi thay đổi.</pre>
+<p>Ví dụ routine:</p>
+<pre>Mỗi ngày làm việc lúc 8:30:
+- Kiểm tra các issue GitHub mới của repo đã kết nối.
+- Nhóm theo mức độ nghiêm trọng.
+- Tóm tắt thành báo cáo ngắn.
+- Không tự đóng issue hoặc gửi bình luận.</pre>
+</section>
+<section id="limits"><h2>13. Giới hạn và trạng thái cần lưu ý</h2>
+<ul>
+<li>Dự án tự mô tả là “early but real”: luồng message → agent → tool → approval → computer use đã chạy end-to-end, nhưng vẫn còn góc cạnh.</li>
+<li>Ubuntu desktop đang beta; Wayland chưa cho bot điều khiển host do safety gate. Xorg có opt-in nhưng cũng beta.</li>
+<li>Windows hỗ trợ local bot control, nhưng preview-only local screen capture được ghi là unavailable.</li>
+<li>Cloud computer Boat và Composio là dịch vụ bên thứ ba; tài khoản, điều khoản và chi phí riêng.</li>
+<li>Webhook receiver mặc định local; muốn nhận sự kiện từ Internet cần thiết kế relay/proxy riêng theo hướng dẫn, không mở toàn bộ API.</li>
+<li>Không nên coi đây là nền tảng “AI tự chạy vô hạn không cần giám sát”. Approval, giới hạn quyền và kiểm tra kết quả vẫn rất quan trọng.</li>
+</ul>
+</section>
+<section id="faq"><h2>14. FAQ & tài liệu chính thức</h2>
+<h3>OpenMausBot có miễn phí không?</h3><p>Phần mềm lõi mã nguồn mở theo Apache 2.0 (ngoại lệ thư mục enterprise có điều khoản riêng). Model, subscription, cloud computer và tích hợp bên thứ ba có thể tốn phí.</p>
+<h3>Có cần Docker để cài Windows không?</h3><p>Không nếu dùng installer desktop phát hành. Docker là một lựa chọn cho triển khai self-host server.</p>
+<h3>Có chạy trên VPS không có domain không?</h3><p>Có thể dùng Tailscale hoặc tunnel theo tài liệu. Không nên dùng HTTP public trực tiếp. Docker installer một lệnh cho VPS yêu cầu domain trỏ tới server.</p>
+<h3>OpenMausBot có tự chứa Claude / GPT không?</h3><p>Không. Đây là lớp điều phối Agent; anh phải cài / xác thực CLI hoặc cấu hình engine có quyền truy cập model.</p>
+<h3>Nên bắt đầu thế nào?</h3><p>Cài desktop trên Windows, kết nối một CLI đã đăng nhập, tạo một bot thử nghiệm, sau đó mới thử computer use và integrations. Chỉ chuyển sang self-host VPS khi đã rõ nhu cầu truy cập từ xa.</p>
+<h3>Nguồn tham khảo</h3>
+<ul>
+<li><a href="https://github.com/milind-soni/OpenMausBot" target="_blank">GitHub repository / README</a></li>
+<li><a href="https://github.com/milind-soni/OpenMausBot/releases/latest" target="_blank">Latest releases / bộ cài chính thức</a></li>
+<li><a href="https://github.com/milind-soni/OpenMausBot/blob/main/docs/self-hosting.md" target="_blank">Self-hosting server guide</a></li>
+<li><a href="https://github.com/milind-soni/OpenMausBot/blob/main/docs/custom-engines.md" target="_blank">Custom engines</a></li>
+<li><a href="https://github.com/milind-soni/OpenMausBot/blob/main/docs/linux-desktop.md" target="_blank">Ubuntu Desktop guide</a></li>
+<li><a href="https://github.com/milind-soni/OpenMausBot/blob/main/LICENSING.md" target="_blank">Licensing details</a></li>
+<li><a href="https://github.com/milind-soni/OpenMausBot/blob/main/SECURITY.md" target="_blank">Security policy</a></li>
+</ul>
+<div class="good"><b>Đề xuất triển khai:</b> Với nhu cầu dùng Claude Code / Codex và làm việc trên Windows, bắt đầu bằng bản desktop Windows x64. Khi đã chạy ổn mới thử cấu hình custom engine (nếu muốn dùng endpoint riêng) và kết nối VPS qua Tailscale. Không cần đưa toàn bộ agent lên VPS ngay từ đầu.</div>
+</section>
+</article></main>
+<footer><div class="wrap">Tài liệu biên soạn bằng tiếng Việt dựa trên README và tài liệu chính thức của repository tại thời điểm 17/11/2026. Tên lệnh, tính năng và trạng thái nền tảng có thể thay đổi theo release. Luôn kiểm tra trang Releases và tài liệu upstream trước khi triển khai production.</div></footer>
+</div>
+<script>
+function copyCode(btn){const pre=btn.parentElement;const code=pre.innerText.replace(/^Copy\\s*/,'');navigator.clipboard.writeText(code).then(()=>{const old=btn.textContent;btn.textContent='Đã copy';setTimeout(()=>btn.textContent=old,1300)}).catch(()=>{btn.textContent='Copy lỗi'})}
+</script>
+</body></html>
