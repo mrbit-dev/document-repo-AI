@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cẩm Nang Toàn Diện Về Claude Code | Tổng Quan, So Sánh & Cấu Hình</title>
+  <meta name="description" content="Hướng dẫn chi tiết về Claude Code: Tổng quan, kiến trúc kỹ thuật, lý do tối ưu cho lập trình, so sánh với Codex và Antigravity, hướng dẫn cài đặt và cấu hình settings.json với các nhà cung cấp AI thứ 3.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#fbf7f4',
+              100: '#f6ede6',
+              200: '#eddbcf',
+              300: '#dfc0ad',
+              400: '#ce9d84',
+              500: '#c17f60',
+              600: '#d97706',
+              700: '#9d5236',
+              800: '#7f4430',
+              900: '#673a2b',
+              claude: '#d97706',
+              accent: '#cc785c'
+            },
+            dark: {
+              bg: '#0c0e14',
+              card: '#131722',
+              surface: '#1b2030',
+              border: '#262d42'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0c0e14;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #262d42;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #d97706;
+    }
+
+    .glass-card {
+      background: rgba(19, 23, 34, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-hover:hover {
+      border-color: rgba(217, 119, 6, 0.4);
+      box-shadow: 0 10px 30px -10px rgba(217, 119, 6, 0.15);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #f97316 0%, #fbbf24 50%, #f43f5e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .gradient-antigravity {
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .code-glow {
+      box-shadow: 0 0 25px -5px rgba(217, 119, 6, 0.12);
+    }
+  </style>
+</head>
+<body class="bg-[#0c0e14] text-slate-200 font-sans antialiased selection:bg-brand-claude selection:text-white">
+
+  <!-- Navbar -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-[#0c0e14]/85 backdrop-blur-md border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 via-orange-500 to-amber-400 flex items-center justify-center shadow-lg shadow-amber-500/20 font-mono font-bold text-slate-950 text-xl">
+          &gt;_
+        </div>
+        <div>
+          <span class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            Claude Code <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">Deep Dive</span>
+          </span>
+          <p class="text-[11px] text-slate-400">Comprehensive Engineering Guide</p>
+        </div>
+      </div>
+      
+      <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-300">
+        <a href="#tong-quan" class="hover:text-amber-400 transition-colors">Tổng Quan</a>
+        <a href="#tai-sao-tot" class="hover:text-amber-400 transition-colors">Ưu Điểm</a>
+        <a href="#cong-nghe" class="hover:text-amber-400 transition-colors">Công Nghệ</a>
+        <a href="#so-sanh" class="hover:text-amber-400 transition-colors">So Sánh Agent</a>
+        <a href="#cai-dat" class="hover:text-amber-400 transition-colors">Cài Đặt</a>
+        <a href="#settings-json" class="hover:text-amber-400 transition-colors">Settings & 3rd Party</a>
+      </nav>
+
+      <div class="flex items-center space-x-3">
+        <a href="#cai-dat" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-600 to-orange-500 text-white text-xs font-semibold hover:from-amber-500 hover:to-orange-400 transition-all shadow-md shadow-orange-500/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          Bắt Đầu Ngay
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-32 pb-20 overflow-hidden border-b border-slate-800/60">
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-tr from-amber-600/15 via-orange-500/10 to-transparent blur-3xl rounded-full"></div>
+      <div class="absolute top-10 right-10 w-96 h-96 bg-indigo-600/10 blur-3xl rounded-full"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <div class="text-center max-w-3xl mx-auto">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/80 text-xs font-medium text-amber-400 mb-6 shadow-inner">
+          <span class="flex h-2 w-2 rounded-full bg-amber-400 animate-pulse"></span>
+          Anthropic's Agentic Coding CLI
+        </div>
+        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+          Khai Phá Kỷ Nguyên <br>
+          <span class="gradient-text">Lập Trình Agentic Với Claude Code</span>
+        </h1>
+        <p class="text-lg text-slate-300 mb-8 leading-relaxed">
+          Không đơn thuần là autocomplete hay chat hỗ trợ, <strong class="text-white">Claude Code</strong> là một AI Agent tự chủ hoạt động trực tiếp trong Terminal của bạn. Nó đọc hiểu toàn bộ codebase, tự động sửa đổi tệp tin, thực thi lệnh shell, chạy test và giải quyết lỗi theo chu trình tự chữa lành.
+        </p>
+
+        <div class="flex flex-wrap justify-center gap-4 text-sm font-semibold">
+          <a href="#tong-quan" class="px-6 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white hover:bg-slate-700/70 hover:border-slate-600 transition-all flex items-center gap-2">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Tổng Quan & Công Nghệ
+          </a>
+          <a href="#so-sanh" class="px-6 py-3 rounded-xl bg-slate-800/50 border border-slate-700/60 text-slate-300 hover:text-white hover:bg-slate-800 transition-all flex items-center gap-2">
+            <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            So Sánh: Claude Code vs Codex vs Antigravity
+          </a>
+          <a href="#settings-json" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-orange-500 text-white hover:from-amber-500 hover:to-orange-400 transition-all flex items-center gap-2 shadow-lg shadow-orange-500/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            Cấu Hình Settings & 3rd Party AI
+          </a>
+        </div>
+
+        <!-- Terminal Preview Simulation -->
+        <div class="mt-12 text-left bg-dark-card border border-dark-border rounded-2xl overflow-hidden shadow-2xl code-glow font-mono text-xs sm:text-sm">
+          <div class="bg-dark-surface px-4 py-3 flex items-center justify-between border-b border-dark-border">
+            <div class="flex items-center space-x-2">
+              <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+              <span class="text-slate-400 font-mono text-xs ml-2">bash - claude</span>
+            </div>
+            <span class="text-[11px] text-amber-400/80 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">Claude 3.7 Sonnet Active</span>
+          </div>
+          <div class="p-5 space-y-3 leading-relaxed text-slate-300">
+            <div class="flex items-center gap-2 text-slate-400">
+              <span class="text-emerald-400 font-bold">$</span>
+              <span>claude "Fix authentication race condition in auth.service.ts and verify with tests"</span>
+            </div>
+            <div class="text-amber-400 font-semibold flex items-center gap-2">
+              <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+              Thinking: Analyzing project structure, searching for auth.service.ts...
+            </div>
+            <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800 text-slate-400 text-xs">
+              <div>→ Tool: <span class="text-sky-300">FileSearch</span> ("auth.service.ts") ➔ Found: <code class="text-white">src/services/auth.service.ts</code></div>
+              <div>→ Tool: <span class="text-sky-300">FileEdit</span> ("src/services/auth.service.ts") ➔ Applied mutex lock to token refresh</div>
+              <div>→ Tool: <span class="text-sky-300">Bash</span> ("npm test auth.service.spec.ts") ➔ <span class="text-emerald-400 font-bold">14 passed, 0 failed</span></div>
+            </div>
+            <div class="text-emerald-400">
+              ✔ Fixed race condition by implementing a mutex lock on concurrent refresh calls. All unit tests passed!
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-24">
+
+    <!-- Section 1: Tổng quan Claude Code -->
+    <section id="tong-quan" class="scroll-mt-24">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">Mục 01</span>
+        <h2 class="text-3xl font-bold text-white tracking-tight">Tổng Quan Về Claude Code</h2>
+      </div>
+      <p class="text-slate-400 text-base max-w-3xl mb-8">
+        Claude Code là công cụ lập trình dòng lệnh (CLI - Command Line Interface) được phát triển bởi <strong>Anthropic</strong>. Được xây dựng để trở thành một "đồng đội kỹ thuật", nó biến cửa sổ terminal thông thường thành một trung tâm điều phối phần mềm tự hành.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card glass-card-hover p-6 rounded-2xl transition-all">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Vận Hành Tại Terminal (Terminal-Native)</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Không cần rời khỏi môi trường dòng lệnh. Claude Code tương tác trực tiếp với file system, git, terminal commands, linter và build tools.
+          </p>
+        </div>
+
+        <div class="glass-card glass-card-hover p-6 rounded-2xl transition-all">
+          <div class="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400 mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Vòng Lặp Agentic Tự Quyết (Agent Loop)</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Thay vì chỉ trả về text để bạn copy/paste, Claude Code tự đặt ra kế hoạch, thực hiện từng bước, xem kết quả đầu ra (feedback), và tự sửa lỗi nếu lệnh gặp sự cố.
+          </p>
+        </div>
+
+        <div class="glass-card glass-card-hover p-6 rounded-2xl transition-all">
+          <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mb-4">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Đọc Hiểu Codebase Toàn Cục</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Duyệt cây thư mục, tìm kiếm mã nguồn qua ripgrep, đọc tệp có chọn lọc giúp nắm bắt kiến trúc tổng thể của cả dự án lớn hàng triệu dòng code mà không tràn context.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Tại sao Claude Code tốt cho lập trình? -->
+    <section id="tai-sao-tot" class="scroll-mt-24">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">Mục 02</span>
+        <h2 class="text-3xl font-bold text-white tracking-tight">Tại Sao Claude Code Lại Xuất Sắc Cho Lập Trình?</h2>
+      </div>
+      <p class="text-slate-400 text-base max-w-3xl mb-10">
+        Khác biệt căn bản giữa một Chatbot thông thường và Claude Code nằm ở tính <strong>thực chiến</strong> và khả năng <strong>tự sửa sai trong môi trường runtime thật</strong>.
+      </p>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <div class="space-y-6">
+          <div class="flex items-start gap-4 p-5 rounded-2xl bg-dark-card border border-dark-border">
+            <div class="p-3 rounded-xl bg-amber-500/10 text-amber-400 font-bold text-xl">01</div>
+            <div>
+              <h4 class="text-lg font-bold text-white mb-1">Mô Hình Tư Duy Đỉnh Cao (Claude 3.7 Sonnet)</h4>
+              <p class="text-sm text-slate-400 leading-relaxed">
+                Tích hợp khả năng <em>Hybrid Extended Thinking</em> (suy nghĩ kéo dài trước khi hành động). Claude Code cân nhắc các edge-case, phân tích dependency trước khi bắt tay viết code, giảm thiểu tối đa bug hồi quy (regression bugs).
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4 p-5 rounded-2xl bg-dark-card border border-dark-border">
+            <div class="p-3 rounded-xl bg-orange-500/10 text-orange-400 font-bold text-xl">02</div>
+            <div>
+              <h4 class="text-lg font-bold text-white mb-1">Cơ Chế "Self-Healing" (Tự Chẩn Đoán & Sửa Lỗi)</h4>
+              <p class="text-sm text-slate-400 leading-relaxed">
+                Khi sửa code, nó tự chạy test suite hoặc linter. Nếu có lỗi biên dịch hoặc test failed, Claude Code tự đọc stack trace, quay lại file nguồn để sửa và chạy lại test cho đến khi toàn bộ passed.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4 p-5 rounded-2xl bg-dark-card border border-dark-border">
+            <div class="p-3 rounded-xl bg-rose-500/10 text-rose-400 font-bold text-xl">03</div>
+            <div>
+              <h4 class="text-lg font-bold text-white mb-1">Giữ Nhà Phát Triển Trong Trạng Thái "Flow"</h4>
+              <p class="text-sm text-slate-400 leading-relaxed">
+                Không phải alt-tab sang browser để copy code, không phải giải thích cấu trúc thư mục từ đầu. Bạn chỉ cần gõ prompt ngắn gọn bằng tiếng Anh hoặc tiếng Việt ngay tại terminal của project.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="flex items-start gap-4 p-5 rounded-2xl bg-dark-card border border-dark-border">
+            <div class="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 font-bold text-xl">04</div>
+            <div>
+              <h4 class="text-lg font-bold text-white mb-1">Git Workflows & An Toàn Mã Nguồn</h4>
+              <p class="text-sm text-slate-400 leading-relaxed">
+                Tự động kiểm tra <code class="text-emerald-300">git status</code>, tạo branch mới, commit với message chuẩn Conventional Commits, giải quyết conflict và tạo Pull Request mà không phá hỏng git tree.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4 p-5 rounded-2xl bg-dark-card border border-dark-border">
+            <div class="p-3 rounded-xl bg-sky-500/10 text-sky-400 font-bold text-xl">05</div>
+            <div>
+              <h4 class="text-lg font-bold text-white mb-1">Cơ Chế Phân Quyền Bảo Mật (Permission Guardrails)</h4>
+              <p class="text-sm text-slate-400 leading-relaxed">
+                Mỗi thao tác nguy hiểm (chạy script lạ, rm file, push git) đều yêu cầu người dùng xác nhận hoặc tuân thủ danh sách allowlist được định nghĩa trong file cấu hình, đảm bảo tính bảo mật cho doanh nghiệp.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4 p-5 rounded-2xl bg-dark-card border border-dark-border">
+            <div class="p-3 rounded-xl bg-purple-500/10 text-purple-400 font-bold text-xl">06</div>
+            <div>
+              <h4 class="text-lg font-bold text-white mb-1">Tối Ưu Hóa Ngữ Cảnh Bằng File Slice</h4>
+              <p class="text-sm text-slate-400 leading-relaxed">
+                Thay vì đọc cả file 5000 dòng, công cụ chỉ đọc các hàm/block liên quan (slice read) và chỉnh sửa bằng chuỗi thay thế chính xác (pattern replacement), giúp tiết kiệm đáng kể chi phí token.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Section 3: Công nghệ gì được sử dụng? -->
+    <section id="cong-nghe" class="scroll-mt-24">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">Mục 03</span>
+        <h2 class="text-3xl font-bold text-white tracking-tight">Kiến Trúc & Công Nghệ Của Claude Code</h2>
+      </div>
+      <p class="text-slate-400 text-base max-w-3xl mb-8">
+        Claude Code được xây dựng trên một ngăn xếp công nghệ tinh gọn, tốc độ cao và mở rộng theo chuẩn công nghiệp:
+      </p>
+
+      <div class="bg-dark-card border border-dark-border rounded-2xl p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <div class="p-5 rounded-xl bg-dark-surface border border-slate-800">
+            <div class="text-amber-400 mb-3">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+            </div>
+            <h4 class="text-base font-bold text-white mb-1">TypeScript & Node.js</h4>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Toàn bộ CLI được viết bằng TypeScript/Node.js, đóng gói qua NPM. Tương thích đa nền tảng (macOS, Linux, Windows qua WSL/PowerShell).
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-dark-surface border border-slate-800">
+            <div class="text-orange-400 mb-3">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            </div>
+            <h4 class="text-base font-bold text-white mb-1">LLM Claude 3.7 / 3.5 Sonnet</h4>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Hỗ trợ Function Calling & Structured Tool Outputs với độ chính xác cao nhất thế giới trong các bài benchmark SWE-bench Verified.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-dark-surface border border-slate-800">
+            <div class="text-sky-400 mb-3">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            </div>
+            <h4 class="text-base font-bold text-white mb-1">Model Context Protocol (MCP)</h4>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Tích hợp chuẩn giao thức MCP của Anthropic, cho phép gắn thêm các Server mở rộng (PostgreSQL, GitHub API, Jira, Local docs) như công cụ mở rộng.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-xl bg-dark-surface border border-slate-800">
+            <div class="text-emerald-400 mb-3">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <h4 class="text-base font-bold text-white mb-1">Ripgrep & Fast AST Search</h4>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Sử dụng các công cụ indexing tốc độ cao như ripgrep, glob, git tree để định vị chính xác vị trí lỗi chỉ trong vài mili-giây.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Architecture Flowchart -->
+        <div class="mt-8 pt-8 border-t border-slate-800">
+          <h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Quy Trình Hoạt Động (Agentic Execution Loop):</h4>
+          <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-mono">
+            <div class="w-full md:w-auto p-4 rounded-xl bg-slate-900 border border-slate-800 text-center flex-1">
+              <span class="text-amber-400 font-bold block mb-1">1. User Prompt</span>
+              <span class="text-slate-400">Yêu cầu từ lập trình viên</span>
+            </div>
+            <div class="text-slate-500 font-bold">➔</div>
+            <div class="w-full md:w-auto p-4 rounded-xl bg-slate-900 border border-amber-500/30 text-center flex-1 shadow-lg shadow-amber-500/5">
+              <span class="text-amber-300 font-bold block mb-1">2. Reasoning & Plan</span>
+              <span class="text-slate-400">Suy luận & vạch chiến lược</span>
+            </div>
+            <div class="text-slate-500 font-bold">➔</div>
+            <div class="w-full md:w-auto p-4 rounded-xl bg-slate-900 border border-slate-800 text-center flex-1">
+              <span class="text-sky-400 font-bold block mb-1">3. Tool Invocations</span>
+              <span class="text-slate-400">Grep, Read, Edit, Bash</span>
+            </div>
+            <div class="text-slate-500 font-bold">➔</div>
+            <div class="w-full md:w-auto p-4 rounded-xl bg-slate-900 border border-emerald-500/30 text-center flex-1">
+              <span class="text-emerald-400 font-bold block mb-1">4. Feedback & Test</span>
+              <span class="text-slate-400">Kiểm thử & Tự sửa nếu fail</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: So sánh với OpenAI Codex và Antigravity -->
+    <section id="so-sanh" class="scroll-mt-24">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">Mục 04</span>
+        <h2 class="text-3xl font-bold text-white tracking-tight">So Sánh: Claude Code vs. Codex vs. Antigravity</h2>
+      </div>
+      <p class="text-slate-400 text-base max-w-3xl mb-8">
+        Ba đại diện tiêu biểu cho 3 triết lý thiết kế AI lập trình hiện đại nhất:
+      </p>
+
+      <!-- Comparison Matrix Table -->
+      <div class="overflow-x-auto rounded-2xl border border-dark-border bg-dark-card shadow-2xl">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-dark-border bg-dark-surface/90 text-xs font-mono uppercase">
+              <th class="p-4 text-slate-400">Tiêu Chí Đánh Giá</th>
+              <th class="p-4 text-amber-400 font-bold bg-amber-500/5 border-x border-amber-500/20">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                  Claude Code (Anthropic)
+                </div>
+              </th>
+              <th class="p-4 text-sky-400 font-bold">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
+                  OpenAI Codex / Copilot
+                </div>
+              </th>
+              <th class="p-4 text-purple-400 font-bold">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                  Antigravity (Google DeepMind)
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-dark-border text-slate-300">
+            <tr>
+              <td class="p-4 font-semibold text-white">Môi Trường Hoạt Động Chính</td>
+              <td class="p-4 bg-amber-500/5 border-x border-amber-500/20 font-medium text-amber-300">
+                Terminal CLI độc lập (Command Line Native)
+              </td>
+              <td class="p-4 text-slate-400">IDE Extension (VS Code, JetBrains) + Web PRs</td>
+              <td class="p-4 text-slate-400">IDE Tích Hợp Đa Năng + CLI (<code class="text-purple-300">agy</code>)</td>
+            </tr>
+
+            <tr>
+              <td class="p-4 font-semibold text-white">Mô Hình Trí Tuệ Nhân Tạo</td>
+              <td class="p-4 bg-amber-500/5 border-x border-amber-500/20">
+                Claude 3.7 Sonnet (Hybrid Thinking) & 3.5 Sonnet
+              </td>
+              <td class="p-4 text-slate-400">GPT-4o, OpenAI o1 / o3-mini</td>
+              <td class="p-4 text-slate-400">Gemini 2.5/3 Pro & Flash (Context lên đến hàng triệu tokens)</td>
+            </tr>
+
+            <tr>
+              <td class="p-4 font-semibold text-white">Cơ Chế Tự Quyết (Agentic Loop)</td>
+              <td class="p-4 bg-amber-500/5 border-x border-amber-500/20 text-emerald-400 font-medium">
+                Cực mạnh: Tự chạy shell, git, đọc log, lặp lại đến khi test xanh
+              </td>
+              <td class="p-4 text-slate-400">Trung bình: Đa phần tập trung gợi ý code (Tab completion) và chat hỗ trợ</td>
+              <td class="p-4 text-purple-300 font-medium">Cực mạnh: Đa tác tử (Swarm), chạy subagent song song</td>
+            </tr>
+
+            <tr>
+              <td class="p-4 font-semibold text-white">Thao Tác Trình Duyệt / UI</td>
+              <td class="p-4 bg-amber-500/5 border-x border-amber-500/20 text-slate-400">
+                Chỉ Terminal (có thể mở web qua link hoặc lệnh shell)
+              </td>
+              <td class="p-4 text-slate-400">Không hỗ trợ trực tiếp (chủ yếu là code editor)</td>
+              <td class="p-4 text-emerald-400 font-medium">
+                Có sẵn Browser Subagent & Generative UI tương tác trực tiếp
+              </td>
+            </tr>
+
+            <tr>
+              <td class="p-4 font-semibold text-white">Hệ Thống Mở Rộng & Plugin</td>
+              <td class="p-4 bg-amber-500/5 border-x border-amber-500/20">
+                Chuẩn mở MCP (Model Context Protocol)
+              </td>
+              <td class="p-4 text-slate-400">GitHub Copilot Extensions, API riêng</td>
+              <td class="p-4 text-slate-400">Native MCP, Builtin Skills & Custom Rules</td>
+            </tr>
+
+            <tr>
+              <td class="p-4 font-semibold text-white">Hỗ Trợ Nhà Cung Cấp 3rd Party</td>
+              <td class="p-4 bg-amber-500/5 border-x border-amber-500/20 text-emerald-400 font-semibold">
+                Linh hoạt: Anthropic, AWS Bedrock, Google Vertex, OpenRouter, LiteLLM
+              </td>
+              <td class="p-4 text-rose-400">Khép kín trong hệ sinh thái OpenAI / Microsoft</td>
+              <td class="p-4 text-slate-400">Được tối ưu hóa sâu theo hệ sinh thái Google Gemini</td>
+            </tr>
+
+            <tr>
+              <td class="p-4 font-semibold text-white">Phù Hợp Nhất Cho</td>
+              <td class="p-4 bg-amber-500/5 border-x border-amber-500/20 font-medium text-white">
+                Kỹ sư muốn bàn giao trọn vẹn 1 tính năng/refactor lớn từ Terminal
+              </td>
+              <td class="p-4 text-slate-400">Lập trình viên muốn code nhanh hàng ngày trong VS Code</td>
+              <td class="p-4 text-slate-400">Dự án lớn cần phối hợp nhiều agent song song, duyệt web và trực quan hóa</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Quick Analysis Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        <div class="p-5 rounded-2xl bg-amber-500/5 border border-amber-500/20">
+          <div class="text-amber-400 font-bold text-sm mb-2 flex items-center gap-2">
+            <span>🔥</span> Thế mạnh của Claude Code
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Khả năng giải quyết vấn đề kỹ thuật phức tạp (SWE-bench top tier), tư duy lập luận logic cực chuẩn, không làm ô nhiễm code, tuân thủ chặt chẽ styleguide hiện tại của dự án.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-sky-500/5 border border-sky-500/20">
+          <div class="text-sky-400 font-bold text-sm mb-2 flex items-center gap-2">
+            <span>⚡</span> Thế mạnh của Codex / Copilot
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Độ trễ (latency) siêu thấp khi gõ phím, tự động hoàn thành dòng code tiếp theo mượt mà, tích hợp sẵn sâu vào kho repo trên GitHub và hệ thống CI/CD Actions.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-purple-500/5 border border-purple-500/20">
+          <div class="text-purple-400 font-bold text-sm mb-2 flex items-center gap-2">
+            <span>🚀</span> Thế mạnh của Antigravity
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Kiến trúc Swarm đa tác tử (nhiều AI cùng làm việc song song), cửa sổ ngữ cảnh khổng lồ triệu tokens, tạo Artifacts trực quan và tích hợp cả trình duyệt thật để kiểm thử trực tiếp.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Hướng dẫn cài đặt -->
+    <section id="cai-dat" class="scroll-mt-24">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">Mục 05</span>
+        <h2 class="text-3xl font-bold text-white tracking-tight">Hướng Dẫn Cài Đặt Claude Code</h2>
+      </div>
+      <p class="text-slate-400 text-base max-w-3xl mb-8">
+        Yêu cầu tiên quyết: <strong>Node.js phiên bản 18+</strong> (khuyên dùng Node 20 hoặc 22) và công cụ <strong>Git</strong> đã cài sẵn trên máy.
+      </p>
+
+      <div class="space-y-6">
+        <!-- Step 1 -->
+        <div class="p-6 rounded-2xl bg-dark-card border border-dark-border">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-xs font-black">1</span>
+              Cài đặt Global qua NPM hoặc Npx
+            </span>
+            <span class="text-xs text-slate-500 font-mono">Terminal / PowerShell</span>
+          </div>
+          <div class="bg-dark-surface p-4 rounded-xl border border-slate-800 flex items-center justify-between font-mono text-sm">
+            <code class="text-amber-300">npm install -g @anthropic-ai/claude-code</code>
+            <button onclick="copyCode(this, 'npm install -g @anthropic-ai/claude-code')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded border border-slate-700 transition-colors">
+              Copy
+            </button>
+          </div>
+          <p class="text-xs text-slate-400 mt-2">
+            Hoặc nếu bạn muốn chạy ngay mà không cần cài global: <code class="text-slate-300 bg-slate-800/80 px-2 py-0.5 rounded">npx @anthropic-ai/claude-code</code>
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="p-6 rounded-2xl bg-dark-card border border-dark-border">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-xs font-black">2</span>
+              Điều hướng đến thư mục dự án của bạn
+            </span>
+            <span class="text-xs text-slate-500 font-mono">Workspace directory</span>
+          </div>
+          <div class="bg-dark-surface p-4 rounded-xl border border-slate-800 flex items-center justify-between font-mono text-sm">
+            <code class="text-amber-300">cd path/to/your/project && claude</code>
+            <button onclick="copyCode(this, 'cd path/to/your/project && claude')" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded border border-slate-700 transition-colors">
+              Copy
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="p-6 rounded-2xl bg-dark-card border border-dark-border">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-bold text-white flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-xs font-black">3</span>
+              Xác thực tài khoản (Authentication)
+            </span>
+            <span class="text-xs text-slate-500 font-mono">Anthropic Console / API Key</span>
+          </div>
+          <p class="text-sm text-slate-300 mb-3 leading-relaxed">
+            Trong lần chạy đầu tiên, Claude Code sẽ tự động mở trình duyệt để bạn đăng nhập qua tài khoản <strong>Anthropic Console</strong> hoặc bạn có thể thiết lập biến môi trường API Key:
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+            <div class="bg-dark-surface p-3 rounded-xl border border-slate-800">
+              <span class="text-slate-400 block mb-1"># macOS / Linux (Bash/Zsh):</span>
+              <code class="text-emerald-300">export ANTHROPIC_API_KEY="sk-ant-..."</code>
+            </div>
+            <div class="bg-dark-surface p-3 rounded-xl border border-slate-800">
+              <span class="text-slate-400 block mb-1"># Windows (PowerShell):</span>
+              <code class="text-emerald-300">$env:ANTHROPIC_API_KEY="sk-ant-..."</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6: Cấu hình settings.json & Nhà cung cấp AI thứ 3 -->
+    <section id="settings-json" class="scroll-mt-24">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">Mục 06</span>
+        <h2 class="text-3xl font-bold text-white tracking-tight">Cấu Hình settings.json & Nhà Cung Cấp AI Thứ 3</h2>
+      </div>
+      <p class="text-slate-400 text-base max-w-3xl mb-8">
+        Claude Code lưu trữ cấu hình linh hoạt. Bạn có thể định cấu hình model, giới hạn token, ngân sách tư duy (thinking budget), cũng như trỏ tới các nhà cung cấp bên thứ ba (OpenRouter, AWS Bedrock, Google Cloud Vertex, hoặc Proxy LiteLLM/Ollama).
+      </p>
+
+      <!-- Vị trí file cấu hình -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 text-xs font-mono">
+        <div class="p-4 rounded-xl bg-dark-card border border-dark-border">
+          <div class="text-amber-400 font-bold mb-1 flex items-center gap-2">
+            <span>🌐</span> Cấu hình Toàn Cục (Global Settings):
+          </div>
+          <p class="text-slate-400 mb-2 font-sans text-xs">Áp dụng cho mọi dự án trên máy tính của bạn:</p>
+          <ul class="text-slate-300 space-y-1">
+            <li>• Linux/macOS: <code class="text-amber-300">~/.claude/settings.json</code> hoặc <code class="text-amber-300">~/.claude.json</code></li>
+            <li>• Windows: <code class="text-amber-300">%USERPROFILE%\.claude\settings.json</code></li>
+          </ul>
+        </div>
+
+        <div class="p-4 rounded-xl bg-dark-card border border-dark-border">
+          <div class="text-sky-400 font-bold mb-1 flex items-center gap-2">
+            <span>📁</span> Cấu hình Theo Dự Án (Project Settings):
+          </div>
+          <p class="text-slate-400 mb-2 font-sans text-xs">Đặt trực tiếp trong thư mục gốc của repository:</p>
+          <ul class="text-slate-300 space-y-1">
+            <li>• File dự án: <code class="text-sky-300">./.claude/settings.json</code> hoặc <code class="text-sky-300">./.claude.json</code></li>
+            <li>• File quy chuẩn prompt: <code class="text-sky-300">./CLAUDE.md</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Interactive Config Generator -->
+      <div class="bg-dark-card border border-dark-border rounded-2xl overflow-hidden shadow-2xl">
+        <div class="p-6 border-b border-dark-border flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h3 class="text-lg font-bold text-white">Trình Tạo File Cấu Hình settings.json</h3>
+            <p class="text-xs text-slate-400">Chọn nhà cung cấp dịch vụ bên dưới để xem cấu hình mẫu tương ứng:</p>
+          </div>
+          
+          <!-- Provider Tabs -->
+          <div class="flex flex-wrap gap-2 text-xs font-semibold" id="providerTabs">
+            <button onclick="selectProvider('anthropic')" id="tab-anthropic" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold transition-all">
+              Anthropic Official
+            </button>
+            <button onclick="selectProvider('openrouter')" id="tab-openrouter" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all">
+              OpenRouter
+            </button>
+            <button onclick="selectProvider('bedrock')" id="tab-bedrock" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all">
+              AWS Bedrock
+            </button>
+            <button onclick="selectProvider('vertex')" id="tab-vertex" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all">
+              Google Cloud Vertex
+            </button>
+            <button onclick="selectProvider('litellm')" id="tab-litellm" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all">
+              LiteLLM / Local Ollama
+            </button>
+          </div>
+        </div>
+
+        <!-- Description Banner -->
+        <div id="providerDescription" class="px-6 py-3 bg-dark-surface/60 border-b border-dark-border text-xs text-slate-300">
+          <!-- Dynamic Text -->
+        </div>
+
+        <!-- Code Block -->
+        <div class="p-6 relative">
+          <button onclick="copyCurrentConfig()" class="absolute top-8 right-8 px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-mono text-amber-400 rounded-lg border border-slate-700 flex items-center gap-1.5 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+            <span id="copyBtnText">Sao Chép JSON</span>
+          </button>
+          <pre class="p-5 rounded-xl bg-slate-950 border border-slate-800/80 font-mono text-xs sm:text-sm text-slate-200 overflow-x-auto leading-relaxed"><code id="configJsonDisplay"></code></pre>
+        </div>
+
+        <!-- Additional Env Vars instructions for this provider -->
+        <div id="envVarSection" class="p-6 bg-dark-surface/40 border-t border-dark-border text-xs font-mono">
+          <!-- Dynamic Env var notes -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 7: Pro Tips & CLAUDE.md Best Practices -->
+    <section class="scroll-mt-24">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">Mẹo Chuyên Sâu</span>
+        <h2 class="text-2xl font-bold text-white tracking-tight">Quy Ước File CLAUDE.md Trong Dự Án</h2>
+      </div>
+      <p class="text-slate-400 text-sm max-w-3xl mb-6">
+        Giống như file <code>README.md</code> dành cho con người, <code>CLAUDE.md</code> là tệp quy chuẩn hướng dẫn dành riêng cho Claude Code ngay khi nó bước vào repository. Hãy đặt file này ở thư mục gốc:
+      </p>
+
+      <div class="bg-dark-card border border-dark-border rounded-xl p-5 font-mono text-xs text-slate-300">
+        <div class="text-amber-400 font-bold mb-2">// Ví dụ tệp ./CLAUDE.md</div>
+<pre class="text-slate-300 leading-relaxed">
+# Dự Án E-Commerce Backend (NestJS + PostgreSQL)
+
+## Lệnh Thường Dùng:
+- Khởi động dev: `npm run start:dev`
+- Chạy test unit: `npm run test`
+- Chạy test e2e: `npm run test:e2e`
+- Format & Lint: `npm run lint`
+
+## Nguyên Tắc Code:
+- Luôn sử dụng TypeScript Strict Mode.
+- Mọi service mới phải có file spec tương ứng.
+- Không sửa trực tiếp migration đã chạy, luôn tạo migration mới qua TypeORM.
+- Sử dụng Conventional Commits cho git (feat:, fix:, chore:, refactor:).
+</pre>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 bg-[#08090d] py-12 text-slate-500 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center space-x-3">
+        <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-mono font-bold text-sm">
+          CC
+        </div>
+        <span class="text-slate-400 font-semibold">Tài liệu tham khảo kỹ thuật Claude Code & Agent Ecosystem</span>
+      </div>
+      <p class="text-slate-500">
+        Được biên soạn chi tiết cho lập trình viên & kỹ sư AI. Hỗ trợ đầy đủ Claude 3.7 Sonnet, Codex và Antigravity.
+      </p>
+      <div class="flex items-center space-x-4 text-slate-400">
+        <a href="#tong-quan" class="hover:text-amber-400 transition-colors">Lên đầu trang ↑</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Interactive JavaScript logic for Settings Generator -->
+  <script>
+    const configs = {
+      anthropic: {
+        desc: "Cấu hình chuẩn sử dụng trực tiếp Anthropic API với mô hình Claude 3.7 Sonnet mới nhất cùng tính năng Extended Thinking (Suy nghĩ sâu) và kiểm soát quyền thực thi an toàn.",
+        json: {
+          "$schema": "https://json.schemastore.org/claude-code-settings.json",
+          "model": "claude-3-7-sonnet-latest",
+          "provider": "anthropic",
+          "apiKey": "sk-ant-api03-xxxxxxxxxxxxxxxxxxxx",
+          "maxThinkingTokens": 8192,
+          "enableExtendedThinking": true,
+          "autoUpdaterStatus": "enabled",
+          "permissions": {
+            "allowCommands": [
+              "npm test*",
+              "npm run lint*",
+              "git status",
+              "git diff",
+              "git log*"
+            ],
+            "denyCommands": [
+              "rm -rf /",
+              "git push --force*"
+            ]
+          },
+          "ignoredFiles": [
+            "**/.git/**",
+            "**/node_modules/**",
+            "**/.env",
+            "**/*.key"
+          ]
+        },
+        env: `
+<span class="text-amber-400 font-bold"># Biến Môi Trường (Nếu không đặt API Key trong settings.json):</span>
+export ANTHROPIC_API_KEY="sk-ant-api03-..."
+export CLAUDE_CODE_MODEL="claude-3-7-sonnet-latest"
+        `
+      },
+
+      openrouter: {
+        desc: "Sử dụng Claude Code thông qua OpenRouter. Bạn có thể tận dụng OpenRouter Credits hoặc chuyển sang các model như Claude 3.7, DeepSeek-R1, hoặc Qwen 2.5 Coder thông qua Base URL tương thích.",
+        json: {
+          "$schema": "https://json.schemastore.org/claude-code-settings.json",
+          "model": "anthropic/claude-3.7-sonnet",
+          "provider": "custom",
+          "baseUrl": "https://openrouter.ai/api/v1",
+          "apiKey": "sk-or-v1-xxxxxxxxxxxxxxxxxxxx",
+          "customHeaders": {
+            "HTTP-Referer": "https://github.com/anthropics/claude-code",
+            "X-Title": "Claude Code Terminal"
+          },
+          "maxTokens": 4096,
+          "permissions": {
+            "allowCommands": ["npm test", "git status"]
+          }
+        },
+        env: `
+<span class="text-amber-400 font-bold"># Thiết lập biến môi trường cho OpenRouter:</span>
+export ANTHROPIC_BASE_URL="https://openrouter.ai/api/v1"
+export ANTHROPIC_API_KEY="sk-or-v1-xxxxxxxxxxxxxxxxxxxx"
+export CLAUDE_CODE_MODEL="anthropic/claude-3.7-sonnet"
+        `
+      },
+
+      bedrock: {
+        desc: "Sử dụng tài nguyên AWS Bedrock của doanh nghiệp. Đảm bảo bạn đã cấp quyền IAM Bedrock InvokeModel và đã bật mô hình Claude 3.7 / 3.5 trong AWS Region tương ứng.",
+        json: {
+          "$schema": "https://json.schemastore.org/claude-code-settings.json",
+          "provider": "bedrock",
+          "model": "anthropic.claude-3-7-sonnet-20250219-v1:0",
+          "aws": {
+            "region": "us-east-1",
+            "profile": "default"
+          },
+          "maxThinkingTokens": 4096,
+          "enableExtendedThinking": true
+        },
+        env: `
+<span class="text-amber-400 font-bold"># Biến Môi Trường Xác Thực AWS:</span>
+export AWS_REGION="us-east-1"
+export AWS_ACCESS_KEY_ID="AKIAxxxxxxxxxxxxxxxx"
+export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+export AWS_SESSION_TOKEN="<tùy chọn nếu dùng SSO/STS>"
+        `
+      },
+
+      vertex: {
+        desc: "Sử dụng Claude qua Google Cloud Vertex AI (Model Garden). Thích hợp cho các công ty đã triển khai hạ tầng trên GCP với bảo mật Private Cloud.",
+        json: {
+          "$schema": "https://json.schemastore.org/claude-code-settings.json",
+          "provider": "vertex",
+          "model": "claude-3-7-sonnet@20250219",
+          "vertex": {
+            "projectId": "your-gcp-project-id",
+            "region": "us-central1"
+          }
+        },
+        env: `
+<span class="text-amber-400 font-bold"># Xác thực Google Cloud SDK (gcloud):</span>
+gcloud auth application-default login
+export ANTHROPIC_VERTEX_PROJECT_ID="your-gcp-project-id"
+export CLOUD_ML_REGION="us-central1"
+        `
+      },
+
+      litellm: {
+        desc: "Kết nối tới LiteLLM Proxy hoặc Local LLMs (Ollama / vLLM). Cho phép chạy mô hình offline nội bộ (như DeepSeek-Coder, Qwen2.5-Coder) với giao diện tương thích Anthropic API.",
+        json: {
+          "$schema": "https://json.schemastore.org/claude-code-settings.json",
+          "provider": "custom",
+          "baseUrl": "http://localhost:4000",
+          "apiKey": "sk-litellm-local-proxy-key",
+          "model": "ollama/qwen2.5-coder:32b",
+          "permissions": {
+            "allowCommands": ["npm test", "git status"]
+          }
+        },
+        env: `
+<span class="text-amber-400 font-bold"># Chạy LiteLLM Proxy cầu nối (Terminal riêng):</span>
+pip install litellm
+litellm --model ollama/qwen2.5-coder:32b --port 4000
+
+<span class="text-amber-400 font-bold"># Sau đó trỏ Claude Code tới Proxy:</span>
+export ANTHROPIC_BASE_URL="http://localhost:4000"
+export ANTHROPIC_API_KEY="sk-litellm-local-proxy-key"
+        `
+      }
+    };
+
+    let currentSelected = 'anthropic';
+
+    function selectProvider(key) {
+      currentSelected = key;
+      const data = configs[key];
+      
+      // Update Tab Styles
+      ['anthropic', 'openrouter', 'bedrock', 'vertex', 'litellm'].forEach(tabKey => {
+        const btn = document.getElementById(`tab-${tabKey}`);
+        if (tabKey === key) {
+          btn.className = "px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold transition-all shadow-md shadow-amber-500/20";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all";
+        }
+      });
+
+      // Update Text
+      document.getElementById('providerDescription').innerHTML = `<p>${data.desc}</p>`;
+      document.getElementById('configJsonDisplay').textContent = JSON.stringify(data.json, null, 2);
+      document.getElementById('envVarSection').innerHTML = `<pre class="text-slate-300 leading-relaxed">${data.env.trim()}</pre>`;
+    }
+
+    function copyCurrentConfig() {
+      const jsonStr = JSON.stringify(configs[currentSelected].json, null, 2);
+      navigator.clipboard.writeText(jsonStr).then(() => {
+        const btnText = document.getElementById('copyBtnText');
+        btnText.textContent = "Đã Sao Chép!";
+        setTimeout(() => {
+          btnText.textContent = "Sao Chép JSON";
+        }, 2000);
+      });
+    }
+
+    function copyCode(btn, text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const oldText = btn.textContent;
+        btn.textContent = "Copied!";
+        btn.classList.add("bg-emerald-600", "text-white");
+        setTimeout(() => {
+          btn.textContent = oldText;
+          btn.classList.remove("bg-emerald-600", "text-white");
+        }, 2000);
+      });
+    }
+
+    // Initialize with Anthropic
+    selectProvider('anthropic');
+  </script>
+</body>
+</html>
